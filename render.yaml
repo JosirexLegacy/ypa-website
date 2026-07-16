@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: ypa-directus
+    runtime: node
+    rootDir: backend/directus
+    buildCommand: npm install
+    startCommand: npx directus start
+    preDeployCommand: npx directus database migrate:latest
+    envVars:
+      - key: DB_CLIENT
+        value: pg
+      - key: DATABASE_URL
+        value: postgresql://neondb_owner:npg_uGhX5Y3wxOWf@ep-cold-dream-avj0fhii-pooler.c-11.us-east-1.aws.neon.tech/ypa%20db?sslmode=require&channel_binding=require
+      - key: KEY
+        value: (your generated key)
+      - key: SECRET
+        value: (your generated key)
+      - key: ADMIN_EMAIL
+        value: admin@ypa.com
+      - key: ADMIN_PASSWORD
+        value: YPAdmin2026!
+      - key: PUBLIC_URL
+        value: https://ypa-directus.onrender.com
+      - key: CORS_ENABLED
+        value: "true"
+      - key: CORS_ORIGIN
+        value: https://ypa-website-b3uh-ashy.vercel.app
+      - key: STORAGE_LOCAL_DRIVER
+        value: local
+      - key: STORAGE_LOCAL_ROOT
+        value: ./uploads
