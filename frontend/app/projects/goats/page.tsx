@@ -96,7 +96,7 @@ async function getGoatsContent() {
 // ============================================================
 // SCROLL REVEAL
 // ============================================================
-const ScrollReveal = ({ children, delay = 0, className = "" }) => {
+const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 

@@ -594,7 +594,7 @@ export default function GalleryPage() {
                 {isVideo(selectedItem) ? (
                   <div className="relative pt-[56.25%]">
                     <iframe
-                      src={getVideoEmbedUrl(selectedItem.video_url)}
+                      src={getVideoEmbedUrl(selectedItem.video_url) ?? undefined}
                       className="absolute inset-0 w-full h-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen

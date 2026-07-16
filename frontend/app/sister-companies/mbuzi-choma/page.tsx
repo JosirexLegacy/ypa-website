@@ -75,11 +75,11 @@ const getImageUrl = (imageId: string) => {
 };
 
 // ============================================================
-// ANIMATIONS
+// ANIMATIONS - FIXED: added "as any" to ease array
 // ============================================================
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as any } }
 };
 
 const staggerContainer = {

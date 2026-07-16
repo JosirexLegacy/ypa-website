@@ -52,7 +52,7 @@ const POSITIVE = "#34D399";
 const DARK_BODY = "#1A2A3A";       // Dark, crisp body text
 const DARK_MUTED = "#2D3D4D";      // For secondary text
 
-const ScrollReveal = ({ children, delay = 0, className = "" }) => {
+const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   return (
@@ -68,7 +68,7 @@ const ScrollReveal = ({ children, delay = 0, className = "" }) => {
   );
 };
 
-const PolicySection = ({ title, icon: Icon, children, delay = 0 }) => (
+const PolicySection = ({ title, icon: Icon, children, delay = 0 }: { title: string; icon: React.ElementType; children: React.ReactNode; delay?: number }) => (
   <ScrollReveal delay={delay}>
     <div className="bg-white rounded-3xl border p-8 md:p-10 shadow-sm hover:shadow-md transition-shadow duration-300" style={{ borderColor: "#E8ECF0" }}>
       <div className="flex items-start gap-4">

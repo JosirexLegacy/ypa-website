@@ -48,7 +48,15 @@ const SKY = "#7EC8FF";
 const GOLD = "#F0B429";
 const MIST = "#F6F8FA";
 
-const ScrollReveal = ({ children, delay = 0, className = "" }) => {
+const ScrollReveal = ({ 
+  children, 
+  delay = 0, 
+  className = "" 
+}: { 
+  children: React.ReactNode; 
+  delay?: number; 
+  className?: string; 
+}) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   return (
@@ -64,7 +72,17 @@ const ScrollReveal = ({ children, delay = 0, className = "" }) => {
   );
 };
 
-const TermsSection = ({ title, icon: Icon, children, delay = 0 }) => (
+const TermsSection = ({ 
+  title, 
+  icon: Icon, 
+  children, 
+  delay = 0 
+}: { 
+  title: string; 
+  icon: React.ElementType; 
+  children: React.ReactNode; 
+  delay?: number; 
+}) => (
   <ScrollReveal delay={delay}>
     <div className="bg-white/80 backdrop-blur-sm rounded-3xl border p-8 md:p-10 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ borderColor: "#E8ECF0", background: "rgba(255,255,255,0.8)" }}>
       <div className="flex items-start gap-4">

@@ -180,7 +180,7 @@ const Navigation = () => {
                   </button>
                 ) : (
                   <Link 
-                    href={item.href}
+                    href={item.href || '#'} // ✅ FIXED: fallback to '#' if href is undefined
                     className={`relative px-3 py-2 text-sm font-light transition-all duration-300 rounded-md ${
                       item.name === "Home" && !isScrolled
                         ? 'text-white hover:text-white/80'
@@ -290,7 +290,7 @@ const Navigation = () => {
                       </div>
                     ) : (
                       <Link
-                        href={item.href}
+                        href={item.href || '#'} // ✅ FIXED: fallback for mobile as well
                         className="block px-5 py-3 text-sm text-[#676767] hover:text-[#1A3A5C] hover:bg-[#F5F9FF] transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
                       >

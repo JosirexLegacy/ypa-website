@@ -321,8 +321,8 @@ const SectionRail = () => {
   );
 };
 
-/// ============================================================
-// SCROLL REVEAL (copy from homepage) – fixed types
+// ============================================================
+// SCROLL REVEAL
 // ============================================================
 const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
   const ref = useRef(null);
@@ -341,6 +341,7 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React
     </motion.div>
   );
 };
+
 // ============================================================
 // HERO
 // ============================================================
@@ -356,7 +357,7 @@ const LINEUP = [
     ],
     gradient: "from-[#060B14] via-[#0E2540] to-[#2196F3]/40",
     href: "/projects/goats",
-    glyph: "goat" as const,
+    image: `${API_URL}/assets/3012af2e-1cc2-404b-9e46-956c56cc1912`,
     aura: SKY,
   },
   {
@@ -370,7 +371,7 @@ const LINEUP = [
     ],
     gradient: "from-[#0E2540] via-[#153455] to-[#060B14]",
     href: "/projects/maize",
-    glyph: "maize" as const,
+    image: "https://tse2.mm.bing.net/th/id/OIP.WJJALakxa5_OhQvljSbsKwHaE8?r=0&w=600&h=400&rs=1&pid=ImgDetMain&o=7&rm=3",
     aura: GOLD,
   },
   {
@@ -384,334 +385,95 @@ const LINEUP = [
     ],
     gradient: "from-[#060B14] via-[#0E2540]/80 to-[#153455]",
     href: "/sacco",
-    glyph: "money" as const,
+    image: "https://farm6.staticflickr.com/5603/15475865161_634b055363.jpg",
     aura: POSITIVE,
   },
 ];
 
-// GlowDefs, GoatGlyph, MaizeGlyph, MoneyGlyph, HeroVisual
-const GlowDefs = () => (
-  <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
-    <defs>
-      <filter id="heroGlow" x="-60%" y="-60%" width="220%" height="220%">
-        <feGaussianBlur stdDeviation="4.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <linearGradient id="goatGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor={SKY} />
-        <stop offset="100%" stopColor={BLUE} />
-      </linearGradient>
-      <linearGradient id="maizeGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#FFE08A" />
-        <stop offset="100%" stopColor={GOLD} />
-      </linearGradient>
-      <linearGradient id="moneyGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#6EE7B7" />
-        <stop offset="100%" stopColor={POSITIVE} />
-      </linearGradient>
-      <linearGradient id="coinGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#FFE08A" />
-        <stop offset="100%" stopColor={GOLD} />
-      </linearGradient>
-    </defs>
-  </svg>
-);
-
-const GoatGlyph = () => {
+// ============================================================
+// HERO VISUAL — a real photograph per programme, staged like a
+// viewfinder rather than a rendered creature. This replaces the
+// old hand-drawn SVG animals: those needed 30+ elements animating
+// simultaneously behind an SVG blur filter, which is expensive to
+// re-rasterize every frame and was the actual source of the scroll
+// jank. This version runs on exactly two GPU-cheap transforms — a
+// crossfade and a slow zoom — full stop.
+const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
   const reduce = useReducedMotion();
-  const off = reduce ? {} : undefined;
+
   return (
-    <svg viewBox="0 0 320 320" className="w-full h-full">
-      <motion.g
-        fill="none"
-        stroke="url(#goatGrad)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        filter="url(#heroGlow)"
-        animate={off || { y: [0, -5, 0] }}
-        transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-      >
-        {/* horns — a slow shimmer instead of movement, so they read as catching light */}
-        <motion.path
-          d="M188 92 C176 62 182 32 210 16"
-          animate={off || { opacity: [0.75, 1, 0.75] }}
-          transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.path
-          d="M214 94 C226 66 246 44 268 34"
-          animate={off || { opacity: [0.75, 1, 0.75] }}
-          transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-        />
-        {/* ears — a little twitch */}
-        <motion.path
-          d="M177 108 C168 100 155 98 148 106"
-          animate={off || { x: [0, -3, 0] }}
-          transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.2 }}
-        />
-        <motion.path
-          d="M222 106 C230 98 242 97 249 104"
-          animate={off || { x: [0, 3, 0] }}
-          transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.6 }}
-        />
-        {/* head — a slow grazing nod */}
-        <motion.ellipse
-          cx="200"
-          cy="122"
-          rx="27"
-          ry="24"
-          animate={off || { y: [0, 3, 0, -2, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* body */}
-        <path d="M178 138 C150 150 118 158 98 182 C82 202 82 226 100 244 C122 262 162 266 197 258 C227 251 247 231 251 206 C254 185 246 160 226 141 C215 132 195 130 178 138 Z" />
-        {/* legs — alternating walk-in-place */}
-        <motion.path d="M118 244 L112 288" animate={off || { y: [0, -4, 0] }} transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.path d="M152 254 L149 292" animate={off || { y: [0, 4, 0] }} transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut", delay: 0.32 }} />
-        <motion.path d="M192 256 L194 294" animate={off || { y: [0, -4, 0] }} transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut", delay: 0.16 }} />
-        <motion.path d="M224 246 L232 286" animate={off || { y: [0, 4, 0] }} transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut", delay: 0.48 }} />
-        {/* tail — a wag */}
-        <motion.path
-          d="M248 198 C262 192 270 200 262 214 C256 224 244 222 240 212"
-          animate={off || { x: [0, 5, 0, -3, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.g>
-      {/* eye — a blink */}
-      <motion.circle
-        cx="207"
-        cy="118"
-        r="3.5"
-        fill={SKY}
-        animate={off || { opacity: [1, 1, 0.15, 1, 1] }}
-        transition={{ duration: 3.6, repeat: Infinity, times: [0, 0.88, 0.91, 0.94, 1] }}
+    <div className="relative w-full max-w-[440px] mx-auto aspect-[4/5]">
+      {/* glow — a single static blur that recolors on slide change via a
+          plain CSS transition, not a per-frame animation loop */}
+      <div
+        className="absolute inset-3 rounded-[2rem] blur-2xl transition-colors duration-[1200ms]"
+        style={{ background: item.aura, opacity: 0.3 }}
       />
-    </svg>
-  );
-};
 
-const KERNEL_TONES = ["#FFE08A", "#F0B429", "#E2790C"];
-
-const MaizeGlyph = () => {
-  const reduce = useReducedMotion();
-  const off = reduce ? {} : undefined;
-  const kernels = [];
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 3; col++) {
-      const y = 76 + row * 19;
-      const stagger = row % 2 === 0 ? 0 : 9;
-      const x = 132 + col * 20 + stagger;
-      const tone = KERNEL_TONES[(row + col) % KERNEL_TONES.length];
-      kernels.push({ x, y, tone, delay: (row + col) * 0.09, key: `${row}-${col}` });
-    }
-  }
-  return (
-    <svg viewBox="0 0 320 320" className="w-full h-full">
-      <g filter="url(#heroGlow)">
-        <path
-          d="M160 44 C186 44 202 64 202 92 L202 226 C202 258 186 280 160 280 C134 280 118 258 118 226 L118 92 C118 64 134 44 160 44 Z"
-          fill="none"
-          stroke="url(#maizeGrad)"
-          strokeWidth="3"
-        />
-        {/* kernels — a wave of light rolling down the cob, each in a different corn tone */}
-        {kernels.map((k) => (
-          <motion.circle
-            key={k.key}
-            cx={k.x}
-            cy={k.y}
-            r="4.4"
-            fill={k.tone}
-            animate={off || { opacity: [0.55, 1, 0.55], scale: [0.9, 1.05, 0.9] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut", delay: k.delay }}
-          />
-        ))}
-        {/* husk leaves — a gentle sway */}
-        <motion.path
-          d="M138 258 C100 268 78 296 66 320"
-          fill="none"
-          stroke="url(#maizeGrad)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          animate={off || { x: [0, -4, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.path
-          d="M182 258 C220 268 242 296 254 320"
-          fill="none"
-          stroke="url(#maizeGrad)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          animate={off || { x: [0, 4, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-        />
-        {/* silk tuft — a light flutter */}
-        <motion.path
-          d="M150 46 C144 28 148 12 160 2"
-          fill="none"
-          stroke="url(#maizeGrad)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          animate={off || { x: [0, -2, 0] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.path
-          d="M172 46 C180 28 182 12 174 2"
-          fill="none"
-          stroke="url(#maizeGrad)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          animate={off || { x: [0, 2, 0] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-        />
-      </g>
-    </svg>
-  );
-};
-
-const SPARKLES = [
-  { x: 92, y: 200, delay: 0 },
-  { x: 236, y: 150, delay: 0.9 },
-  { x: 190, y: 210, delay: 1.7 },
-];
-
-const MoneyGlyph = () => {
-  const reduce = useReducedMotion();
-  const off = reduce ? {} : undefined;
-  return (
-    <svg viewBox="0 0 320 320" className="w-full h-full">
-      <g filter="url(#heroGlow)">
-        {/* coin stack — gold, each settling into place with a slight stagger */}
-        <g fill="none" stroke="url(#coinGrad)" strokeWidth="3">
-          <motion.ellipse
-            cx="146" cy="240" rx="58" ry="19"
-            animate={off || { y: [0, -3, 0] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.ellipse
-            cx="153" cy="212" rx="58" ry="19"
-            animate={off || { y: [0, -3, 0] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
-          />
-          <motion.ellipse
-            cx="160" cy="184" rx="58" ry="19"
-            animate={off || { y: [0, -3, 0] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          />
-          <ellipse cx="160" cy="184" rx="40" ry="12" opacity="0.6" />
-        </g>
-        <circle cx="160" cy="184" r="9" fill="none" stroke="url(#coinGrad)" strokeWidth="2.5" />
-
-        {/* growth line — draws itself, then resets, on a loop */}
-        <motion.path
-          d="M62 262 L104 230 L142 248 L188 168 L246 96"
-          fill="none"
-          stroke="url(#moneyGrad)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          initial={{ pathLength: 0 }}
-          animate={off || { pathLength: [0, 1] }}
-          transition={{ duration: 2.6, repeat: Infinity, repeatType: "loop", repeatDelay: 1.2, ease: "easeInOut" }}
-        />
-        <path d="M222 96 L246 96 L246 120" fill="none" stroke="url(#moneyGrad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        {[
-          [104, 230],
-          [142, 248],
-          [188, 168],
-        ].map(([cx, cy], idx) => (
-          <motion.circle
-            key={idx}
-            cx={cx}
-            cy={cy}
-            r="3.5"
-            fill={POSITIVE}
-            animate={off || { opacity: [0, 1] }}
-            transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.2, delay: idx * 0.5, ease: "easeInOut" }}
-          />
-        ))}
-
-        {/* sparkle glints */}
-        {SPARKLES.map((s, idx) => (
-          <motion.g
-            key={idx}
-            animate={off || { opacity: [0, 1, 0], scale: [0.4, 1, 0.4] }}
-            transition={{ duration: 2, repeat: Infinity, delay: s.delay, ease: "easeInOut" }}
-            style={{ transformOrigin: `${s.x}px ${s.y}px` }}
-          >
-            <path d={`M${s.x - 6} ${s.y} L${s.x + 6} ${s.y}`} stroke={GOLD} strokeWidth="2" strokeLinecap="round" />
-            <path d={`M${s.x} ${s.y - 6} L${s.x} ${s.y + 6}`} stroke={GOLD} strokeWidth="2" strokeLinecap="round" />
-          </motion.g>
-        ))}
-      </g>
-    </svg>
-  );
-};
-
-const GLYPHS: Record<string, () => JSX.Element> = {
-  goat: GoatGlyph,
-  maize: MaizeGlyph,
-  money: MoneyGlyph,
-};
-
-const HeroVisual = ({ glyph, aura }: { glyph: string; aura: string }) => {
-  const reduce = useReducedMotion();
-  const Glyph = GLYPHS[glyph] || GoatGlyph;
-
-  return (
-    <div className="relative w-full max-w-[420px] mx-auto aspect-square">
-      <GlowDefs />
-
+      {/* one slow-rotating ring for texture — a single transform, no filter */}
       <motion.div
-        key={`aura-${aura}`}
-        animate={reduce ? { opacity: 0.5 } : { opacity: [0.35, 0.55, 0.35], scale: [1, 1.08, 1] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-[6%] rounded-full blur-3xl"
-        style={{ background: aura }}
-      />
-
-      <motion.svg
-        viewBox="0 0 320 320"
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-[-14px] rounded-[2.4rem] border pointer-events-none"
+        style={{ borderColor: "rgba(255,255,255,0.12)" }}
         animate={reduce ? {} : { rotate: 360 }}
-        transition={{ duration: 48, repeat: Infinity, ease: "linear" }}
-      >
-        <circle cx="160" cy="160" r="148" fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1" strokeDasharray="2 10" />
-        <circle cx="160" cy="12" r="4" fill={aura} />
-      </motion.svg>
-      <motion.svg
-        viewBox="0 0 320 320"
-        className="absolute inset-0 w-full h-full"
-        animate={reduce ? {} : { rotate: -360 }}
-        transition={{ duration: 64, repeat: Infinity, ease: "linear" }}
-      >
-        <circle cx="160" cy="160" r="128" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray="1 6" />
-      </motion.svg>
+        transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
+      />
 
-      <motion.div
-        animate={reduce ? {} : { y: [0, -12, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-[14%]"
+      <div
+        className="relative w-full h-full rounded-[2rem] overflow-hidden border"
+        style={{ borderColor: "rgba(255,255,255,0.14)", boxShadow: `0 30px 70px -24px ${item.aura}55` }}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={glyph}
-            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.85, filter: "blur(14px)" }}
-            animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.12, filter: "blur(14px)" }}
-            transition={{ duration: 1.1, ease: [0.25, 0.1, 0.25, 1] }}
-            className="w-full h-full"
-          >
-            <Glyph />
-          </motion.div>
+        <AnimatePresence>
+          <motion.img
+            key={item.image}
+            src={item.image}
+            alt={item.title}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, scale: reduce ? 1 : 1.1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: { duration: 0.7 },
+              scale: { duration: 7, ease: "linear" },
+            }}
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80";
+            }}
+          />
         </AnimatePresence>
-      </motion.div>
+
+        {/* scrim, static — keeps the tag legible over any photo */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "linear-gradient(to top, rgba(6,11,20,0.75) 0%, transparent 42%)" }}
+        />
+
+        {/* viewfinder corners — plain static SVG, zero animation cost */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <g stroke="rgba(255,255,255,0.55)" strokeWidth="0.6" fill="none">
+            <path d="M5 16 V6 H15" />
+            <path d="M85 6 H95 V16" />
+            <path d="M95 84 V94 H85" />
+            <path d="M15 94 H5 V84" />
+          </g>
+        </svg>
+
+        <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between">
+          <span className={`${mono.className} text-[10px] tracking-[0.12em] uppercase text-white/75`}>
+            {item.kicker}
+          </span>
+          <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
+            <span
+              className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-60"
+              style={{ background: item.aura }}
+            />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: item.aura }} />
+          </span>
+        </div>
+      </div>
     </div>
   );
 };
+
 
 const Hero = () => {
   const [i, setI] = useState(0);
@@ -847,7 +609,7 @@ const Hero = () => {
           </AnimatePresence>
 
           <div className="hidden lg:block">
-            <HeroVisual glyph={current.glyph} aura={current.aura} />
+            <HeroVisual item={current} />
           </div>
         </div>
       </div>
@@ -1090,7 +852,7 @@ const CONFIG_CARDS = [
 ];
 
 const TheLineup = () => {
-  const [hover, setHover] = useState(null);
+  const [hover, setHover] = useState<number | null>(null);
 
   return (
     <section id="lineup" className="px-6 md:px-14 py-24" style={{ background: INK }}>
@@ -1230,7 +992,7 @@ const TrustBar = () => {
 // ============================================================
 // SIGNAL — with "View all stories" link
 // ============================================================
-const Signal = ({ signalArticles }) => {
+const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
   if (!signalArticles || signalArticles.length === 0) return null;
 
   const featured = signalArticles.find((a) => a.big === true) || signalArticles[0] || null;
@@ -1372,7 +1134,7 @@ const MemberVoices = () => {
 // ============================================================
 // PRESS SIGNAL
 // ============================================================
-const PressSignal = ({ pressItems }) => {
+const PressSignal = ({ pressItems }: { pressItems: any[] }) => {
   const press = pressItems || [];
   if (press.length === 0) return null;
 
@@ -1401,7 +1163,7 @@ const PressSignal = ({ pressItems }) => {
 
       <div className="divide-y" style={{ borderColor: "#E8ECF0" }}>
         {press.slice(0, 3).map((item, i) => {
-          const Icon = typeIcons[item.type] || Newspaper;
+          const Icon = typeIcons[item.type as keyof typeof typeIcons] || Newspaper;
           return (
             <ScrollReveal key={i} delay={i * 0.06}>
               <Link href={item.link || "#"} target="_blank" className="group flex items-center gap-5 py-6">
@@ -1435,7 +1197,7 @@ const PressSignal = ({ pressItems }) => {
 // ============================================================
 // LIVE PANEL
 // ============================================================
-const LivePanel = ({ events, blogs }) => {
+const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
   const facts = [
     { icon: Target, title: "Our Mission", description: "Empowering Africa's youth through sustainable agribusiness and financial inclusion." },
     { icon: Heart, title: "Our Impact", description: "130,000+ goats under care. 1,000+ SACCO members. 12 branches across Uganda." },

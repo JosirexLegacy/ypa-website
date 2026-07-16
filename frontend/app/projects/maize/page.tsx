@@ -88,7 +88,17 @@ async function getMaizeContent() {
 // ============================================================
 // SCROLL REVEAL
 // ============================================================
-const ScrollReveal = ({ children, delay = 0, className = "" }) => {
+const ScrollReveal = ({
+  children,
+  delay = 0,
+  className = "",
+  style = {},
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+  style?: React.CSSProperties;
+}) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -99,6 +109,7 @@ const ScrollReveal = ({ children, delay = 0, className = "" }) => {
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
       transition={{ duration: 0.7, delay, ease: [0.25, 0.1, 0.25, 1] }}
       className={className}
+      style={style}          // <-- This applies the style prop
     >
       {children}
     </motion.div>

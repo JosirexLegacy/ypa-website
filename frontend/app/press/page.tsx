@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Navigation from "@/components/Navigation";
@@ -182,7 +182,8 @@ function Pagination({
   );
 }
 
-export default function PressPage() {
+// ===== PRESS CONTENT COMPONENT (uses useSearchParams) =====
+function PressContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -237,26 +238,20 @@ export default function PressPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#F8FBFF]">
-        <Navigation />
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <div className="text-center">
-            <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-12 h-12 border-4 border-[#E3F2FD] border-t-[#2196F3] rounded-full mx-auto"
-            />
-          </div>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-[#E3F2FD] border-t-[#2196F3] rounded-full mx-auto"
+          />
         </div>
-        <Footer />
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#F8FBFF] overflow-x-hidden">
-      <Navigation />
-
+    <>
       {/* ===== HERO - Compact ===== */}
       <section className="relative pt-24 pb-8 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#F0F7FE] via-white to-[#E8F4FD]"></div>
@@ -645,8 +640,29 @@ export default function PressPage() {
           </motion.div>
         </div>
       </section>
+    </>
+  );
+}
 
+// ===== MAIN EXPORT WITH SUSPENSE BOUNDARY =====
+export default function PressPage() {
+  return (
+    <main className="min-h-screen bg-[#F8FBFF] overflow-x-hidden">
+      <Navigation />
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-12 h-12 border-4 border-[#E3F2FD] border-t-[#2196F3] rounded-full mx-auto"
+            />
+          </div>
+        </div>
+      }>
+        <PressContent />
+      </Suspense>
       <Footer />
     </main>
   );
-} 
+}

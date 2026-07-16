@@ -302,7 +302,7 @@ export const Footer = () => {
           </div>
           <div className="relative flex justify-center">
             <div className="px-4 rounded-full" style={{ background: INK }}>
-              <SparklesIcon className="w-5 h-5" style={{ color: `${BLUE}60` }} />
+              <SparklesIcon className="w-5 h-5 text-[#2196F3]/60" />
             </div>
           </div>
         </div>
