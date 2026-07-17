@@ -32,7 +32,12 @@ import {
 } from 'lucide-react';
 
 // ============================================================
-// DATA FETCHING (UNCHANGED)
+// API BASE
+// ============================================================
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
+
+// ============================================================
+// DATA FETCHING
 // ============================================================
 export default function GalleryPage() {
   const [images, setImages] = useState<any[]>([]);
@@ -45,7 +50,7 @@ export default function GalleryPage() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const res = await fetch('http://localhost:8055/items/gallery', {
+        const res = await fetch(`${API_URL}/items/gallery`, {
           cache: 'no-store'
         });
         const data = await res.json();
@@ -59,7 +64,7 @@ export default function GalleryPage() {
     fetchImages();
   }, []);
 
-  // ✅ Helpers (UNCHANGED)
+  // ✅ Helpers
   const getVideoEmbedUrl = (url: string) => {
     if (!url) return null;
     const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
@@ -80,7 +85,7 @@ export default function GalleryPage() {
     return item.type === 'video' && item.video_url && getVideoEmbedUrl(item.video_url);
   };
 
-  // ✅ Keyboard navigation (UNCHANGED)
+  // ✅ Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedItem) return;
@@ -100,7 +105,7 @@ export default function GalleryPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedItem, images]);
 
-  // ✅ Categories (UNCHANGED)
+  // ✅ Categories
   const categories = ['all', ...new Set(images.map(item => item.category).filter(Boolean))];
   const featuredItems = images.filter((item: any) => item.featured === true);
   const regularItems = images.filter((item: any) => item.featured !== true);
@@ -108,7 +113,7 @@ export default function GalleryPage() {
     ? regularItems 
     : regularItems.filter(item => item.category === activeCategory);
 
-  // ✅ Size helper (UNCHANGED)
+  // ✅ Size helper
   const getItemSize = (index: number, total: number) => {
     if (viewMode === 'grid') return 'col-span-1 row-span-1';
     const patterns = [
@@ -151,7 +156,6 @@ export default function GalleryPage() {
 
       {/* ===== HERO - Futuristic with Grid ===== */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden">
-        {/* Background grid */}
         <div className="absolute inset-0" style={{
           backgroundImage: `
             linear-gradient(rgba(33,150,243,0.03) 1px, transparent 1px),
@@ -160,7 +164,6 @@ export default function GalleryPage() {
           backgroundSize: '80px 80px'
         }} />
         
-        {/* Animated glow orbs */}
         <motion.div 
           className="absolute top-[-20%] right-[-10%] w-[700px] h-[700px] rounded-full blur-3xl opacity-20"
           style={{ background: '#2196F3' }}
@@ -230,7 +233,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* ===== FILTERS & CONTROLS - Neon Glass ===== */}
+      {/* ===== FILTERS & CONTROLS ===== */}
       <div className="sticky top-20 z-30 flex justify-center px-4 -mt-6">
         <div
           className="inline-flex flex-wrap items-center gap-2 px-4 py-2 rounded-full transition-all duration-300"
@@ -282,7 +285,7 @@ export default function GalleryPage() {
         </div>
       </div>
 
-      {/* ===== FEATURED SECTION - Holographic Cards ===== */}
+      {/* ===== FEATURED SECTION ===== */}
       {featuredItems.length > 0 && activeCategory === 'all' && (
         <section className="px-6 py-16">
           <div className="container mx-auto max-w-6xl">
@@ -309,6 +312,7 @@ export default function GalleryPage() {
                             index === 1 ? 'lg:col-span-1 lg:row-span-1' : 
                             'lg:col-span-1 lg:row-span-1';
                 const height = index === 0 ? 'h-[500px] md:h-[600px]' : 'h-[300px] md:h-[350px]';
+                const imageUrl = item.image ? `${API_URL}/assets/${item.image}` : null;
                 
                 return (
                   <motion.div
@@ -330,15 +334,18 @@ export default function GalleryPage() {
                           alt={item.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
-                      ) : (
+                      ) : imageUrl ? (
                         <img
-                          src={`http://localhost:8055/assets/${item.image}`}
+                          src={imageUrl}
                           alt={item.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#0A0A0F]">
+                          <ImageIcon className="w-16 h-16 text-white/10" />
+                        </div>
                       )}
                       
-                      {/* Neon Overlay on Hover */}
                       <motion.div 
                         className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 via-[#0A0A0F]/30 to-transparent"
                         initial={{ opacity: 0 }}
@@ -346,7 +353,6 @@ export default function GalleryPage() {
                         transition={{ duration: 0.4 }}
                       />
                       
-                      {/* Glow border on hover */}
                       <motion.div 
                         className="absolute inset-0 rounded-2xl border-2 border-transparent"
                         whileHover={{ borderColor: '#2196F3', boxShadow: 'inset 0 0 30px rgba(33,150,243,0.2)' }}
@@ -403,7 +409,7 @@ export default function GalleryPage() {
         </section>
       )}
 
-      {/* ===== ALL ITEMS - Neon Masonry ===== */}
+      {/* ===== ALL ITEMS ===== */}
       <section id="gallery-grid" className={`px-6 py-16 ${featuredItems.length > 0 && activeCategory === 'all' ? 'bg-[#0A0A0F]' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <motion.div 
@@ -439,7 +445,7 @@ export default function GalleryPage() {
                 const isVideoItem = isVideo(item);
                 const thumbnail = isVideoItem 
                   ? getYouTubeThumbnail(item.video_url) 
-                  : `http://localhost:8055/assets/${item.image}`;
+                  : item.image ? `${API_URL}/assets/${item.image}` : null;
                 
                 const getHeight = () => {
                   if (viewMode === 'grid') return 'h-full';
@@ -465,11 +471,17 @@ export default function GalleryPage() {
                     className={`group relative cursor-pointer rounded-xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 shadow-lg hover:shadow-[0_20px_60px_-15px_rgba(33,150,243,0.2)] transition-all duration-500 ${size} ${getHeight()}`}
                   >
                     <div className="relative w-full h-full">
-                      <img
-                        src={thumbnail || '/images/placeholder.jpg'}
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
+                      {thumbnail ? (
+                        <img
+                          src={thumbnail}
+                          alt={item.title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#0A0A0F]">
+                          <ImageIcon className="w-12 h-12 text-white/10" />
+                        </div>
+                      )}
                       
                       {isVideoItem && (
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -531,7 +543,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* ===== LIGHTBOX - Futuristic ===== */}
+      {/* ===== LIGHTBOX ===== */}
       <AnimatePresence>
         {selectedItem && (
           <motion.div
@@ -602,7 +614,7 @@ export default function GalleryPage() {
                   </div>
                 ) : (
                   <img
-                    src={`http://localhost:8055/assets/${selectedItem.image}`}
+                    src={`${API_URL}/assets/${selectedItem.image}`}
                     alt={selectedItem.title}
                     className="w-full h-full object-contain max-h-[80vh]"
                   />
@@ -659,7 +671,7 @@ export default function GalleryPage() {
         )}
       </AnimatePresence>
 
-      {/* ===== CTA - Neon Glass ===== */}
+      {/* ===== CTA ===== */}
       <section className="px-6 py-20">
         <div className="container mx-auto max-w-4xl">
           <motion.div 
