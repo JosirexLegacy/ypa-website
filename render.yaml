@@ -10,11 +10,11 @@ services:
       - key: DB_CLIENT
         value: pg
       - key: DATABASE_URL
-        value: postgresql://neondb_owner:npg_uGhX5Y3wxOWf@ep-cold-dream-avj0fhii-pooler.c-11.us-east-1.aws.neon.tech/ypa%20db?sslmode=require&channel_binding=require
+        value: postgresql://neondb_owner:npg_uGhX5Y3wxOWf@ep-cold-dream-avj0fhii-pooler.c-11.us-east-1.aws.neon.tech/ypa_db?sslmode=require&channel_binding=require
       - key: KEY
-        value: (your generated key)
+        value: ie0JPTVbMfx32NrXrXPrWBro2+DhcyGZylrjwARzujY=
       - key: SECRET
-        value: (your generated key)
+        value: nuteGMQOvZQ6c3XvJkoAFWWjLRLV2YLbebq9NAXOXN0=
       - key: ADMIN_EMAIL
         value: admin@ypa.com
       - key: ADMIN_PASSWORD
