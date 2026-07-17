@@ -19,8 +19,7 @@ import {
 } from "lucide-react";
 
 // ============================================================
-// FONTS + TOKENS — identical to the homepage and About page.
-// Keep all three in sync if the palette ever changes.
+// FONTS + TOKENS
 // ============================================================
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -44,6 +43,11 @@ const INK_ON_LIGHT = "#0E2540";
 const MUTE_ON_LIGHT = "#5B6B7A";
 const POSITIVE = "#34D399";
 
+// ============================================================
+// API BASE
+// ============================================================
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
+
 const NeedsInfo = ({ children = "Add details" }: { children?: string }) => (
   <span
     className="inline-flex items-center gap-1 text-[9px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded-full border border-dashed align-middle ml-2"
@@ -55,11 +59,11 @@ const NeedsInfo = ({ children = "Add details" }: { children?: string }) => (
 );
 
 // ============================================================
-// DATA — untouched: same endpoint, same shape.
+// DATA — now uses production API URL
 // ============================================================
 async function getContactContent() {
   try {
-    const res = await fetch("http://localhost:8055/items/contact", { cache: "no-store" });
+    const res = await fetch(`${API_URL}/items/contact`, { cache: "no-store" });
     if (!res.ok) return null;
     const data = await res.json();
     return data.data || null;
@@ -97,9 +101,7 @@ const TiktokIcon = () => (
 );
 
 // ============================================================
-// GOAT MARK — the same signature illustration from the original
-// hero, recolored to sit on the new dark panel instead of a
-// light one. It's a nice, on-brand touch; keeping it.
+// GOAT MARK
 // ============================================================
 const GoatMark = () => (
   <svg viewBox="0 0 400 400" className="w-full h-full opacity-[0.08]" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -154,7 +156,6 @@ export default function ContactPage() {
     setErrorMessage("");
 
     try {
-      // ✅ Prepare data with proper field names
       const submissionData = {
         name: formData.name.trim(),
         email: formData.email.trim(),
@@ -166,7 +167,7 @@ export default function ContactPage() {
 
       console.log("📤 Sending to Directus:", submissionData);
 
-      const res = await fetch("http://localhost:8055/items/contact_submissions", {
+      const res = await fetch(`${API_URL}/items/contact_submissions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -178,12 +179,10 @@ export default function ContactPage() {
       console.log("📥 Directus Response:", responseData);
 
       if (!res.ok) {
-        // ✅ Better error handling
         const errorMsg = responseData.errors?.[0]?.message || `Error ${res.status}`;
         throw new Error(errorMsg);
       }
 
-      // ✅ Success!
       setFormStatus("success");
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
 
@@ -228,7 +227,6 @@ export default function ContactPage() {
     { icon: TiktokIcon, href: content?.social_tiktok || "#", label: "TikTok" },
   ];
 
-  // Direct-line facts. Anything not in Directus yet is flagged, not invented.
   const directLines = [
     { icon: Mail, label: "EMAIL", value: content?.email, need: "add support email to Directus" },
     { icon: Phone, label: "PHONE", value: content?.phone, need: "add phone number to Directus" },
@@ -240,7 +238,6 @@ export default function ContactPage() {
     <main className={`${display.variable} ${mono.variable} min-h-screen bg-white overflow-x-hidden font-sans`}>
       <Navigation />
 
-      {/* ===== HERO ===== */}
       <section id="hero" ref={heroRef} className="relative pt-32 pb-20 px-6 md:px-14 overflow-hidden min-h-[52vh] flex items-center" style={{ background: INK }}>
         <div
           className="absolute inset-0 opacity-[0.05] pointer-events-none"
@@ -294,7 +291,6 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* ===== DIRECT LINES — signature strip, consistent with the "verify" bars on other pages ===== */}
       <section className="border-y" style={{ background: NAVY, borderColor: LINE }}>
         <div className="flex items-center gap-3 px-6 md:px-14 pt-4">
           <Zap className="h-3.5 w-3.5" style={{ color: GOLD }} />
@@ -321,11 +317,9 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* ===== CONTACT INFO + FORM ===== */}
       <section className="px-6 md:px-14 py-20" style={{ background: MIST }}>
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-12">
-            {/* LEFT: Contact Info */}
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
               <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
                 Reach out
@@ -372,7 +366,6 @@ export default function ContactPage() {
                 )}
               </div>
 
-              {/* Social Links */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} viewport={{ once: true }} className="mt-10">
                 <h3 className={`${mono.className} text-[10px] font-semibold tracking-[0.15em] uppercase mb-4`} style={{ color: MUTE_ON_LIGHT }}>
                   Follow us
@@ -407,7 +400,6 @@ export default function ContactPage() {
               </motion.div>
             </motion.div>
 
-            {/* RIGHT: Contact Form */}
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
               <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
                 Send a message
@@ -563,7 +555,6 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* ===== CTA — visit a branch ===== */}
       <section className="px-6 md:px-14 py-24 relative overflow-hidden" style={{ background: INK }}>
         <div className="absolute top-[-40%] right-[-10%] w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none" style={{ background: `${BLUE}14` }} />
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }} className="relative container mx-auto max-w-2xl text-center">
