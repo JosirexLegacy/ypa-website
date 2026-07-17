@@ -167,7 +167,8 @@ export default function ContactPage() {
 
       console.log("📤 Sending to Directus:", submissionData);
 
-      const res = await fetch(`${API_URL}/items/contact_submissions`, {
+      // ✅ FIXED: using singular "contact_submission" (matches your collection)
+      const res = await fetch(`${API_URL}/items/contact_submission`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
