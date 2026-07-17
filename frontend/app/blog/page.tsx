@@ -405,13 +405,17 @@ export default function BlogPage() {
                       <img
                         src={`${API_URL}/assets/${featuredPost.featured_image}`}
                         alt={featuredPost.title}
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <BookOpen className="w-20 h-20" style={{ color: `${BLUE}15` }} />
-                      </div>
-                    )}
+                    ) : null}
+                    <div className={`absolute inset-0 flex items-center justify-center ${featuredPost.featured_image ? 'hidden' : ''}`}>
+                      <BookOpen className="w-20 h-20" style={{ color: `${BLUE}15` }} />
+                    </div>
                     <div className="absolute top-4 left-4 flex gap-2">
                       <span
                         className={`${mono.className} px-3 py-1 text-[10px] tracking-[0.1em] uppercase text-white rounded-full flex items-center gap-1`}
@@ -525,18 +529,22 @@ export default function BlogPage() {
                       className="relative rounded-2xl border bg-white overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col"
                       style={{ borderColor: "#E8ECF0" }}
                     >
-                      <div className="relative w-full h-52 overflow-hidden bg-[#F5F9FF] flex-shrink-0">
+                      <div className="relative w-full h-52 min-h-[208px] overflow-hidden bg-[#F5F9FF] flex-shrink-0">
                         {post.featured_image ? (
                           <img
                             src={`${API_URL}/assets/${post.featured_image}`}
                             alt={post.title}
+                            crossOrigin="anonymous"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <BookOpen className="w-12 h-12" style={{ color: `${BLUE}15` }} />
-                          </div>
-                        )}
+                        ) : null}
+                        <div className={`absolute inset-0 flex items-center justify-center ${post.featured_image ? 'hidden' : ''}`}>
+                          <BookOpen className="w-12 h-12" style={{ color: `${BLUE}15` }} />
+                        </div>
                         {/* Category badge – top left */}
                         {post.category && (
                           <div className="absolute top-3 left-3">
