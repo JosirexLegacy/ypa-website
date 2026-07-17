@@ -31,3 +31,5 @@ services:
         value: ./uploads
       - key: NODE_VERSION
         value: "18"
+      - key: CXXFLAGS
+        value: "--std=c++17"
