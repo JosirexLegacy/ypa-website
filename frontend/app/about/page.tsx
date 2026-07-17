@@ -58,11 +58,16 @@ const INK_ON_LIGHT = "#0E2540";
 const MUTE_ON_LIGHT = "#5B6B7A";
 
 // ============================================================
-// DATA
+// API BASE
+// ============================================================
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
+
+// ============================================================
+// DATA FETCHING
 // ============================================================
 async function getAboutContent() {
   try {
-    const res = await fetch("http://localhost:8055/items/about", { cache: "no-store" });
+    const res = await fetch(`${API_URL}/items/about`, { cache: "no-store" });
     if (!res.ok) return null;
     const data = await res.json();
     return data.data?.[0] || null;
@@ -73,7 +78,7 @@ async function getAboutContent() {
 
 async function getFAQs() {
   try {
-    const res = await fetch("http://localhost:8055/items/faqs?sort[]=order", { cache: "no-store" });
+    const res = await fetch(`${API_URL}/items/faqs?sort[]=order`, { cache: "no-store" });
     if (!res.ok) return [];
     const data = await res.json();
     return data.data || [];
@@ -83,7 +88,7 @@ async function getFAQs() {
 }
 
 // ============================================================
-// ANIMATION PRESETS (no ease property to fix type errors)
+// ANIMATION PRESETS
 // ============================================================
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -125,7 +130,7 @@ const ParallaxHero = ({ content }: { content: any }) => {
     <section id="hero" ref={ref} className="relative min-h-[88vh] flex items-center overflow-hidden" style={{ background: INK }}>
       <motion.div className="absolute inset-0" style={reduce ? {} : { y, opacity }}>
         {content?.hero_image ? (
-          <img src={`http://localhost:8055/assets/${content.hero_image}`} alt="Youth Platform Africa" className="w-full h-full object-cover" />
+          <img src={`${API_URL}/assets/${content.hero_image}`} alt="Youth Platform Africa" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${INK}, ${NAVY})` }} />
         )}
@@ -277,7 +282,7 @@ const NumberCounter = ({ target, label, suffix = "" }: { target: number; label: 
 };
 
 // ============================================================
-// SCROLL REVEAL (fixed – no ease property)
+// SCROLL REVEAL
 // ============================================================
 const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
   const ref = useRef(null);
@@ -791,7 +796,7 @@ const PartnersSection = () => {
 };
 
 // ============================================================
-// FAQ
+// FAQ SECTION
 // ============================================================
 const FAQSection = ({ faqs }: { faqs: any[] }) => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
