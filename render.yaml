@@ -1,13 +1,9 @@
 services:
   - type: web
     name: ypa-directus
-    runtime: node
+    runtime: docker
     rootDir: backend/directus
-    buildCommand: |
-      export CXXFLAGS="--std=c++17"
-      npm install
-    startCommand: npx directus start
-    preDeployCommand: npx directus database migrate:latest
+    dockerfilePath: Dockerfile
     envVars:
       - key: DB_CLIENT
         value: pg
@@ -31,7 +27,3 @@ services:
         value: local
       - key: STORAGE_LOCAL_ROOT
         value: ./uploads
-      - key: NODE_VERSION
-        value: "18"
-      - key: npm_config_build_from_source
-        value: "true"
