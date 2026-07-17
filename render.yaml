@@ -3,7 +3,9 @@ services:
     name: ypa-directus
     runtime: node
     rootDir: backend/directus
-    buildCommand: npm install
+    buildCommand: |
+      export CXXFLAGS="--std=c++17"
+      npm install
     startCommand: npx directus start
     preDeployCommand: npx directus database migrate:latest
     envVars:
@@ -31,5 +33,5 @@ services:
         value: ./uploads
       - key: NODE_VERSION
         value: "18"
-      - key: CXXFLAGS
-        value: "--std=c++17"
+      - key: npm_config_build_from_source
+        value: "true"
