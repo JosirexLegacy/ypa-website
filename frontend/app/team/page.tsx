@@ -78,13 +78,13 @@ export default function TeamPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0A0A0F]">
+      <main className="min-h-screen bg-white">
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <motion.div 
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-[#2196F3]/30 border-t-[#2196F3] rounded-full"
+            className="w-12 h-12 border-4 border-[#E3F2FD] border-t-[#2196F3] rounded-full"
           />
         </div>
         <Footer />
@@ -93,30 +93,23 @@ export default function TeamPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0F] overflow-x-hidden">
+    <main className="min-h-screen bg-white overflow-x-hidden">
       <Navigation />
 
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(33,150,243,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(33,150,243,0.03) 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px'
-        }} />
+      {/* ===== HERO – Light with Blue Gradient Edges ===== */}
+      <section className="relative pt-32 pb-24 px-6 overflow-hidden bg-gradient-to-b from-[#F0F7FE] via-white to-white">
+        {/* Blue gradient orbs on edges */}
+        <div className="absolute top-[-30%] right-[-15%] w-[600px] h-[600px] rounded-full blur-3xl opacity-30" style={{ background: 'radial-gradient(circle, #2196F3, transparent 70%)' }} />
+        <div className="absolute bottom-[-30%] left-[-15%] w-[600px] h-[600px] rounded-full blur-3xl opacity-20" style={{ background: 'radial-gradient(circle, #64B5F6, transparent 70%)' }} />
         
-        <motion.div 
-          className="absolute top-[-20%] right-[-10%] w-[700px] h-[700px] rounded-full blur-3xl opacity-20"
-          style={{ background: '#2196F3' }}
-          animate={{ x: [0, 50, -30, 0], y: [0, -30, 40, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full blur-3xl opacity-15"
-          style={{ background: '#7EC8FF' }}
-          animate={{ x: [0, -40, 30, 0], y: [0, 30, -40, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        />
+        {/* Subtle grid background */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `
+            linear-gradient(rgba(33,150,243,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(33,150,243,0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px'
+        }} />
 
         <div className="relative container mx-auto max-w-6xl z-10">
           <motion.div 
@@ -127,7 +120,7 @@ export default function TeamPage() {
           >
             <div>
               <motion.span 
-                className="inline-flex items-center gap-2 text-[#2196F3] font-medium text-sm uppercase tracking-wider bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-[#2196F3]/20"
+                className="inline-flex items-center gap-2 text-[#2196F3] font-medium text-sm uppercase tracking-wider bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-[#2196F3]/20 shadow-sm"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
@@ -136,16 +129,16 @@ export default function TeamPage() {
                 Our Team
               </motion.span>
               <motion.h1 
-                className="text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight mt-4 leading-[1.1]"
+                className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mt-4 leading-[1.1]"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 The People <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2196F3] via-[#64B5F6] to-[#7EC8FF]">Behind YPA</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2196F3] to-[#64B5F6]">Behind YPA</span>
               </motion.h1>
               <motion.p 
-                className="text-lg text-white/40 mt-3 max-w-xl"
+                className="text-lg text-gray-500 mt-3 max-w-xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
@@ -159,11 +152,11 @@ export default function TeamPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-xl px-5 py-2.5 rounded-full border border-white/10 shadow-lg">
-                <span className="text-xs font-medium text-white/50">{members.length} members</span>
+              <div className="flex items-center gap-2 bg-white/70 backdrop-blur-xl px-5 py-2.5 rounded-full border border-gray-200 shadow-sm">
+                <span className="text-xs font-medium text-gray-500">{members.length} members</span>
               </div>
               {leadership.length > 0 && (
-                <div className="flex items-center gap-2 bg-gradient-to-r from-[#2196F3]/10 to-[#64B5F6]/10 backdrop-blur-xl px-5 py-2.5 rounded-full border border-[#2196F3]/20 shadow-lg">
+                <div className="flex items-center gap-2 bg-gradient-to-r from-[#2196F3]/10 to-[#64B5F6]/10 backdrop-blur-xl px-5 py-2.5 rounded-full border border-[#2196F3]/20 shadow-sm">
                   <Star className="w-4 h-4 text-[#2196F3]" />
                   <span className="text-xs font-medium text-[#2196F3]">{leadership.length} leadership</span>
                 </div>
@@ -173,15 +166,12 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* FILTERS & SEARCH */}
+      {/* ===== FILTERS & SEARCH – Glassmorphism ===== */}
       <div className="sticky top-20 z-30 flex justify-center px-4 -mt-6">
         <div
-          className="inline-flex flex-wrap items-center gap-2 px-4 py-2 rounded-full transition-all duration-300"
+          className="inline-flex flex-wrap items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 bg-white/70 backdrop-blur-xl shadow-lg border border-white/50"
           style={{
-            background: "rgba(10,10,15,0.7)",
-            backdropFilter: "blur(24px) saturate(1.4)",
-            boxShadow: "0 8px 40px rgba(33,150,243,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
-            border: "1px solid rgba(33,150,243,0.2)",
+            boxShadow: "0 8px 32px rgba(33,150,243,0.08)",
           }}
         >
           {departments.map((dept) => (
@@ -192,14 +182,14 @@ export default function TeamPage() {
               whileTap={{ scale: 0.95 }}
               className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 whitespace-nowrap ${
                 activeDepartment === dept
-                  ? 'bg-gradient-to-r from-[#2196F3] to-[#64B5F6] text-white shadow-lg shadow-[#2196F3]/30'
-                  : 'text-white/50 hover:text-white hover:bg-white/5'
+                  ? 'bg-gradient-to-r from-[#2196F3] to-[#64B5F6] text-white shadow-md shadow-[#2196F3]/25'
+                  : 'text-gray-500 hover:text-[#1A3A5C] hover:bg-white/50'
               }`}
             >
               {dept === 'all' ? 'All' : dept}
             </motion.button>
           ))}
-          <div className="w-px h-5 bg-white/10 mx-1"></div>
+          <div className="w-px h-5 bg-gray-200 mx-1"></div>
           
           <div className="relative">
             <input
@@ -207,18 +197,18 @@ export default function TeamPage() {
               placeholder="Search members..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent border-none outline-none text-white/70 text-xs placeholder-white/30 w-32 focus:w-48 transition-all duration-300 px-2 py-1"
+              className="bg-transparent border-none outline-none text-gray-700 text-xs placeholder-gray-400 w-32 focus:w-48 transition-all duration-300 px-2 py-1"
             />
-            <Search className="w-3.5 h-3.5 text-white/20 absolute right-2 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-gray-400 absolute right-2 top-1/2 -translate-y-1/2" />
           </div>
           
-          <div className="w-px h-5 bg-white/10 mx-1"></div>
+          <div className="w-px h-5 bg-gray-200 mx-1"></div>
           <button
             onClick={() => setViewMode('grid')}
             className={`p-1.5 rounded-lg transition-all duration-300 ${
               viewMode === 'grid' 
                 ? 'bg-[#2196F3]/20 text-[#2196F3]' 
-                : 'text-white/30 hover:text-white/60'
+                : 'text-gray-400 hover:text-gray-600'
             }`}
             aria-label="Grid view"
           >
@@ -229,7 +219,7 @@ export default function TeamPage() {
             className={`p-1.5 rounded-lg transition-all duration-300 ${
               viewMode === 'list' 
                 ? 'bg-[#2196F3]/20 text-[#2196F3]' 
-                : 'text-white/30 hover:text-white/60'
+                : 'text-gray-400 hover:text-gray-600'
             }`}
             aria-label="List view"
           >
@@ -238,7 +228,7 @@ export default function TeamPage() {
         </div>
       </div>
 
-      {/* LEADERSHIP SPOTLIGHT */}
+      {/* ===== LEADERSHIP SPOTLIGHT – Glass Cards ===== */}
       {leadership.length > 0 && activeDepartment === 'all' && (
         <section className="px-6 py-16">
           <div className="container mx-auto max-w-6xl">
@@ -250,8 +240,8 @@ export default function TeamPage() {
               viewport={{ once: true }}
             >
               <Star className="w-5 h-5 text-[#2196F3] fill-[#2196F3]/30" />
-              <h2 className="text-xl font-bold text-white">Leadership Team</h2>
-              <span className="text-sm text-white/30">({leadership.length})</span>
+              <h2 className="text-xl font-bold text-[#1A3A5C]">Leadership Team</h2>
+              <span className="text-sm text-gray-400">({leadership.length})</span>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -262,11 +252,14 @@ export default function TeamPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  whileHover={{ y: -8 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
                   onClick={() => setSelectedMember(member)}
-                  className="group relative cursor-pointer rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 shadow-xl hover:shadow-[0_20px_60px_-15px_rgba(33,150,243,0.3)] transition-all duration-500"
+                  className="group relative cursor-pointer rounded-2xl overflow-hidden bg-white/70 backdrop-blur-xl border border-white/50 shadow-xl hover:shadow-2xl transition-all duration-500"
+                  style={{
+                    boxShadow: "0 8px 32px rgba(33,150,243,0.06)",
+                  }}
                 >
-                  <div className="relative h-64 w-full overflow-hidden bg-[#0A0A0F]">
+                  <div className="relative h-64 w-full overflow-hidden bg-gradient-to-br from-[#F0F7FE] to-white">
                     {member.image ? (
                       <img
                         src={`${API_URL}/assets/${member.image}`}
@@ -275,15 +268,15 @@ export default function TeamPage() {
                         style={{ objectPosition: '50% 20%' }}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
-                        <User className="w-16 h-16 text-white/10" />
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/5 to-[#64B5F6]/5">
+                        <User className="w-16 h-16 text-gray-300" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-xl font-bold text-white">{member.name}</h3>
+                      <h3 className="text-xl font-bold text-[#1A3A5C]">{member.name}</h3>
                       <p className="text-[#2196F3] text-sm font-medium">{member.role}</p>
-                      <p className="text-white/40 text-xs mt-1">{member.department}</p>
+                      <p className="text-gray-500 text-xs mt-1">{member.department}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -293,8 +286,8 @@ export default function TeamPage() {
         </section>
       )}
 
-      {/* ALL MEMBERS */}
-      <section className={`px-6 py-16 ${leadership.length > 0 && activeDepartment === 'all' ? 'border-t border-white/5' : ''}`}>
+      {/* ===== ALL MEMBERS – Glass Grid ===== */}
+      <section className={`px-6 py-16 ${leadership.length > 0 && activeDepartment === 'all' ? 'border-t border-gray-100' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <motion.div 
             className="flex items-center gap-3 mb-8"
@@ -303,15 +296,15 @@ export default function TeamPage() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <div className="w-5 h-5 bg-gradient-to-br from-[#2196F3] to-[#64B5F6] rounded-full shadow-lg shadow-[#2196F3]/30"></div>
-            <h2 className="text-xl font-bold text-white">
+            <div className="w-5 h-5 bg-gradient-to-br from-[#2196F3] to-[#64B5F6] rounded-full shadow-md shadow-[#2196F3]/30"></div>
+            <h2 className="text-xl font-bold text-[#1A3A5C]">
               {activeDepartment === 'all' ? 'All Members' : activeDepartment}
             </h2>
-            <span className="text-sm text-white/30">({regularMembers.length})</span>
+            <span className="text-sm text-gray-400">({regularMembers.length})</span>
             {activeDepartment !== 'all' && (
               <button
                 onClick={() => setActiveDepartment('all')}
-                className="text-xs text-white/30 hover:text-white/60 transition-colors flex items-center gap-1"
+                className="text-xs text-gray-400 hover:text-[#2196F3] transition-colors flex items-center gap-1"
               >
                 <X className="w-3 h-3" />
                 Clear filter
@@ -320,10 +313,10 @@ export default function TeamPage() {
           </motion.div>
 
           {regularMembers.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+            <div className="text-center py-20 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-200">
               <div className="text-6xl mb-4 opacity-30">👥</div>
-              <h3 className="text-xl font-medium text-white/80">No members found</h3>
-              <p className="text-white/30 text-sm mt-1">Try adjusting your search or filter</p>
+              <h3 className="text-xl font-medium text-gray-700">No members found</h3>
+              <p className="text-gray-400 text-sm mt-1">Try adjusting your search or filter</p>
             </div>
           ) : (
             <div className={viewMode === 'grid' 
@@ -339,13 +332,16 @@ export default function TeamPage() {
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
                   onClick={() => setSelectedMember(member)}
-                  className={`group relative cursor-pointer rounded-xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 hover:border-[#2196F3]/30 shadow-lg hover:shadow-[0_20px_60px_-15px_rgba(33,150,243,0.2)] transition-all duration-500 ${
+                  className={`group relative cursor-pointer rounded-xl overflow-hidden bg-white/60 backdrop-blur-md border border-white/50 shadow-md hover:shadow-xl transition-all duration-500 ${
                     viewMode === 'list' ? 'flex items-center gap-4 p-4' : ''
                   }`}
+                  style={{
+                    boxShadow: "0 4px 16px rgba(33,150,243,0.04)",
+                  }}
                 >
                   {viewMode === 'grid' ? (
                     <>
-                      <div className="relative h-48 w-full overflow-hidden bg-[#0A0A0F]">
+                      <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-[#F0F7FE] to-white">
                         {member.image ? (
                           <img
                             src={`${API_URL}/assets/${member.image}`}
@@ -355,17 +351,17 @@ export default function TeamPage() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/5 to-[#64B5F6]/5">
-                            <User className="w-12 h-12 text-white/10" />
+                            <User className="w-12 h-12 text-gray-300" />
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/70 via-transparent to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-transparent" />
                       </div>
                       <div className="p-4">
-                        <h4 className="text-sm font-semibold text-white truncate">{member.name}</h4>
+                        <h4 className="text-sm font-semibold text-[#1A3A5C] truncate">{member.name}</h4>
                         <p className="text-xs text-[#2196F3] truncate">{member.role}</p>
-                        <p className="text-[10px] text-white/30 mt-1">{member.department}</p>
+                        <p className="text-[10px] text-gray-400 mt-1">{member.department}</p>
                         {member.experience && (
-                          <div className="flex items-center gap-1 mt-2 text-[10px] text-white/20">
+                          <div className="flex items-center gap-1 mt-2 text-[10px] text-gray-400">
                             <Clock className="w-3 h-3" />
                             <span>{member.experience}</span>
                           </div>
@@ -374,7 +370,7 @@ export default function TeamPage() {
                     </>
                   ) : (
                     <>
-                      <div className="w-16 h-16 rounded-full overflow-hidden shrink-0 bg-[#0A0A0F] border border-white/10">
+                      <div className="w-16 h-16 rounded-full overflow-hidden shrink-0 bg-gradient-to-br from-[#F0F7FE] to-white border border-gray-200">
                         {member.image ? (
                           <img
                             src={`${API_URL}/assets/${member.image}`}
@@ -383,17 +379,17 @@ export default function TeamPage() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-white/20" />
+                            <User className="w-6 h-6 text-gray-300" />
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-semibold text-white">{member.name}</h4>
+                        <h4 className="text-sm font-semibold text-[#1A3A5C]">{member.name}</h4>
                         <p className="text-xs text-[#2196F3]">{member.role}</p>
-                        <p className="text-[10px] text-white/30">{member.department}</p>
+                        <p className="text-[10px] text-gray-400">{member.department}</p>
                       </div>
                       {member.experience && (
-                        <div className="text-[10px] text-white/20 flex items-center gap-1">
+                        <div className="text-[10px] text-gray-400 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           <span>{member.experience}</span>
                         </div>
@@ -407,7 +403,7 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* MEMBER DETAIL MODAL */}
+      {/* ===== MEMBER DETAIL MODAL – Glass ===== */}
       <AnimatePresence>
         {selectedMember && (
           <motion.div
@@ -415,7 +411,7 @@ export default function TeamPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-lg flex items-center justify-center p-4"
             onClick={() => setSelectedMember(null)}
           >
             <motion.button
@@ -423,7 +419,7 @@ export default function TeamPage() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => setSelectedMember(null)}
-              className="absolute top-6 right-6 text-white/30 hover:text-white transition-colors duration-300 p-2 hover:bg-white/5 rounded-full z-10 border border-white/5"
+              className="absolute top-6 right-6 text-white/60 hover:text-white transition-colors duration-300 p-2 hover:bg-white/10 rounded-full z-10 border border-white/10"
             >
               <X className="w-6 h-6" />
             </motion.button>
@@ -436,8 +432,8 @@ export default function TeamPage() {
               transition={{ duration: 0.3 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-[#0A0A0F] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-                <div className="relative h-72 w-full overflow-hidden bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
+              <div className="bg-white/90 backdrop-blur-2xl border border-white/50 rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative h-72 w-full overflow-hidden bg-gradient-to-br from-[#F0F7FE] to-white">
                   {selectedMember.image ? (
                     <img
                       src={`${API_URL}/assets/${selectedMember.image}`}
@@ -447,18 +443,18 @@ export default function TeamPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <User className="w-24 h-24 text-white/10" />
+                      <User className="w-24 h-24 text-gray-300" />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F]/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
                 </div>
 
                 <div className="p-8 -mt-16 relative z-10">
                   <div className="flex flex-col md:flex-row md:items-end gap-4">
                     <div>
-                      <h2 className="text-3xl font-bold text-white">{selectedMember.name}</h2>
+                      <h2 className="text-3xl font-bold text-[#1A3A5C]">{selectedMember.name}</h2>
                       <p className="text-[#2196F3] text-lg font-medium">{selectedMember.role}</p>
-                      <p className="text-white/40 text-sm mt-1">{selectedMember.department}</p>
+                      <p className="text-gray-500 text-sm mt-1">{selectedMember.department}</p>
                     </div>
                     <div className="flex items-center gap-3 ml-auto">
                       {selectedMember.linkedin && (
@@ -466,24 +462,24 @@ export default function TeamPage() {
                           href={selectedMember.linkedin}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 rounded-full bg-white/5 hover:bg-[#2196F3]/20 border border-white/10 hover:border-[#2196F3]/30 transition-colors"
+                          className="p-2 rounded-full bg-white/5 hover:bg-[#2196F3]/10 border border-gray-200 hover:border-[#2196F3]/30 transition-colors"
                         >
-                          <LinkedInIcon className="w-5 h-5 text-white/40 hover:text-[#2196F3]" />
+                          <LinkedInIcon className="w-5 h-5 text-gray-500 hover:text-[#2196F3]" />
                         </a>
                       )}
                       {selectedMember.email && (
                         <a
                           href={`mailto:${selectedMember.email}`}
-                          className="p-2 rounded-full bg-white/5 hover:bg-[#2196F3]/20 border border-white/10 hover:border-[#2196F3]/30 transition-colors"
+                          className="p-2 rounded-full bg-white/5 hover:bg-[#2196F3]/10 border border-gray-200 hover:border-[#2196F3]/30 transition-colors"
                         >
-                          <Mail className="w-5 h-5 text-white/40 hover:text-[#2196F3]" />
+                          <Mail className="w-5 h-5 text-gray-500 hover:text-[#2196F3]" />
                         </a>
                       )}
                     </div>
                   </div>
 
                   {selectedMember.experience && (
-                    <div className="mt-6 flex items-center gap-3 text-sm text-white/50 bg-white/5 rounded-xl px-4 py-3 border border-white/5">
+                    <div className="mt-6 flex items-center gap-3 text-sm text-gray-600 bg-white/50 rounded-xl px-4 py-3 border border-gray-200">
                       <Clock className="w-4 h-4 text-[#2196F3]" />
                       <span>{selectedMember.experience} of experience</span>
                     </div>
@@ -491,8 +487,8 @@ export default function TeamPage() {
 
                   {selectedMember.bio && (
                     <div className="mt-6">
-                      <h4 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-2">About</h4>
-                      <p className="text-white/60 text-sm leading-relaxed">{selectedMember.bio}</p>
+                      <h4 className="text-sm font-semibold text-[#1A3A5C]/60 uppercase tracking-wider mb-2">About</h4>
+                      <p className="text-gray-600 text-sm leading-relaxed">{selectedMember.bio}</p>
                     </div>
                   )}
                 </div>
@@ -502,11 +498,11 @@ export default function TeamPage() {
         )}
       </AnimatePresence>
 
-      {/* CTA */}
+      {/* ===== CTA – Glass ===== */}
       <section className="px-6 py-20">
         <div className="container mx-auto max-w-4xl">
           <motion.div 
-            className="relative bg-white/5 backdrop-blur-xl rounded-3xl p-12 border border-white/10 shadow-2xl text-center overflow-hidden"
+            className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-12 border border-white/50 shadow-xl text-center overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -521,10 +517,10 @@ export default function TeamPage() {
                 transition={{ duration: 4, repeat: Infinity }}
                 className="inline-block"
               >
-                <Sparkles className="w-12 h-12 text-[#2196F3]/30 mx-auto mb-4" />
+                <Sparkles className="w-12 h-12 text-[#2196F3]/40 mx-auto mb-4" />
               </motion.div>
-              <h3 className="text-2xl font-bold text-white">Join Our Team</h3>
-              <p className="text-white/30 text-sm mt-2 max-w-md mx-auto">
+              <h3 className="text-2xl font-bold text-[#1A3A5C]">Join Our Team</h3>
+              <p className="text-gray-500 text-sm mt-2 max-w-md mx-auto">
                 We're always looking for passionate individuals to join the YPA family.
               </p>
               <motion.div
