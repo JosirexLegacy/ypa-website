@@ -69,12 +69,6 @@ const INK_ON_LIGHT = "#0E2540";
 const MUTE_ON_LIGHT = "#5B6B7A";
 const POSITIVE = "#34D399";
 
-// Pulled directly from the YPA mark: the antique gold of the arc text
-// and the brick-maroon of the tagline. Used sparingly, only in the
-// hero, so the rest of the site's palette stays exactly as it was.
-const LOGO_GOLD = "#C9A227";
-const MAROON = "#8C2F39";
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
@@ -330,11 +324,7 @@ const SectionRail = () => {
 // ============================================================
 // SCROLL REVEAL
 // ============================================================
-const ScrollReveal = ({ children, delay = 0, className = "" }: { 
-  children: React.ReactNode; 
-  delay?: number; 
-  className?: string;
-}) => {
+const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const reduce = useReducedMotion();
@@ -353,7 +343,7 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: {
 };
 
 // ============================================================
-// HERO – Apple-Style Subtle Blue Gradient
+// HERO
 // ============================================================
 const LINEUP = [
   {
@@ -365,8 +355,7 @@ const LINEUP = [
       { label: "Success rate", value: "95%" },
       { label: "Market access", value: "Guaranteed" },
     ],
-    // ✅ Apple-style subtle blue gradient – bright, clean, premium
-    gradient: "from-[#0A1628] via-[#1A3A5C] to-[#2196F3]/60",
+    gradient: "from-[#060B14] via-[#0E2540] to-[#2196F3]/40",
     href: "/projects/goats",
     image: `${API_URL}/assets/3012af2e-1cc2-404b-9e46-956c56cc1912`,
     aura: SKY,
@@ -380,7 +369,7 @@ const LINEUP = [
       { label: "Avg. return", value: "3.0×" },
       { label: "Off-take", value: "Contracted" },
     ],
-    gradient: "from-[#0A1628] via-[#1A3A5C] to-[#64B5F6]/50",
+    gradient: "from-[#0E2540] via-[#153455] to-[#060B14]",
     href: "/projects/maize",
     image: "https://tse2.mm.bing.net/th/id/OIP.WJJALakxa5_OhQvljSbsKwHaE8?r=0&w=600&h=400&rs=1&pid=ImgDetMain&o=7&rm=3",
     aura: GOLD,
@@ -394,7 +383,7 @@ const LINEUP = [
       { label: "Branches", value: "12" },
       { label: "Founded", value: "2014" },
     ],
-    gradient: "from-[#0A1628] via-[#1A3A5C] to-[#2196F3]/50",
+    gradient: "from-[#060B14] via-[#0E2540]/80 to-[#153455]",
     href: "/sacco",
     image: "https://farm6.staticflickr.com/5603/15475865161_634b055363.jpg",
     aura: POSITIVE,
@@ -402,13 +391,18 @@ const LINEUP = [
 ];
 
 // ============================================================
-// HERO VISUAL
-// ============================================================
+// HERO VISUAL — a real photograph per programme, staged like a
+// viewfinder rather than a rendered creature. This replaces the
+// old hand-drawn SVG animals: those needed 30+ elements animating
+// simultaneously behind an SVG blur filter, which is expensive to
+// re-rasterize every frame and was the actual source of the scroll
+// jank. This version runs on exactly two GPU-cheap transforms — a
+// crossfade and a slow zoom — full stop.
 const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
   const reduce = useReducedMotion();
 
   return (
-    <div className="relative w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[440px] mx-auto aspect-[4/3] lg:aspect-[4/5]">
+    <div className="relative w-full max-w-[440px] mx-auto aspect-[4/5]">
       {/* glow — a single static blur that recolors on slide change via a
           plain CSS transition, not a per-frame animation loop */}
       <div
@@ -463,17 +457,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           </g>
         </svg>
 
-        {/* award chip — static, no animation cost, ties the #1 ranking to the photo itself */}
-        <div
-          className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full px-2.5 py-1"
-          style={{ background: "rgba(6,11,20,0.55)", backdropFilter: "blur(6px)", border: `1px solid ${LOGO_GOLD}66` }}
-        >
-          <Award className="h-3 w-3" style={{ color: LOGO_GOLD }} />
-          <span className={`${mono.className} text-[9px] tracking-[0.1em] uppercase`} style={{ color: LOGO_GOLD }}>
-            #1 in Africa
-          </span>
-        </div>
-
         <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between">
           <span className={`${mono.className} text-[10px] tracking-[0.12em] uppercase text-white/75`}>
             {item.kicker}
@@ -492,11 +475,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
 };
 
 
-// A single smooth, premium easing curve used throughout the hero so
-// every transition — background, text, buttons — feels like one
-// cohesive motion instead of several different timing curves.
-const EASE = [0.22, 1, 0.36, 1] as const;
-
 const Hero = () => {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -513,7 +491,7 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen overflow-hidden bg-[#0A1628]"
+      className="relative min-h-screen overflow-hidden bg-[#060B14]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -523,7 +501,7 @@ const Hero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.1, ease: EASE }}
+          transition={{ duration: 1.4, ease: "easeInOut" }}
           className={`absolute inset-0 bg-gradient-to-br ${current.gradient}`}
         />
       </AnimatePresence>
@@ -535,19 +513,11 @@ const Hero = () => {
           className="absolute top-[8%] right-[6%] w-[560px] h-[560px] rounded-full blur-3xl transition-colors duration-[1500ms]"
           style={{ background: `${current.aura}26` }}
         />
-        {/* second ambient blob — desktop only, one less animated layer for phones */}
         <motion.div
           animate={reduce ? {} : { x: [0, -70, 40, 0], y: [0, 50, -60, 0] }}
           transition={{ duration: 32, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-          className="hidden sm:block absolute bottom-[6%] left-[4%] w-[420px] h-[420px] rounded-full blur-3xl"
+          className="absolute bottom-[6%] left-[4%] w-[420px] h-[420px] rounded-full blur-3xl"
           style={{ background: `${SKY}14` }}
-        />
-        {/* a touch of the logo's gold/maroon — static paint, no motion, effectively free */}
-        <div
-          className="absolute top-0 left-0 w-full h-full"
-          style={{
-            background: `radial-gradient(ellipse 420px 320px at 8% 0%, ${LOGO_GOLD}12, transparent 60%), radial-gradient(ellipse 380px 300px at 100% 100%, ${MAROON}10, transparent 60%)`,
-          }}
         />
       </div>
 
@@ -564,44 +534,23 @@ const Hero = () => {
 
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 md:px-14">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-4 lg:gap-16 items-center">
-          <div className="order-2 lg:order-1">
-            {/* permanent credential — doesn't rotate with the slides, this is
-                the single strongest trust signal so it stays put and stays visible.
-                One smooth entrance on mount, then it just sits there. */}
+          <AnimatePresence mode="wait">
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              key={i}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.15 }}
-              className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 mb-4 border"
-              style={{
-                background: `${LOGO_GOLD}14`,
-                borderColor: `${LOGO_GOLD}45`,
-                boxShadow: `0 8px 20px -8px ${MAROON}40`,
-              }}
+              exit={{ opacity: 0, y: -24 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              <Award className="h-3.5 w-3.5 shrink-0" style={{ color: LOGO_GOLD }} />
-              <span className={`${mono.className} text-[10px] sm:text-[11px] tracking-[0.1em] uppercase font-medium`} style={{ color: LOGO_GOLD }}>
-                Ranked #1 goat farming programme in Africa
-              </span>
-            </motion.div>
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -24 }}
-                transition={{ duration: 0.6, ease: EASE }}
+              <div
+                className={`${mono.className} flex items-center gap-3 text-[11px] tracking-[0.25em] uppercase text-white/50 mb-7`}
               >
-                <div
-                  className={`${mono.className} flex items-center gap-3 text-[11px] tracking-[0.25em] uppercase text-white/50 mb-7`}
-                >
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34D399] opacity-75" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34D399]" />
-                  </span>
-                  {current.kicker}
-                </div>
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34D399] opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34D399]" />
+                </span>
+                {current.kicker}
+              </div>
 
               <h1
                 className={`${display.className} text-5xl md:text-6xl lg:text-7xl font-medium text-white leading-[1.03] tracking-tight max-w-xl`}
@@ -627,15 +576,15 @@ const Hero = () => {
               <div className="mt-10 flex flex-wrap gap-4">
                 <Link
                   href={current.href}
-                  className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02]"
+                  className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white transition-all hover:-translate-y-0.5"
                   style={{ background: BLUE, boxShadow: `0 20px 40px -12px ${BLUE}66` }}
                 >
                   Configure this programme
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
                 <Link
                   href="/about"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-8 py-4 text-sm font-medium text-white/75 backdrop-blur-md transition-all duration-300 ease-out hover:bg-white/10 hover:text-white hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-8 py-4 text-sm font-medium text-white/75 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white"
                 >
                   <Play className="h-4 w-4" />
                   See how YPA works
@@ -658,9 +607,8 @@ const Hero = () => {
               </div>
             </motion.div>
           </AnimatePresence>
-          </div>
 
-          <div className="order-1 lg:order-2 mb-2 lg:mb-0">
+          <div className="hidden lg:block">
             <HeroVisual item={current} />
           </div>
         </div>
@@ -1203,7 +1151,7 @@ const PressSignal = ({ pressItems }: { pressItems: any[] }) => {
             </h2>
           </div>
           <Link
-            href="/press"
+            href="/blog"
             className="inline-flex items-center gap-2 text-sm font-medium group"
             style={{ color: BLUE }}
           >
