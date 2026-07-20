@@ -288,8 +288,8 @@ export default function TeamPage() {
                       <img
                         src={`${API_URL}/assets/${member.image}`}
                         alt={member.name}
-                        className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
-                        style={{ objectPosition: 'center' }}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        style={{ objectPosition: 'top center' }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
@@ -368,8 +368,8 @@ export default function TeamPage() {
                           <img
                             src={`${API_URL}/assets/${member.image}`}
                             alt={member.name}
-                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
-                            style={{ objectPosition: 'center' }}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            style={{ objectPosition: 'top center' }}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/5 to-[#64B5F6]/5">
@@ -460,8 +460,8 @@ export default function TeamPage() {
                     <img
                       src={`${API_URL}/assets/${selectedMember.image}`}
                       alt={selectedMember.name}
-                      className="w-full h-full object-contain"
-                      style={{ objectPosition: 'center' }}
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: 'top center' }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
