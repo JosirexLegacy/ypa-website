@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 // ============================================================
-// CUSTOM LINKEDIN ICON (to avoid lucide-react import issues)
+// CUSTOM LINKEDIN ICON
 // ============================================================
 const LinkedInIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -109,11 +109,9 @@ export default function TeamPage() {
 
   return (
     <main className="min-h-screen bg-[#0A0A0F] overflow-x-hidden">
-
-      {/* ===== NAVIGATION ===== */}
       <Navigation />
 
-      {/* ===== HERO - Futuristic ===== */}
+      {/* ===== HERO ===== */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden">
         <div className="absolute inset-0" style={{
           backgroundImage: `
@@ -290,7 +288,8 @@ export default function TeamPage() {
                       <img
                         src={`${API_URL}/assets/${member.image}`}
                         alt={member.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
+                        style={{ objectPosition: 'center' }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
@@ -369,7 +368,8 @@ export default function TeamPage() {
                           <img
                             src={`${API_URL}/assets/${member.image}`}
                             alt={member.name}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
+                            style={{ objectPosition: 'center' }}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/5 to-[#64B5F6]/5">
@@ -460,7 +460,8 @@ export default function TeamPage() {
                     <img
                       src={`${API_URL}/assets/${selectedMember.image}`}
                       alt={selectedMember.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
+                      style={{ objectPosition: 'center' }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -519,7 +520,7 @@ export default function TeamPage() {
         )}
       </AnimatePresence>
 
-      {/* ===== CTA - Join the Team ===== */}
+      {/* ===== CTA ===== */}
       <section className="px-6 py-20">
         <div className="container mx-auto max-w-4xl">
           <motion.div 
