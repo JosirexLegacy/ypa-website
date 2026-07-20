@@ -266,15 +266,16 @@ export default function TeamPage() {
                   onClick={() => setSelectedMember(member)}
                   className="group relative cursor-pointer rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 shadow-xl hover:shadow-[0_20px_60px_-15px_rgba(33,150,243,0.3)] transition-all duration-500"
                 >
-                  <div className="relative overflow-hidden bg-[#0A0A0F]">
+                  <div className="relative h-64 w-full overflow-hidden bg-[#0A0A0F]">
                     {member.image ? (
                       <img
                         src={`${API_URL}/assets/${member.image}`}
                         alt={member.name}
-                        className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        style={{ objectPosition: '50% 20%' }}
                       />
                     ) : (
-                      <div className="w-full aspect-square flex items-center justify-center bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
                         <User className="w-16 h-16 text-white/10" />
                       </div>
                     )}
@@ -344,15 +345,16 @@ export default function TeamPage() {
                 >
                   {viewMode === 'grid' ? (
                     <>
-                      <div className="relative overflow-hidden bg-[#0A0A0F]">
+                      <div className="relative h-48 w-full overflow-hidden bg-[#0A0A0F]">
                         {member.image ? (
                           <img
                             src={`${API_URL}/assets/${member.image}`}
                             alt={member.name}
-                            className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            style={{ objectPosition: '50% 20%' }}
                           />
                         ) : (
-                          <div className="w-full aspect-square flex items-center justify-center bg-gradient-to-br from-[#2196F3]/5 to-[#64B5F6]/5">
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/5 to-[#64B5F6]/5">
                             <User className="w-12 h-12 text-white/10" />
                           </div>
                         )}
@@ -435,15 +437,16 @@ export default function TeamPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="bg-[#0A0A0F] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-                <div className="relative overflow-hidden bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
+                <div className="relative h-72 w-full overflow-hidden bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
                   {selectedMember.image ? (
                     <img
                       src={`${API_URL}/assets/${selectedMember.image}`}
                       alt={selectedMember.name}
-                      className="w-full h-auto"
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: '50% 20%' }}
                     />
                   ) : (
-                    <div className="w-full aspect-[3/2] flex items-center justify-center">
+                    <div className="w-full h-full flex items-center justify-center">
                       <User className="w-24 h-24 text-white/10" />
                     </div>
                   )}
