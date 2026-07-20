@@ -23,23 +23,14 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-// ============================================================
-// CUSTOM LINKEDIN ICON
-// ============================================================
 const LinkedInIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
   </svg>
 );
 
-// ============================================================
-// DESIGN TOKENS
-// ============================================================
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
-// ============================================================
-// DATA FETCHING
-// ============================================================
 async function fetchTeamMembers() {
   try {
     const res = await fetch(
@@ -55,9 +46,6 @@ async function fetchTeamMembers() {
   }
 }
 
-// ============================================================
-// MAIN COMPONENT
-// ============================================================
 export default function TeamPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,10 +63,8 @@ export default function TeamPage() {
     load();
   }, []);
 
-  // Get unique departments
   const departments = ['all', ...new Set(members.map(m => m.department).filter(Boolean))];
 
-  // Filter members
   const filteredMembers = members.filter(member => {
     const matchesDepartment = activeDepartment === 'all' || member.department === activeDepartment;
     const matchesSearch = member.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -87,7 +73,6 @@ export default function TeamPage() {
     return matchesDepartment && matchesSearch;
   });
 
-  // Featured/Leadership members
   const leadership = filteredMembers.filter(m => m.featured === true);
   const regularMembers = filteredMembers.filter(m => m.featured !== true);
 
@@ -111,7 +96,6 @@ export default function TeamPage() {
     <main className="min-h-screen bg-[#0A0A0F] overflow-x-hidden">
       <Navigation />
 
-      {/* ===== HERO ===== */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden">
         <div className="absolute inset-0" style={{
           backgroundImage: `
@@ -189,7 +173,7 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* ===== FILTERS & SEARCH ===== */}
+      {/* FILTERS & SEARCH */}
       <div className="sticky top-20 z-30 flex justify-center px-4 -mt-6">
         <div
           className="inline-flex flex-wrap items-center gap-2 px-4 py-2 rounded-full transition-all duration-300"
@@ -217,7 +201,6 @@ export default function TeamPage() {
           ))}
           <div className="w-px h-5 bg-white/10 mx-1"></div>
           
-          {/* Search */}
           <div className="relative">
             <input
               type="text"
@@ -255,7 +238,7 @@ export default function TeamPage() {
         </div>
       </div>
 
-      {/* ===== LEADERSHIP SPOTLIGHT ===== */}
+      {/* LEADERSHIP SPOTLIGHT */}
       {leadership.length > 0 && activeDepartment === 'all' && (
         <section className="px-6 py-16">
           <div className="container mx-auto max-w-6xl">
@@ -283,21 +266,19 @@ export default function TeamPage() {
                   onClick={() => setSelectedMember(member)}
                   className="group relative cursor-pointer rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 shadow-xl hover:shadow-[0_20px_60px_-15px_rgba(33,150,243,0.3)] transition-all duration-500"
                 >
-                  <div className="relative h-64 overflow-hidden bg-[#0A0A0F]">
+                  <div className="relative overflow-hidden bg-[#0A0A0F]">
                     {member.image ? (
                       <img
                         src={`${API_URL}/assets/${member.image}`}
                         alt={member.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        style={{ objectPosition: 'top center' }}
+                        className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
+                      <div className="w-full aspect-square flex items-center justify-center bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
                         <User className="w-16 h-16 text-white/10" />
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 via-transparent to-transparent" />
-                    
                     <div className="absolute bottom-0 left-0 right-0 p-6">
                       <h3 className="text-xl font-bold text-white">{member.name}</h3>
                       <p className="text-[#2196F3] text-sm font-medium">{member.role}</p>
@@ -311,7 +292,7 @@ export default function TeamPage() {
         </section>
       )}
 
-      {/* ===== ALL MEMBERS ===== */}
+      {/* ALL MEMBERS */}
       <section className={`px-6 py-16 ${leadership.length > 0 && activeDepartment === 'all' ? 'border-t border-white/5' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <motion.div 
@@ -363,16 +344,15 @@ export default function TeamPage() {
                 >
                   {viewMode === 'grid' ? (
                     <>
-                      <div className="relative h-48 overflow-hidden bg-[#0A0A0F]">
+                      <div className="relative overflow-hidden bg-[#0A0A0F]">
                         {member.image ? (
                           <img
                             src={`${API_URL}/assets/${member.image}`}
                             alt={member.name}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            style={{ objectPosition: 'top center' }}
+                            className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2196F3]/5 to-[#64B5F6]/5">
+                          <div className="w-full aspect-square flex items-center justify-center bg-gradient-to-br from-[#2196F3]/5 to-[#64B5F6]/5">
                             <User className="w-12 h-12 text-white/10" />
                           </div>
                         )}
@@ -425,7 +405,7 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* ===== MEMBER DETAIL MODAL ===== */}
+      {/* MEMBER DETAIL MODAL */}
       <AnimatePresence>
         {selectedMember && (
           <motion.div
@@ -455,16 +435,15 @@ export default function TeamPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="bg-[#0A0A0F] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-                <div className="relative h-72 overflow-hidden bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
+                <div className="relative overflow-hidden bg-gradient-to-br from-[#2196F3]/10 to-[#64B5F6]/10">
                   {selectedMember.image ? (
                     <img
                       src={`${API_URL}/assets/${selectedMember.image}`}
                       alt={selectedMember.name}
-                      className="w-full h-full object-cover"
-                      style={{ objectPosition: 'top center' }}
+                      className="w-full h-auto"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full aspect-[3/2] flex items-center justify-center">
                       <User className="w-24 h-24 text-white/10" />
                     </div>
                   )}
@@ -520,7 +499,7 @@ export default function TeamPage() {
         )}
       </AnimatePresence>
 
-      {/* ===== CTA ===== */}
+      {/* CTA */}
       <section className="px-6 py-20">
         <div className="container mx-auto max-w-4xl">
           <motion.div 
