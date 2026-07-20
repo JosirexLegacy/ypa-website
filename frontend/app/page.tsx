@@ -353,7 +353,7 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: {
 };
 
 // ============================================================
-// HERO
+// HERO – Apple-Style Subtle Blue Gradient
 // ============================================================
 const LINEUP = [
   {
@@ -365,7 +365,8 @@ const LINEUP = [
       { label: "Success rate", value: "95%" },
       { label: "Market access", value: "Guaranteed" },
     ],
-    gradient: "from-[#060B14] via-[#0E2540] to-[#2196F3]/40",
+    // ✅ Apple-style subtle blue gradient – bright, clean, premium
+    gradient: "from-[#0A1628] via-[#1A3A5C] to-[#2196F3]/60",
     href: "/projects/goats",
     image: `${API_URL}/assets/3012af2e-1cc2-404b-9e46-956c56cc1912`,
     aura: SKY,
@@ -379,7 +380,7 @@ const LINEUP = [
       { label: "Avg. return", value: "3.0×" },
       { label: "Off-take", value: "Contracted" },
     ],
-    gradient: "from-[#0E2540] via-[#153455] to-[#060B14]",
+    gradient: "from-[#0A1628] via-[#1A3A5C] to-[#64B5F6]/50",
     href: "/projects/maize",
     image: "https://tse2.mm.bing.net/th/id/OIP.WJJALakxa5_OhQvljSbsKwHaE8?r=0&w=600&h=400&rs=1&pid=ImgDetMain&o=7&rm=3",
     aura: GOLD,
@@ -393,7 +394,7 @@ const LINEUP = [
       { label: "Branches", value: "12" },
       { label: "Founded", value: "2014" },
     ],
-    gradient: "from-[#060B14] via-[#0E2540]/80 to-[#153455]",
+    gradient: "from-[#0A1628] via-[#1A3A5C] to-[#2196F3]/50",
     href: "/sacco",
     image: "https://farm6.staticflickr.com/5603/15475865161_634b055363.jpg",
     aura: POSITIVE,
@@ -401,13 +402,8 @@ const LINEUP = [
 ];
 
 // ============================================================
-// HERO VISUAL — a real photograph per programme, staged like a
-// viewfinder rather than a rendered creature. This replaces the
-// old hand-drawn SVG animals: those needed 30+ elements animating
-// simultaneously behind an SVG blur filter, which is expensive to
-// re-rasterize every frame and was the actual source of the scroll
-// jank. This version runs on exactly two GPU-cheap transforms — a
-// crossfade and a slow zoom — full stop.
+// HERO VISUAL
+// ============================================================
 const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
   const reduce = useReducedMotion();
 
@@ -517,7 +513,7 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen overflow-hidden bg-[#060B14]"
+      className="relative min-h-screen overflow-hidden bg-[#0A1628]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -1207,7 +1203,7 @@ const PressSignal = ({ pressItems }: { pressItems: any[] }) => {
             </h2>
           </div>
           <Link
-            href="/blog"
+            href="/press"
             className="inline-flex items-center gap-2 text-sm font-medium group"
             style={{ color: BLUE }}
           >
