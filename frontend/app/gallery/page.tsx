@@ -9,27 +9,28 @@ import {
   Camera, 
   Sparkles, 
   ZoomIn, 
-  Play, 
-  Video, 
-  Image as ImageIcon, 
   X, 
   ChevronLeft, 
   ChevronRight,
   Grid3x3,
   LayoutGrid,
-  Heart,
-  Clock,
+  Tag,
   Calendar,
   MapPin,
-  User,
-  Tag,
-  ArrowUpRight,
-  ExternalLink,
-  Shield,
   Star,
-  Eye,
-  Zap
+  Zap,
+  Award,
+  Heart,
+  Eye
 } from 'lucide-react';
+
+// ============================================================
+// BRAND COLORS - YPA Design System
+// ============================================================
+const YPA_BLUE = "#00AEEF";
+const YPA_BLUE_LIGHT = "#33C1F5";
+const YPA_BLUE_SOFT = "#E6F8FD";
+const GOLD = "#F0B429";
 
 // ============================================================
 // API BASE
@@ -37,14 +38,87 @@ import {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
-// DATA FETCHING
+// FALLBACK IMAGES
+// ============================================================
+const FALLBACK_IMAGES = {
+  gallery: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80',
+  default: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80'
+};
+
+// ============================================================
+// FALLBACK GALLERY DATA
+// ============================================================
+const FALLBACK_GALLERY = [
+  {
+    id: '1',
+    title: 'Goats Programme - Central Region',
+    description: 'Mubende × Boer × Kalahari goats thriving under YPA care',
+    category: 'goats',
+    image: 'https://images.unsplash.com/photo-1535268647677-300d0a4c3b7b?w=900&q=80',
+    featured: true,
+    location: 'Central Region, Uganda',
+    date_created: '2026-07-15'
+  },
+  {
+    id: '2',
+    title: 'Maize Harvest Season',
+    description: 'Farmers celebrating a successful contract farming season',
+    category: 'maize',
+    image: 'https://images.unsplash.com/photo-1593250481214-81611f9bca0f?w=800&q=80',
+    featured: true,
+    location: 'Western Region, Uganda',
+    date_created: '2026-07-12'
+  },
+  {
+    id: '3',
+    title: 'YPA SACCO Members',
+    description: 'Members gathering for quarterly savings review',
+    category: 'sacco',
+    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+    featured: true,
+    location: 'Kampala, Uganda',
+    date_created: '2026-07-10'
+  },
+  {
+    id: '4',
+    title: 'Goat Vaccination Drive',
+    description: 'Veterinary team vaccinating goats across 12 branches',
+    category: 'goats',
+    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+    featured: false,
+    location: 'Eastern Region, Uganda',
+    date_created: '2026-07-08'
+  },
+  {
+    id: '5',
+    title: 'Contract Farming Workshop',
+    description: 'Training farmers on modern maize cultivation techniques',
+    category: 'maize',
+    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+    featured: false,
+    location: 'Northern Region, Uganda',
+    date_created: '2026-07-05'
+  },
+  {
+    id: '6',
+    title: 'YPA Branch Opening',
+    description: 'New branch opening ceremony in Masaka',
+    category: 'events',
+    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+    featured: false,
+    location: 'Masaka, Uganda',
+    date_created: '2026-07-01'
+  }
+];
+
+// ============================================================
+// MAIN GALLERY PAGE
 // ============================================================
 export default function GalleryPage() {
   const [images, setImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('masonry');
+  const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const [activeCategory, setActiveCategory] = useState('all');
 
   useEffect(() => {
@@ -53,39 +127,36 @@ export default function GalleryPage() {
         const res = await fetch(`${API_URL}/items/gallery`, {
           cache: 'no-store'
         });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
         const data = await res.json();
-        setImages(data.data || []);
-        setLoading(false);
+        
+        if (data.data && data.data.length > 0) {
+          setImages(data.data);
+        } else {
+          setImages(FALLBACK_GALLERY);
+        }
       } catch (err) {
-        console.error('Error:', err);
+        console.error('Error fetching gallery:', err);
+        setImages(FALLBACK_GALLERY);
+      } finally {
         setLoading(false);
       }
     };
+    
     fetchImages();
   }, []);
 
-  // ✅ Helpers
-  const getVideoEmbedUrl = (url: string) => {
-    if (!url) return null;
-    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
-    if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-    if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-    return null;
+  const getImageUrl = (image: string | undefined) => {
+    if (!image) return FALLBACK_IMAGES.gallery;
+    if (image.startsWith('http')) return image;
+    return `${API_URL}/assets/${image}`;
   };
 
-  const getYouTubeThumbnail = (url: string) => {
-    const embedUrl = getVideoEmbedUrl(url);
-    if (!embedUrl) return null;
-    const videoId = embedUrl.split('/embed/')[1];
-    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-  };
-
-  const isVideo = (item: any) => {
-    return item.type === 'video' && item.video_url && getVideoEmbedUrl(item.video_url);
-  };
-
-  // ✅ Keyboard navigation
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedItem) return;
@@ -105,7 +176,7 @@ export default function GalleryPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedItem, images]);
 
-  // ✅ Categories
+  // Categories
   const categories = ['all', ...new Set(images.map(item => item.category).filter(Boolean))];
   const featuredItems = images.filter((item: any) => item.featured === true);
   const regularItems = images.filter((item: any) => item.featured !== true);
@@ -113,34 +184,15 @@ export default function GalleryPage() {
     ? regularItems 
     : regularItems.filter(item => item.category === activeCategory);
 
-  // ✅ Size helper
-  const getItemSize = (index: number, total: number) => {
-    if (viewMode === 'grid') return 'col-span-1 row-span-1';
-    const patterns = [
-      'col-span-1 row-span-1',
-      'col-span-1 row-span-1',
-      'col-span-2 row-span-1',
-      'col-span-1 row-span-1',
-      'col-span-1 row-span-2',
-      'col-span-1 row-span-1',
-      'col-span-2 row-span-1',
-      'col-span-1 row-span-1',
-      'col-span-1 row-span-1',
-      'col-span-1 row-span-2',
-    ];
-    if (index < 3) return index === 0 ? 'col-span-2 row-span-2' : 'col-span-2 row-span-1';
-    return patterns[index % patterns.length];
-  };
-
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0A0A0F]">
+      <main className="min-h-screen bg-white">
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <motion.div 
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-[#2196F3]/30 border-t-[#2196F3] rounded-full"
+            className="w-10 h-10 border-3 border-[#00AEEF]/30 border-t-[#00AEEF] rounded-full"
           />
         </div>
         <Footer />
@@ -149,257 +201,162 @@ export default function GalleryPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0F] overflow-x-hidden">
+    <main className="min-h-screen bg-white overflow-x-hidden">
 
-      {/* ===== NAVIGATION ===== */}
       <Navigation />
 
-      {/* ===== HERO - Futuristic with Grid ===== */}
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(33,150,243,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(33,150,243,0.03) 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px'
-        }} />
-        
-        <motion.div 
-          className="absolute top-[-20%] right-[-10%] w-[700px] h-[700px] rounded-full blur-3xl opacity-20"
-          style={{ background: '#2196F3' }}
-          animate={{ x: [0, 50, -30, 0], y: [0, -30, 40, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full blur-3xl opacity-15"
-          style={{ background: '#7EC8FF' }}
-          animate={{ x: [0, -40, 30, 0], y: [0, 30, -40, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        <div className="relative container mx-auto max-w-6xl z-10">
-          <motion.div 
-            className="flex flex-col md:flex-row md:items-end justify-between gap-6"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+      {/* ===== HERO - Premium ===== */}
+      <section className="relative pt-28 md:pt-32 pb-12 md:pb-16 px-5 md:px-14 bg-gradient-to-b from-[#E6F8FD] to-white">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <motion.span 
-                className="inline-flex items-center gap-2 text-[#2196F3] font-medium text-sm uppercase tracking-wider bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-[#2196F3]/20"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Camera className="w-4 h-4" />
+              <span className="inline-flex items-center gap-2 text-[#00AEEF] text-xs font-medium uppercase tracking-wider bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#00AEEF]/20 shadow-sm">
+                <Camera className="w-3.5 h-3.5" />
                 Gallery
-                <Zap className="w-3 h-3 text-[#64B5F6] ml-1" />
-              </motion.span>
-              <motion.h1 
-                className="text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight mt-4 leading-[1.1]"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                Visual <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2196F3] via-[#64B5F6] to-[#7EC8FF]">Journey</span>
-              </motion.h1>
-              <motion.p 
-                className="text-lg text-white/40 mt-3 max-w-xl"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                Images and videos from YPA's journey across Africa
-              </motion.p>
+              </span>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111111] mt-3 leading-tight">
+                Visual <br className="block md:hidden" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00AEEF] to-[#33C1F5]">Journey</span>
+              </h1>
+              <p className="text-sm text-[#5B6B7A] mt-1.5 max-w-xl">
+                Images from YPA's journey across Africa
+              </p>
             </div>
-            <motion.div 
-              className="flex items-center gap-4 flex-wrap"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-xl px-5 py-2.5 rounded-full border border-white/10 shadow-lg">
-                <span className="text-xs font-medium text-white/50">{images.length} items</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-[#E8ECF0] text-xs text-[#5B6B7A] shadow-sm">
+                <span>{images.length} items</span>
               </div>
               {featuredItems.length > 0 && (
-                <div className="flex items-center gap-2 bg-gradient-to-r from-[#2196F3]/10 to-[#64B5F6]/10 backdrop-blur-xl px-5 py-2.5 rounded-full border border-[#2196F3]/20 shadow-lg">
-                  <Sparkles className="w-4 h-4 text-[#2196F3]" />
-                  <span className="text-xs font-medium text-[#2196F3]">{featuredItems.length} featured</span>
+                <div className="flex items-center gap-1.5 bg-[#F0B429]/10 px-3.5 py-1.5 rounded-full border border-[#F0B429]/20 text-xs text-[#F0B429]">
+                  <Award className="w-3.5 h-3.5" />
+                  <span>{featuredItems.length} featured</span>
                 </div>
               )}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ===== FILTERS & CONTROLS ===== */}
-      <div className="sticky top-20 z-30 flex justify-center px-4 -mt-6">
-        <div
-          className="inline-flex flex-wrap items-center gap-2 px-4 py-2 rounded-full transition-all duration-300"
-          style={{
-            background: "rgba(10,10,15,0.7)",
-            backdropFilter: "blur(24px) saturate(1.4)",
-            boxShadow: "0 8px 40px rgba(33,150,243,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
-            border: "1px solid rgba(33,150,243,0.2)",
-          }}
-        >
-          {categories.map((cat) => (
-            <motion.button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 whitespace-nowrap ${
-                activeCategory === cat
-                  ? 'bg-gradient-to-r from-[#2196F3] to-[#64B5F6] text-white shadow-lg shadow-[#2196F3]/30'
-                  : 'text-white/50 hover:text-white hover:bg-white/5'
+      {/* ===== FILTERS - Sticky ===== */}
+      <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8ECF0] py-3 px-5 md:px-14">
+        <div className="container mx-auto max-w-6xl flex items-center justify-between overflow-x-auto">
+          <div className="flex items-center gap-1.5 md:gap-2 flex-nowrap">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-3.5 md:px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 ${
+                  activeCategory === cat
+                    ? 'bg-[#00AEEF] text-white shadow-sm shadow-[#00AEEF]/20'
+                    : 'text-[#5B6B7A] hover:text-[#111111] hover:bg-[#F6F8FA]'
+                }`}
+              >
+                {cat === 'all' ? 'All' : cat}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1 ml-4 pl-4 border-l border-[#E8ECF0]">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg transition-all duration-300 ${
+                viewMode === 'grid' 
+                  ? 'text-[#00AEEF] bg-[#00AEEF]/10' 
+                  : 'text-[#5B6B7A] hover:text-[#111111]'
               }`}
+              aria-label="Grid view"
             >
-              {cat === 'all' ? 'All' : cat}
-            </motion.button>
-          ))}
-          <div className="w-px h-5 bg-white/10 mx-1"></div>
-          <button
-            onClick={() => setViewMode('masonry')}
-            className={`p-1.5 rounded-lg transition-all duration-300 ${
-              viewMode === 'masonry' 
-                ? 'bg-[#2196F3]/20 text-[#2196F3]' 
-                : 'text-white/30 hover:text-white/60'
-            }`}
-            aria-label="Masonry view"
-          >
-            <Grid3x3 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-lg transition-all duration-300 ${
-              viewMode === 'grid' 
-                ? 'bg-[#2196F3]/20 text-[#2196F3]' 
-                : 'text-white/30 hover:text-white/60'
-            }`}
-            aria-label="Grid view"
-          >
-            <LayoutGrid className="w-4 h-4" />
-          </button>
+              <Grid3x3 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('masonry')}
+              className={`p-1.5 rounded-lg transition-all duration-300 ${
+                viewMode === 'masonry' 
+                  ? 'text-[#00AEEF] bg-[#00AEEF]/10' 
+                  : 'text-[#5B6B7A] hover:text-[#111111]'
+              }`}
+              aria-label="Masonry view"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ===== FEATURED SECTION ===== */}
+      {/* ===== FEATURED - Premium Rounded ===== */}
       {featuredItems.length > 0 && activeCategory === 'all' && (
-        <section className="px-6 py-16">
+        <section className="px-5 md:px-14 py-10 md:py-16">
           <div className="container mx-auto max-w-6xl">
-            <motion.div 
-              className="flex items-center gap-3 mb-8"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <motion.div 
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                <Star className="w-5 h-5 text-[#2196F3] fill-[#2196F3]/30" />
-              </motion.div>
-              <h2 className="text-xl font-bold text-white">Featured Stories</h2>
-              <span className="text-sm text-white/30">({featuredItems.length})</span>
-            </motion.div>
+            <div className="flex items-center gap-2.5 mb-5 md:mb-8">
+              <Star className="w-4 h-4 text-[#F0B429] fill-[#F0B429]/30" />
+              <h2 className="text-base md:text-lg font-bold text-[#111111]">Featured Stories</h2>
+              <span className="text-xs text-[#5B6B7A]">({featuredItems.length})</span>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 auto-rows-fr">
               {featuredItems.map((item: any, index: number) => {
-                const size = index === 0 ? 'lg:col-span-2 lg:row-span-2' : 
-                            index === 1 ? 'lg:col-span-1 lg:row-span-1' : 
-                            'lg:col-span-1 lg:row-span-1';
-                const height = index === 0 ? 'h-[500px] md:h-[600px]' : 'h-[300px] md:h-[350px]';
-                const imageUrl = item.image ? `${API_URL}/assets/${item.image}` : null;
+                const isLarge = index === 0;
+                const imageUrl = getImageUrl(item.image);
                 
                 return (
                   <motion.div
                     key={item.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    whileHover={{ y: -8 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.08 }}
+                    whileHover={{ y: -4 }}
                     onClick={() => setSelectedItem(item)}
-                    onMouseEnter={() => setHoveredId(item.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    className={`group relative cursor-pointer rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl hover:shadow-[0_20px_60px_-15px_rgba(33,150,243,0.3)] transition-all duration-500 ${size}`}
+                    className={`group relative cursor-pointer overflow-hidden bg-[#F6F8FA] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${
+                      isLarge 
+                        ? 'md:col-span-2 row-span-2 aspect-[4/3] md:aspect-[16/9]' 
+                        : 'aspect-[4/3] md:aspect-[3/4]'
+                    }`}
                   >
-                    <div className={`relative ${height} bg-[#0A0A0F]`}>
-                      {isVideo(item) ? (
-                        <img
-                          src={getYouTubeThumbnail(item.video_url) || ''}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#0A0A0F]">
-                          <ImageIcon className="w-16 h-16 text-white/10" />
-                        </div>
-                      )}
-                      
-                      <motion.div 
-                        className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 via-[#0A0A0F]/30 to-transparent"
-                        initial={{ opacity: 0 }}
-                        whileHover={{ opacity: 1 }}
-                        transition={{ duration: 0.4 }}
+                    <div className="absolute inset-0">
+                      <img
+                        src={imageUrl}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.src = FALLBACK_IMAGES.gallery;
+                        }}
                       />
-                      
-                      <motion.div 
-                        className="absolute inset-0 rounded-2xl border-2 border-transparent"
-                        whileHover={{ borderColor: '#2196F3', boxShadow: 'inset 0 0 30px rgba(33,150,243,0.2)' }}
-                        transition={{ duration: 0.3 }}
-                      />
-                      
-                      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0A0A0F]/90 to-transparent">
-                        <motion.div
-                          initial={{ y: 10, opacity: 0.8 }}
-                          whileHover={{ y: 0, opacity: 1 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <h3 className="text-xl font-bold text-white">{item.title}</h3>
-                          <div className="flex flex-wrap items-center gap-3 mt-1.5 text-sm text-white/50">
-                            <span className="flex items-center gap-1">
-                              <Tag className="w-3.5 h-3.5" />
-                              {item.category}
-                            </span>
-                            {item.description && (
-                              <>
-                                <span className="w-1 h-1 rounded-full bg-white/20"></span>
-                                <span className="line-clamp-1">{item.description}</span>
-                              </>
-                            )}
-                          </div>
-                          <span className="inline-flex items-center gap-1 mt-2 text-sm text-[#64B5F6] font-medium">
-                            {isVideo(item) ? 'Watch' : 'View'} <ZoomIn className="w-4 h-4" />
-                          </span>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="absolute top-4 left-4 flex items-center gap-2">
-                        <span className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium text-white/80 border border-white/10">
+                    </div>
+                    
+                    {/* Premium gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/80 via-[#111111]/20 to-transparent group-hover:from-[#111111]/90 transition-all duration-500" />
+                    
+                    {/* Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="bg-[#00AEEF] px-2.5 py-0.5 rounded-full text-[10px] font-medium text-white shadow-sm shadow-[#00AEEF]/30">
                           {item.category}
                         </span>
-                        <span className="bg-gradient-to-r from-[#2196F3] to-[#64B5F6] px-3 py-1 rounded-full text-white text-xs font-medium flex items-center gap-1 shadow-lg shadow-[#2196F3]/30">
-                          <Sparkles className="w-3 h-3" />
-                          Featured
-                        </span>
+                        {isLarge && (
+                          <span className="bg-[#F0B429] px-2.5 py-0.5 rounded-full text-[10px] font-medium text-white shadow-sm shadow-[#F0B429]/30 flex items-center gap-1">
+                            <Sparkles className="w-2.5 h-2.5" />
+                            Featured
+                          </span>
+                        )}
                       </div>
-                      
-                      {isVideo(item) && (
-                        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium text-white/60 flex items-center gap-1 border border-white/10">
-                          <Video className="w-3 h-3" />
-                          Video
-                        </div>
+                      <h3 className="text-white font-semibold text-sm md:text-base lg:text-lg leading-snug line-clamp-2">{item.title}</h3>
+                      {isLarge && item.description && (
+                        <p className="text-white/60 text-xs md:text-sm mt-1 line-clamp-2 hidden md:block">{item.description}</p>
                       )}
+                      <div className="flex items-center gap-3 mt-1.5 text-xs text-white/40">
+                        <span className="flex items-center gap-1">
+                          <Tag className="w-3 h-3" />
+                          {item.category}
+                        </span>
+                        {item.location && (
+                          <>
+                            <span className="w-0.5 h-0.5 rounded-full bg-white/20"></span>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {item.location}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 );
@@ -409,129 +366,78 @@ export default function GalleryPage() {
         </section>
       )}
 
-      {/* ===== ALL ITEMS ===== */}
-      <section id="gallery-grid" className={`px-6 py-16 ${featuredItems.length > 0 && activeCategory === 'all' ? 'bg-[#0A0A0F]' : ''}`}>
+      {/* ===== ALL ITEMS - Premium Rounded Grid ===== */}
+      <section className={`px-5 md:px-14 pb-10 md:pb-16 ${featuredItems.length > 0 && activeCategory === 'all' ? 'bg-[#F6F8FA]' : 'bg-white'}`}>
         <div className="container mx-auto max-w-6xl">
-          <motion.div 
-            className="flex items-center gap-3 mb-8"
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <div className="w-5 h-5 bg-gradient-to-br from-[#2196F3] to-[#64B5F6] rounded-full shadow-lg shadow-[#2196F3]/30"></div>
-            <h2 className="text-xl font-bold text-white">
+          <div className="flex items-center gap-2.5 mb-5 md:mb-8">
+            <div className="w-1 h-5 md:h-6 bg-gradient-to-b from-[#00AEEF] to-[#33C1F5] rounded-full shadow-sm shadow-[#00AEEF]/20"></div>
+            <h2 className="text-base md:text-lg font-bold text-[#111111]">
               {activeCategory === 'all' ? 'All Items' : activeCategory}
             </h2>
-            <span className="text-sm text-white/30">({filteredItems.length})</span>
-          </motion.div>
+            <span className="text-xs text-[#5B6B7A]">({filteredItems.length})</span>
+          </div>
 
           {filteredItems.length === 0 ? (
-            <motion.div 
-              className="text-center py-20 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <div className="text-6xl mb-4 opacity-30">📸</div>
-              <h3 className="text-xl font-medium text-white/80">No items found</h3>
-              <p className="text-white/30 text-sm mt-1">Try selecting a different category</p>
-            </motion.div>
+            <div className="text-center py-16 bg-white rounded-2xl border border-[#E8ECF0] shadow-sm">
+              <div className="text-4xl mb-3 opacity-30">📸</div>
+              <h3 className="text-base font-medium text-[#111111]">No items found</h3>
+              <p className="text-sm text-[#5B6B7A] mt-0.5">Try selecting a different category</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px] md:auto-rows-[220px]">
+            <div className={`grid gap-4 md:gap-5 auto-rows-fr ${
+              viewMode === 'grid' 
+                ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' 
+                : 'grid-cols-2 md:grid-cols-3'
+            }`}>
               {filteredItems.map((item: any, index: number) => {
-                const size = getItemSize(index, filteredItems.length);
-                const isVideoItem = isVideo(item);
-                const thumbnail = isVideoItem 
-                  ? getYouTubeThumbnail(item.video_url) 
-                  : item.image ? `${API_URL}/assets/${item.image}` : null;
+                const imageUrl = getImageUrl(item.image);
+                const isTall = viewMode === 'masonry' && index % 4 === 0;
+                const isWide = viewMode === 'masonry' && index % 3 === 0 && index > 0;
                 
-                const getHeight = () => {
-                  if (viewMode === 'grid') return 'h-full';
-                  const heights = ['h-full', 'h-full', 'h-[280px]', 'h-full', 'h-[260px]', 'h-full'];
-                  return heights[index % heights.length];
-                };
+                let aspectClass = 'aspect-square';
+                let roundClass = 'rounded-2xl';
+                if (viewMode === 'masonry') {
+                  if (isTall) aspectClass = 'aspect-[3/4] md:aspect-[2/3]';
+                  else if (isWide) aspectClass = 'aspect-[4/3] md:aspect-[16/9]';
+                  else aspectClass = 'aspect-square';
+                }
 
                 return (
                   <motion.div
                     key={item.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: index * 0.03 }}
-                    viewport={{ once: true }}
-                    whileHover={{ 
-                      y: -6, 
-                      scale: 1.02,
-                      transition: { duration: 0.2 }
-                    }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: Math.min(index * 0.02, 0.3) }}
+                    whileHover={{ y: -4, scale: 1.01 }}
                     onClick={() => setSelectedItem(item)}
-                    onMouseEnter={() => setHoveredId(item.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    className={`group relative cursor-pointer rounded-xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 shadow-lg hover:shadow-[0_20px_60px_-15px_rgba(33,150,243,0.2)] transition-all duration-500 ${size} ${getHeight()}`}
+                    className={`group relative cursor-pointer overflow-hidden bg-[#F6F8FA] ${roundClass} shadow-sm hover:shadow-lg transition-all duration-500 ${aspectClass} ${viewMode === 'masonry' && isWide ? 'md:col-span-2' : ''}`}
                   >
-                    <div className="relative w-full h-full">
-                      {thumbnail ? (
-                        <img
-                          src={thumbnail}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#0A0A0F]">
-                          <ImageIcon className="w-12 h-12 text-white/10" />
-                        </div>
-                      )}
-                      
-                      {isVideoItem && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <motion.div 
-                            className="w-12 h-12 bg-black/70 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl border border-white/20"
-                            whileHover={{ scale: 1.1 }}
-                            animate={{ 
-                              scale: hoveredId === item.id ? 1.1 : 1,
-                              transition: { duration: 0.3 }
-                            }}
-                          >
-                            <Play className="w-5 h-5 text-[#2196F3] ml-0.5" />
-                          </motion.div>
-                        </div>
-                      )}
-                      
-                      <motion.div 
-                        className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/70 via-transparent to-transparent"
-                        initial={{ opacity: 0 }}
-                        whileHover={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
+                    <div className="absolute inset-0">
+                      <img
+                        src={imageUrl}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.src = FALLBACK_IMAGES.gallery;
+                        }}
                       />
-                      
-                      <motion.div 
-                        className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#0A0A0F]/80 to-transparent"
-                        initial={{ y: 20, opacity: 0 }}
-                        whileHover={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <p className="text-sm font-medium text-white truncate">{item.title}</p>
-                        <div className="flex items-center gap-2 mt-0.5 text-xs text-white/50">
-                          <Tag className="w-3 h-3" />
-                          {item.category}
-                          {item.description && (
-                            <>
-                              <span className="w-0.5 h-0.5 rounded-full bg-white/20"></span>
-                              <span className="truncate">{item.description}</span>
-                            </>
-                          )}
-                        </div>
-                      </motion.div>
-                      
-                      <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-medium text-white/70 border border-white/10">
-                        {item.category}
-                      </div>
-                      
-                      {isVideoItem && (
-                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-medium text-white/50 flex items-center gap-1 border border-white/10">
-                          <Video className="w-3 h-3" />
-                          Video
+                    </div>
+                    
+                    {/* Premium gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                    
+                    {/* Category badge */}
+                    <div className="absolute top-3 left-3 bg-[#111111]/70 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] font-medium text-white/80 border border-white/10 shadow-sm">
+                      {item.category}
+                    </div>
+                    
+                    {/* Hover info */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#111111]/80 to-transparent translate-y-full group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                      <p className="text-white text-xs md:text-sm font-medium truncate">{item.title}</p>
+                      {item.location && (
+                        <div className="flex items-center gap-1 mt-0.5 text-[10px] text-white/50">
+                          <MapPin className="w-2.5 h-2.5" />
+                          {item.location}
                         </div>
                       )}
                     </div>
@@ -543,56 +449,46 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* ===== LIGHTBOX ===== */}
+      {/* ===== LIGHTBOX - Premium ===== */}
       <AnimatePresence>
         {selectedItem && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-[#111111]/95 backdrop-blur-xl flex items-center justify-center p-4"
             onClick={() => setSelectedItem(null)}
           >
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
+            <button
               onClick={() => setSelectedItem(null)}
-              className="absolute top-6 right-6 text-white/30 hover:text-white transition-colors duration-300 p-2 hover:bg-white/5 rounded-full z-10 border border-white/5"
+              className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors p-2 z-10 hover:bg-white/5 rounded-full"
             >
               <X className="w-6 h-6" />
-            </motion.button>
+            </button>
 
-            <motion.button
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 const currentIndex = images.findIndex(i => i.id === selectedItem.id);
                 const prevIndex = (currentIndex - 1 + images.length) % images.length;
                 setSelectedItem(images[prevIndex]);
               }}
-              className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors duration-300 p-2 hover:bg-white/5 rounded-full z-10 border border-white/5"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors p-2 z-10 hover:bg-white/5 rounded-full"
             >
-              <ChevronLeft className="w-8 h-8" />
-            </motion.button>
+              <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
+            </button>
 
-            <motion.button
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 const currentIndex = images.findIndex(i => i.id === selectedItem.id);
                 const nextIndex = (currentIndex + 1) % images.length;
                 setSelectedItem(images[nextIndex]);
               }}
-              className="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors duration-300 p-2 hover:bg-white/5 rounded-full z-10 border border-white/5"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors p-2 z-10 hover:bg-white/5 rounded-full"
             >
-              <ChevronRight className="w-8 h-8" />
-            </motion.button>
+              <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
+            </button>
 
             <motion.div 
               className="max-w-5xl w-full max-h-[90vh]"
@@ -602,115 +498,71 @@ export default function GalleryPage() {
               transition={{ duration: 0.3 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative rounded-2xl overflow-hidden bg-black/50 border border-white/10 shadow-2xl">
-                {isVideo(selectedItem) ? (
-                  <div className="relative pt-[56.25%]">
-                    <iframe
-                      src={getVideoEmbedUrl(selectedItem.video_url) ?? undefined}
-                      className="absolute inset-0 w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                ) : (
-                  <img
-                    src={`${API_URL}/assets/${selectedItem.image}`}
-                    alt={selectedItem.title}
-                    className="w-full h-full object-contain max-h-[80vh]"
-                  />
-                )}
+              <div className="relative rounded-2xl overflow-hidden bg-[#111111] shadow-2xl">
+                <img
+                  src={getImageUrl(selectedItem.image)}
+                  alt={selectedItem.title}
+                  className="w-full h-auto max-h-[75vh] object-contain"
+                  onError={(e) => {
+                    e.currentTarget.src = FALLBACK_IMAGES.gallery;
+                  }}
+                />
               </div>
               
-              <motion.div 
-                className="mt-6 text-white text-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <h3 className="text-2xl md:text-3xl font-bold text-white">{selectedItem.title}</h3>
-                <p className="text-white/40 text-sm md:text-base mt-2 max-w-2xl mx-auto">
-                  {selectedItem.description || 'A moment captured from YPA\'s journey'}
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-4 mt-3 text-xs text-white/20">
-                  <span className="flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5" />
+              <div className="mt-5 text-white text-center">
+                <h3 className="text-lg md:text-xl font-bold">{selectedItem.title}</h3>
+                {selectedItem.description && (
+                  <p className="text-white/50 text-sm mt-1 max-w-xl mx-auto">{selectedItem.description}</p>
+                )}
+                <div className="flex flex-wrap items-center justify-center gap-3 mt-2 text-xs text-white/30">
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-3 h-3" />
                     {selectedItem.category}
                   </span>
-                  <span className="w-1 h-1 rounded-full bg-white/10"></span>
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {selectedItem.date_created ? new Date(selectedItem.date_created).toLocaleDateString() : 'Recent'}
-                  </span>
-                  <span className="w-1 h-1 rounded-full bg-white/10"></span>
-                  <span className="flex items-center gap-1.5">
-                    {isVideo(selectedItem) ? (
-                      <>
-                        <Video className="w-3.5 h-3.5" />
-                        Video
-                      </>
-                    ) : (
-                      <>
-                        <ImageIcon className="w-3.5 h-3.5" />
-                        Photo
-                      </>
-                    )}
-                  </span>
+                  {selectedItem.date_created && (
+                    <>
+                      <span className="w-0.5 h-0.5 rounded-full bg-white/10"></span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(selectedItem.date_created).toLocaleDateString()}
+                      </span>
+                    </>
+                  )}
                   {selectedItem.location && (
                     <>
-                      <span className="w-1 h-1 rounded-full bg-white/10"></span>
-                      <span className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5" />
+                      <span className="w-0.5 h-0.5 rounded-full bg-white/10"></span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
                         {selectedItem.location}
                       </span>
                     </>
                   )}
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ===== CTA ===== */}
-      <section className="px-6 py-20">
+      {/* ===== CTA - Premium ===== */}
+      <section className="px-5 md:px-14 py-12 md:py-16 bg-[#F6F8FA]">
         <div className="container mx-auto max-w-4xl">
-          <motion.div 
-            className="relative bg-white/5 backdrop-blur-xl rounded-3xl p-12 border border-white/10 shadow-2xl text-center overflow-hidden"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#2196F3]/10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#64B5F6]/10 rounded-full blur-2xl"></div>
-            
-            <div className="relative z-10">
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="inline-block"
-              >
-                <Camera className="w-12 h-12 text-[#2196F3]/30 mx-auto mb-4" />
-              </motion.div>
-              <h3 className="text-2xl font-bold text-white">Share Your YPA Story</h3>
-              <p className="text-white/30 text-sm mt-2 max-w-md mx-auto">
-                Have photos or videos from your YPA journey? We'd love to feature them.
-              </p>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-block"
-              >
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center gap-2 mt-6 bg-gradient-to-r from-[#2196F3] to-[#64B5F6] text-white px-8 py-3.5 rounded-full text-sm font-medium shadow-lg shadow-[#2196F3]/30 hover:shadow-xl transition-all duration-300"
-                >
-                  Submit your story
-                  <Sparkles className="w-4 h-4" />
-                </Link>
-              </motion.div>
+          <div className="bg-white rounded-2xl p-8 md:p-12 border border-[#E8ECF0] text-center shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#00AEEF]/20 to-[#33C1F5]/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <Camera className="w-5 h-5 text-[#00AEEF]" />
             </div>
-          </motion.div>
+            <h3 className="text-lg md:text-xl font-bold text-[#111111]">Share Your YPA Story</h3>
+            <p className="text-sm text-[#5B6B7A] mt-1 max-w-md mx-auto">
+              Have photos from your YPA journey? We'd love to feature them.
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 mt-4 bg-gradient-to-r from-[#00AEEF] to-[#33C1F5] text-white px-6 py-2.5 rounded-full text-sm font-medium shadow-sm shadow-[#00AEEF]/30 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+            >
+              Submit your story
+              <Sparkles className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
