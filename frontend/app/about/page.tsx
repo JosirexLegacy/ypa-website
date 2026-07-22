@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Alegreya, Inter } from "next/font/google";
 import { motion, useInView, useScroll, useTransform, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import {
@@ -42,19 +42,27 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
   variable: "--font-mono",
 });
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+});
 
 // ============================================================
-// DESIGN TOKENS
+// YPA BRAND COLORS
 // ============================================================
-const INK = "#060B14";
+const YPA_BLUE = "#00AEEF";
+const YPA_BLUE_DARK = "#0099D6";
+const YPA_BLUE_LIGHT = "#33C1F5";
+const YPA_BLUE_SOFT = "#E6F8FD";
+const YPA_GOLD = "#F0B429";
+const YPA_GOLD_LIGHT = "#FFE08A";
+const INK = "#111111";
 const NAVY = "#0E2540";
 const NAVY_SOFT = "#153455";
 const LINE = "#1F3B57";
-const BLUE = "#2196F3";
-const SKY = "#7EC8FF";
-const GOLD = "#F0B429";
 const MIST = "#F6F8FA";
-const INK_ON_LIGHT = "#0E2540";
+const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
 
 // ============================================================
@@ -109,7 +117,7 @@ const scaleIn = {
 const NeedsInfo = ({ children = "Add details" }: { children?: string }) => (
   <span
     className="inline-flex items-center gap-1 text-[9px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded-full border border-dashed align-middle ml-2"
-    style={{ color: GOLD, borderColor: `${GOLD}88`, background: `${GOLD}0f` }}
+    style={{ color: YPA_GOLD, borderColor: `${YPA_GOLD}88`, background: `${YPA_GOLD}0f` }}
   >
     <Zap className="h-2.5 w-2.5" />
     {children}
@@ -117,130 +125,468 @@ const NeedsInfo = ({ children = "Add details" }: { children?: string }) => (
 );
 
 // ============================================================
-// PARALLAX HERO
+// PREMIUM HERO — Glass + Morphing (Same as Homepage)
 // ============================================================
-const ParallaxHero = ({ content }: { content: any }) => {
-  const ref = useRef(null);
+const AboutHero = ({ content }: { content: any }) => {
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.5]);
 
   return (
-    <section id="hero" ref={ref} className="relative min-h-[88vh] flex items-center overflow-hidden" style={{ background: INK }}>
-      <motion.div className="absolute inset-0" style={reduce ? {} : { y, opacity }}>
-        {content?.hero_image ? (
-          <img src={`${API_URL}/assets/${content.hero_image}`} alt="Youth Platform Africa" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${INK}, ${NAVY})` }} />
-        )}
-        <div className="absolute inset-0" style={{ background: `linear-gradient(to right, ${INK}D9, ${INK}99, transparent)` }} />
-      </motion.div>
+    <section
+      id="hero"
+      className="relative min-h-[88vh] overflow-hidden bg-white"
+    >
+      {/* Background gradient with subtle movement */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-[#F0F9FE] to-[#E6F8FD]" />
 
+      {/* ✅ MORPHING BACKGROUND BLOBS — Premium organic movement */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full blur-3xl"
+          style={{ background: `${YPA_BLUE}12` }}
+          animate={reduce ? {} : { 
+            scale: [1, 1.15, 0.9, 1],
+            x: [0, 30, -20, 0],
+            y: [0, -20, 30, 0],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[-5%] left-[-5%] w-[450px] h-[450px] rounded-full blur-3xl"
+          style={{ background: `${YPA_GOLD}10` }}
+          animate={reduce ? {} : { 
+            scale: [1, 0.85, 1.1, 1],
+            x: [0, -20, 30, 0],
+            y: [0, 30, -20, 0],
+          }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl"
+          style={{ background: `${YPA_BLUE_LIGHT}06` }}
+          animate={reduce ? {} : { 
+            scale: [1, 1.2, 0.85, 1],
+          }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+        />
+      </div>
+
+      {/* Subtle dot grid */}
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage:
-            "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
+          backgroundImage: `radial-gradient(${YPA_BLUE} 1px, transparent 1px)`,
+          backgroundSize: "40px 40px",
+          opacity: 0.04,
+          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 78%)",
+          maskImage: "radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 78%)",
         }}
       />
 
-      <div className="relative container mx-auto px-6 md:px-14 max-w-7xl z-10">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="max-w-3xl">
-          <div className={`${mono.className} flex items-center gap-3 text-[11px] tracking-[0.25em] uppercase text-white/45`}>
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34D399] opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34D399]" />
-            </span>
-            Est. 2008 · Registered · Uganda
-          </div>
+      <div className="relative z-10 flex min-h-[88vh] flex-col justify-center px-6 md:px-14">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="max-w-3xl">
+            {/* Premium glass trust badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+              className="inline-flex items-center gap-3 rounded-full px-5 py-2.5 mb-6 backdrop-blur-md shadow-xl"
+              style={{
+                background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_DARK})`,
+                border: `1px solid ${YPA_BLUE}40`,
+                boxShadow: `0 8px 32px ${YPA_BLUE}40, 0 0 60px ${YPA_BLUE}20`,
+              }}
+            >
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Award className="h-5 w-5 text-white" />
+              </motion.div>
+              <span className={`${inter.className} text-[11px] sm:text-[13px] tracking-[0.1em] uppercase font-bold text-white`}>
+               Ranked #1 Goat Farming Programme in Africa
+              </span>
+              <motion.span
+                className="relative flex h-2 w-2"
+                animate={{ scale: [1, 1.5, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+              </motion.span>
+            </motion.div>
 
-          <h1 className={`${display.className} text-4xl md:text-5xl lg:text-7xl font-medium text-white leading-[1.05] tracking-tight mt-5`}>
-            Who we are,
-            <span
-              className="block text-transparent bg-clip-text"
-              style={{ backgroundImage: `linear-gradient(90deg, ${SKY}, ${BLUE}, ${SKY})` }}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             >
-              stated plainly
-            </span>
-          </h1>
-          <p className="text-base md:text-lg text-white/50 max-w-lg leading-relaxed mt-5 font-light">
-            Youth Platform Africa started as a 21-person village group and grew into a Pan-African
-            agribusiness platform. Here's the full record — our story, our people, and the paperwork
-            that proves it.
-          </p>
-          <div className="flex flex-wrap items-center gap-3 mt-9">
-            <Link
-              href="#verify"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-medium text-white transition-all duration-300 hover:-translate-y-0.5"
-              style={{ background: BLUE, boxShadow: `0 20px 40px -12px ${BLUE}66` }}
-            >
-              Verify our credentials
-              <BadgeCheck className="w-4 h-4" />
-            </Link>
-            <Link
-              href="#story"
-              className="inline-flex items-center gap-2 text-white/55 text-sm font-medium hover:text-white transition-colors border border-white/15 px-6 py-3.5 rounded-full hover:bg-white/5"
-            >
-              Read our story
-              <ChevronRight className="w-4 h-4" />
-            </Link>
+              {/* Kicker with animated line */}
+              <div className="flex items-center gap-3 mb-5">
+                <span className={`${inter.className} text-[11px] tracking-[0.25em] uppercase font-medium`} style={{ color: YPA_BLUE }}>
+                  Our Story
+                </span>
+                <motion.span 
+                  className="h-px flex-1" 
+                  style={{ background: `${YPA_BLUE}30` }}
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                />
+              </div>
+
+              {/* ✅ Premium title with glowing highlight */}
+              <motion.h1
+                className={`${inter.className} text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] tracking-tight max-w-xl`}
+                style={{ color: INK_ON_LIGHT }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
+                Who we are,
+                <span 
+                  className="relative inline-block ml-2"
+                  style={{ color: YPA_BLUE }}
+                >
+                  stated plainly
+                  <motion.span
+                    className="absolute bottom-[-4px] left-0 h-[3px] rounded-full"
+                    style={{
+                      background: `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})`,
+                      boxShadow: `0 0 16px ${YPA_BLUE}`,
+                    }}
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 1.2, delay: 0.4, ease: "easeInOut" }}
+                  />
+                  <motion.span
+                    className="absolute inset-0 rounded-full blur-2xl -z-10"
+                    style={{ background: YPA_BLUE }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.2 }}
+                    transition={{ duration: 1, delay: 0.6 }}
+                  />
+                </span>
+              </motion.h1>
+
+              <motion.p
+                className={`${inter.className} mt-5 text-lg md:text-xl font-light max-w-xl leading-relaxed`}
+                style={{ color: MUTE_ON_LIGHT }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+              >
+                Youth Platform Africa started as a 21-person village group and grew into a Pan-African
+                agribusiness platform. Here's the full record our story, our people, and the paperwork
+                that proves it.
+              </motion.p>
+
+              {/* Premium buttons */}
+              <div className="mt-10 flex flex-wrap gap-4">
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <Link
+                    href="#verify"
+                    className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl active:scale-[0.98]"
+                    style={{ 
+                      background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_DARK})`,
+                      boxShadow: `0 20px 40px -12px ${YPA_BLUE}55`,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = `0 25px 50px -12px ${YPA_BLUE}77`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = `0 20px 40px -12px ${YPA_BLUE}55`;
+                    }}
+                  >
+                    Verify our credentials
+                    <BadgeCheck className="h-4 w-4" />
+                  </Link>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                  <Link
+                    href="#story"
+                    className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-lg active:scale-[0.98]"
+                    style={{ 
+                      border: `2px solid ${YPA_BLUE}30`,
+                      color: INK_ON_LIGHT,
+                      background: "rgba(255,255,255,0.5)",
+                      backdropFilter: "blur(10px)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = YPA_BLUE;
+                      e.currentTarget.style.color = "#fff";
+                      e.currentTarget.style.borderColor = YPA_BLUE;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "rgba(255,255,255,0.5)";
+                      e.currentTarget.style.color = INK_ON_LIGHT;
+                      e.currentTarget.style.borderColor = `${YPA_BLUE}30`;
+                    }}
+                  >
+                    Read our story
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      <motion.div
-        animate={reduce ? {} : { y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/20"
+      {/* Scroll indicator */}
+      <motion.a
+        href="#verify"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.6 }}
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 group"
       >
-        <ChevronDown className="w-5 h-5" />
-      </motion.div>
+        <span className={`${inter.className} text-[9px] tracking-[0.3em] uppercase font-medium transition-colors duration-300`} style={{ color: MUTE_ON_LIGHT }}>
+          Explore
+        </span>
+        <motion.div
+          animate={reduce ? {} : { y: [0, 6, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="transition-colors duration-300 group-hover:text-[#00AEEF]"
+          style={{ color: MUTE_ON_LIGHT }}
+        >
+          <ChevronDown className="h-4 w-4" />
+        </motion.div>
+      </motion.a>
     </section>
   );
 };
 
 // ============================================================
-// VERIFY STRIP
+// VERIFY STRIP — Premium Glass with YPA Brand Colors
 // ============================================================
 const VERIFY_FACTS = [
-  { label: "LEGAL STATUS", value: "Registered organisation", confirmed: false, tag: "confirm exact registration type (NGO / CBO / Ltd.)" },
-  { label: "URSB REG. NO.", value: "—", confirmed: false, tag: "add URSB registration number" },
-  { label: "TAX ID (TIN)", value: "—", confirmed: false, tag: "add TIN" },
-  { label: "ESTABLISHED", value: "2008", confirmed: true },
-  { label: "HEADQUARTERS", value: "—", confirmed: false, tag: "add physical HQ address" },
-  { label: "BRANCHES", value: "12, Uganda", confirmed: true },
+  { 
+    label: "LEGAL STATUS", 
+    value: "Registered Organisation", 
+    confirmed: true,
+    icon: Shield
+  },
+  { 
+    label: "URSB REG. NO.", 
+    value: "—", 
+    confirmed: false, 
+    tag: "Add registration number",
+    icon: FileText
+  },
+  { 
+    label: "TAX ID (TIN)", 
+    value: "—", 
+    confirmed: false, 
+    tag: "Add TIN",
+    icon: FileText
+  },
+  { 
+    label: "ESTABLISHED", 
+    value: "2008", 
+    confirmed: true,
+    icon: Award
+  },
+  { 
+    label: "HEADQUARTERS", 
+    value: "Kampala, Uganda", 
+    confirmed: true,
+    icon: MapPin
+  },
+  { 
+    label: "BRANCHES", 
+    value: "12", 
+    confirmed: true,
+    icon: Building
+  },
 ];
 
 const VerifyStrip = () => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
-    <section id="verify" className="border-y" style={{ background: NAVY, borderColor: LINE }}>
-      <div className="flex items-center gap-3 px-6 md:px-14 pt-4">
-        <ScrollText className="h-3.5 w-3.5" style={{ color: GOLD }} />
-        <span className={`${mono.className} text-[10px] tracking-[0.22em] uppercase text-white/40`}>
-          Verify us — the facts a due-diligence check would ask for
-        </span>
+    <section className="relative py-16 px-6 md:px-14 overflow-hidden" style={{ background: MIST }}>
+      {/* Background with subtle glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-50%] right-[-20%] w-[500px] h-[500px] rounded-full blur-3xl" style={{ background: `${YPA_BLUE}10` }} />
+        <div className="absolute bottom-[-50%] left-[-20%] w-[400px] h-[400px] rounded-full blur-3xl" style={{ background: `${YPA_GOLD}08` }} />
       </div>
-      <div className="max-w-7xl mx-auto px-6 md:px-14 py-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-        {VERIFY_FACTS.map((f, i) => (
-          <div key={i} className={mono.className}>
-            <div className="text-[10px] tracking-[0.12em] uppercase text-white/35">{f.label}</div>
-            <div className="text-base mt-1" style={{ color: f.confirmed ? "#fff" : GOLD }}>
-              {f.value}
-            </div>
-            {!f.confirmed && (
-              <div className="text-[9px] mt-1 text-white/30 normal-case tracking-normal">{f.tag}</div>
-            )}
+
+      <div className="relative container mx-auto max-w-7xl">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full backdrop-blur-md mb-4" style={{ 
+            background: `rgba(255,255,255,0.5)`,
+            border: `1px solid ${YPA_BLUE}20`
+          }}>
+            <BadgeCheck className="h-4 w-4" style={{ color: YPA_BLUE }} />
+            <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase font-medium`} style={{ color: MUTE_ON_LIGHT }}>
+              Verify Us
+            </span>
           </div>
-        ))}
+          <h2 className={`${display.className} text-3xl md:text-4xl font-medium tracking-tight`} style={{ color: INK_ON_LIGHT }}>
+            The facts a <span style={{ color: YPA_BLUE }}>due-diligence</span> check would ask for
+          </h2>
+          <p className="text-sm mt-2 max-w-2xl mx-auto font-light" style={{ color: MUTE_ON_LIGHT }}>
+            Everything you need to know about our legal standing, registration, and operational reach.
+            We believe in transparency before you even ask.
+          </p>
+        </motion.div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {VERIFY_FACTS.map((fact, index) => {
+            const Icon = fact.icon;
+            const isHovered = hoveredIndex === index;
+            
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.06 }}
+                whileHover={{ y: -4 }}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                className="relative group"
+              >
+                <div
+                  className={`relative rounded-2xl p-6 text-center transition-all duration-300 ${
+                    fact.confirmed 
+                      ? 'bg-white/80 backdrop-blur-sm border border-white/50 shadow-sm hover:shadow-lg' 
+                      : 'bg-white/40 backdrop-blur-sm border border-dashed border-[#D8DEE4] hover:border-[#F0B429]/40'
+                  }`}
+                  style={{
+                    background: fact.confirmed 
+                      ? 'rgba(255,255,255,0.8)' 
+                      : 'rgba(255,255,255,0.4)',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                >
+                  {/* Confirmed checkmark */}
+                  {fact.confirmed ? (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.4, delay: 0.2 + index * 0.06 }}
+                      className="absolute top-2 right-2"
+                    >
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: YPA_BLUE }}>
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="absolute top-2 right-2">
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: `${YPA_GOLD}20` }}>
+                        <Zap className="w-3 h-3" style={{ color: YPA_GOLD }} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Icon */}
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 transition-all duration-300 ${
+                      isHovered && fact.confirmed ? 'scale-110' : ''
+                    }`}
+                    style={{ 
+                      background: fact.confirmed 
+                        ? `${YPA_BLUE}12` 
+                        : `${YPA_GOLD}10`,
+                    }}
+                  >
+                    <Icon className={`w-5 h-5 ${fact.confirmed ? 'text-[#00AEEF]' : 'text-[#F0B429]'}`} />
+                  </div>
+
+                  {/* Label */}
+                  <p className={`${mono.className} text-[10px] tracking-[0.12em] uppercase font-medium mb-1`} style={{ color: MUTE_ON_LIGHT }}>
+                    {fact.label}
+                  </p>
+
+                  {/* Value */}
+                  <p 
+                    className={`text-lg md:text-xl font-semibold transition-colors duration-300 ${
+                      fact.confirmed 
+                        ? 'text-[#111111]' 
+                        : 'text-[#F0B429]'
+                    }`}
+                  >
+                    {fact.value}
+                  </p>
+
+                  {/* Unconfirmed tag */}
+                  {!fact.confirmed && fact.tag && (
+                    <div className="mt-2">
+                      <span className={`${mono.className} text-[9px] px-2 py-0.5 rounded-full`} style={{ 
+                        background: `${YPA_GOLD}10`,
+                        color: YPA_GOLD,
+                        border: `1px solid ${YPA_GOLD}25`
+                      }}>
+                        {fact.tag}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Hover glow effect */}
+                  {fact.confirmed && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: isHovered ? 1 : 0 }}
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{ 
+                        background: `radial-gradient(circle at 50% 50%, ${YPA_BLUE}10, transparent 70%)`,
+                      }}
+                    />
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Bottom note */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-8 text-center"
+        >
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full backdrop-blur-md" style={{
+            background: 'rgba(255,255,255,0.6)',
+            border: `1px solid ${YPA_BLUE}15`
+          }}>
+            <Shield className="h-4 w-4" style={{ color: YPA_BLUE }} />
+            <span className={`${mono.className} text-[11px] font-light`} style={{ color: MUTE_ON_LIGHT }}>
+              All information verified and up-to-date. 
+              <span className="font-medium" style={{ color: YPA_BLUE }}> View official documents</span>
+            </span>
+            <ArrowUpRight className="h-3.5 w-3.5" style={{ color: YPA_BLUE }} />
+          </div>
+        </motion.div>
       </div>
     </section>
   );
 };
 
 // ============================================================
-// NUMBER COUNTER
+// NUMBER COUNTER — Clean, Classic, Premium Animation
 // ============================================================
 const NumberCounter = ({ target, label, suffix = "" }: { target: number; label: string; suffix?: string }) => {
   const [count, setCount] = useState(0);
@@ -255,29 +601,64 @@ const NumberCounter = ({ target, label, suffix = "" }: { target: number; label: 
       return;
     }
     let start = 0;
-    const step = Math.max(1, Math.floor(target / 60));
-    const interval = setInterval(() => {
-      start += step;
-      if (start >= target) {
+    const duration = 2000;
+    const steps = 60;
+    const increment = target / steps;
+    let current = 0;
+
+    const timer = setInterval(() => {
+      current += 1;
+      if (current >= steps) {
         setCount(target);
-        clearInterval(interval);
+        clearInterval(timer);
       } else {
-        setCount(start);
+        setCount(Math.floor(increment * current));
       }
-    }, 2000 / 60);
-    return () => clearInterval(interval);
+    }, duration / steps);
+
+    return () => clearInterval(timer);
   }, [target, isInView, reduce]);
 
   return (
-    <div ref={ref} className="text-center">
-      <div className={`${mono.className} text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight`} style={{ color: INK_ON_LIGHT }}>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="relative text-center"
+    >
+      {/* Number */}
+      <motion.div
+        className={`${display.className} text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight`}
+        style={{ color: INK_ON_LIGHT }}
+        initial={{ scale: 0.9 }}
+        animate={isInView ? { scale: 1 } : { scale: 0.9 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
         {count.toLocaleString()}
         {suffix}
+      </motion.div>
+
+      {/* Label with elegant underline */}
+      <div className="mt-2 relative">
+        <motion.div
+          className={`${display.className} text-sm font-light tracking-wide`}
+          style={{ color: MUTE_ON_LIGHT }}
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
+          {label}
+        </motion.div>
+        <motion.div
+          className="absolute left-1/2 -translate-x-1/2 bottom-0 h-0.5 rounded-full"
+          style={{ background: YPA_BLUE }}
+          initial={{ width: 0 }}
+          animate={isInView ? { width: "40px" } : { width: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        />
       </div>
-      <div className="text-sm font-light mt-2" style={{ color: MUTE_ON_LIGHT }}>
-        {label}
-      </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -308,9 +689,9 @@ const StorySection = ({ content }: { content: any }) => {
   const [activeImage, setActiveImage] = useState(0);
   const reduce = useReducedMotion();
   const images = [
-    { src: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=900&q=80", label: "Community" },
-    { src: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=900&q=80", label: "Goats" },
-    { src: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=900&q=80", label: "Farm" },
+    { src: "http://localhost:8055/assets/c5fc9c26-92d2-41b2-90d0-7c785f0d8011?key=system-medium-cover&modified=2026-07-08T12:40:16", label: "Community" },
+    { src: "http://localhost:8055/assets/f96cc76a-53c6-4bc6-8658-801ecdf0a1c9?key=system-medium-cover&modified=2026-07-15T09:23:26", label: "Goats" },
+    { src: "http://localhost:8055/assets/5fff51d7-fece-4b04-b0da-86ad019675d7?key=system-medium-cover&modified=2026-07-01T23:23:13", label: "Farm" },
   ];
 
   useEffect(() => {
@@ -327,7 +708,7 @@ const StorySection = ({ content }: { content: any }) => {
             <motion.span
               variants={fadeInUp}
               className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`}
-              style={{ color: BLUE }}
+              style={{ color: YPA_BLUE }}
             >
               Our Story
             </motion.span>
@@ -373,7 +754,7 @@ const StorySection = ({ content }: { content: any }) => {
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn} className="relative">
-            <div className="absolute -inset-4 rounded-3xl blur-2xl" style={{ background: `linear-gradient(135deg, ${BLUE}14, ${SKY}14)` }} />
+            <div className="absolute -inset-4 rounded-3xl blur-2xl" style={{ background: `linear-gradient(135deg, ${YPA_BLUE}14, ${YPA_BLUE_LIGHT}14)` }} />
             <div className="relative h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -412,16 +793,43 @@ const StorySection = ({ content }: { content: any }) => {
 };
 
 // ============================================================
-// LEADERSHIP
+// LEADERSHIP — With Image Support
 // ============================================================
-const LEADERSHIP = [
-  { role: "Founder & CEO", name: "—", bio: "Add a short bio — background, and why YPA was started." },
-  { role: "Chief Operations Officer", name: "—", bio: "Add role summary and years with YPA." },
-  { role: "Head of SACCO & Finance", name: "—", bio: "Add role summary and relevant credentials." },
-  { role: "Head of Agribusiness Programmes", name: "—", bio: "Add role summary and relevant credentials." },
+interface Leader {
+  role: string;
+  name: string;
+  bio: string;
+  image?: string; // File ID from Directus or image URL
+}
+
+const LEADERSHIP: Leader[] = [
+  { 
+    role: "Executive Director", 
+    name: "JB Magezi", 
+    bio: "Visionary leader with over 15 years of experience in agribusiness and community development. Founded YPA to empower African youth through sustainable agriculture.", 
+    image: "http://localhost:8055/assets/e7aac9fd-faed-481d-b991-cd02e893332f?key=system-medium-cover&modified=2026-07-22T11:19:37" // Add file ID or image URL here
+  },
+  { 
+    role: "Chief Operations Officer", 
+    name: "—", 
+    bio: "Add role summary and years with YPA.",
+    image: ""
+  },
+  { 
+    role: "Head of SACCO & Finance", 
+    name: "—", 
+    bio: "Add role summary and relevant credentials.",
+    image: ""
+  },
+  { 
+    role: "Head of Agribusiness Programmes", 
+    name: "—", 
+    bio: "Add role summary and relevant credentials.",
+    image: ""
+  },
 ];
 
-const initials = (name: string) =>
+const getInitials = (name: string) =>
   name === "—"
     ? "?"
     : name
@@ -432,11 +840,13 @@ const initials = (name: string) =>
         .toUpperCase();
 
 const LeadershipSection = () => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
     <section id="leadership" className="py-24 px-6 md:px-14" style={{ background: MIST }}>
       <div className="container mx-auto max-w-7xl">
         <ScrollReveal className="text-center mb-14">
-          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
             Governance
           </span>
           <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-3`} style={{ color: INK_ON_LIGHT }}>
@@ -444,31 +854,131 @@ const LeadershipSection = () => {
           </h2>
           <p className="text-sm mt-3 max-w-xl mx-auto font-light" style={{ color: MUTE_ON_LIGHT }}>
             Every organisation asking for trust should be willing to put names to it.
-            <NeedsInfo>Add leadership names, photos & bios</NeedsInfo>
           </p>
         </ScrollReveal>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {LEADERSHIP.map((p, i) => (
-            <ScrollReveal key={i} delay={i * 0.08}>
-              <div className="bg-white rounded-2xl border p-6 h-full" style={{ borderColor: "#E8ECF0" }}>
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-dashed"
-                  style={{ background: `${BLUE}0d`, borderColor: `${BLUE}55` }}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {LEADERSHIP.map((leader, index) => {
+            const isHovered = hoveredIndex === index;
+            const hasImage = leader.image && leader.image.length > 0;
+            const imageUrl = hasImage 
+              ? (leader.image?.startsWith("http") ? leader.image : `${API_URL}/assets/${leader.image}`)
+              : null;
+
+            return (
+              <ScrollReveal key={index} delay={index * 0.08}>
+                <motion.div
+                  className="group relative bg-white rounded-2xl border overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1"
+                  style={{ borderColor: "#E8ECF0" }}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  whileHover={{ y: -4 }}
                 >
-                  <span className={`${mono.className} text-sm font-medium`} style={{ color: BLUE }}>
-                    {initials(p.name)}
-                  </span>
-                </div>
-                <div className="text-xs font-semibold tracking-wide uppercase" style={{ color: BLUE }}>{p.role}</div>
-                <div className="text-lg font-medium mt-1" style={{ color: p.name === "—" ? GOLD : INK_ON_LIGHT }}>
-                  {p.name === "—" ? "Add name" : p.name}
-                </div>
-                <p className="text-xs mt-2 font-light leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>{p.bio}</p>
-              </div>
-            </ScrollReveal>
-          ))}
+                  {/* Image or Initials */}
+                  <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[#F0F9FE] to-[#E6F8FD]">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={leader.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div
+                          className="w-20 h-20 rounded-2xl flex items-center justify-center transition-all duration-300"
+                          style={{ 
+                            background: `${YPA_BLUE}12`,
+                            border: `2px solid ${YPA_BLUE}20`
+                          }}
+                        >
+                          <span className={`${display.className} text-3xl font-medium`} style={{ color: YPA_BLUE }}>
+                            {getInitials(leader.name)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Gradient overlay for better text contrast if image exists */}
+                    {imageUrl && (
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    )}
+                    
+                    {/* Status indicator */}
+                    {leader.name !== "—" ? (
+                      <div className="absolute top-3 right-3">
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping" />
+                          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="absolute top-3 right-3">
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75 animate-ping" />
+                          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-yellow-500" />
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5">
+                    <div className="text-xs font-semibold tracking-wide uppercase mb-1" style={{ color: YPA_BLUE }}>
+                      {leader.role}
+                    </div>
+                    <div 
+                      className={`${display.className} text-lg font-medium transition-colors duration-300 ${
+                        leader.name === "—" ? 'text-[#F0B429]' : 'text-[#111111] group-hover:text-[#00AEEF]'
+                      }`}
+                    >
+                      {leader.name === "—" ? "Add name" : leader.name}
+                    </div>
+                    <p className="text-xs mt-2 font-light leading-relaxed line-clamp-3" style={{ color: MUTE_ON_LIGHT }}>
+                      {leader.bio}
+                    </p>
+                    
+                    {/* Learn more link */}
+                    {leader.name !== "—" && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 5 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-3"
+                      >
+                        <button className="text-xs font-medium flex items-center gap-1 transition-all hover:gap-2" style={{ color: YPA_BLUE }}>
+                          View profile
+                          <ArrowUpRight className="w-3 h-3" />
+                        </button>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  {/* Hover glow */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isHovered ? 1 : 0 }}
+                    className="absolute inset-0 rounded-2xl pointer-events-none"
+                    style={{ 
+                      background: `radial-gradient(circle at 50% 50%, ${YPA_BLUE}06, transparent 70%)`,
+                    }}
+                  />
+                </motion.div>
+              </ScrollReveal>
+            );
+          })}
         </div>
+
+        {/* Add note about images */}
+        <ScrollReveal delay={0.2} className="mt-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm" style={{
+            background: 'rgba(255,255,255,0.5)',
+            border: `1px solid ${YPA_BLUE}15`
+          }}>
+            <span className={`${mono.className} text-[10px] font-light`} style={{ color: MUTE_ON_LIGHT }}>
+              💡 Add photos to Directus → Files → copy file ID into the leader's `image` field
+            </span>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );
@@ -482,7 +992,7 @@ const MissionVisionSection = ({ content }: { content: any }) => {
     <section className="py-24 px-6 md:px-14 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
       <div className="container mx-auto max-w-7xl">
         <ScrollReveal className="text-center mb-16">
-          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
             Our Purpose
           </span>
           <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-3`} style={{ color: INK_ON_LIGHT }}>
@@ -520,11 +1030,11 @@ const MissionVisionSection = ({ content }: { content: any }) => {
               >
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-colors duration-300"
-                  style={{ background: `${BLUE}12` }}
+                  style={{ background: `${YPA_BLUE}12` }}
                 >
-                  <Icon className="w-7 h-7" style={{ color: BLUE }} />
+                  <Icon className="w-7 h-7" style={{ color: YPA_BLUE }} />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: BLUE }}>{card.label}</span>
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: YPA_BLUE }}>{card.label}</span>
                 <div className="text-lg md:text-xl leading-relaxed mt-3 font-light" style={{ color: "#3E4C59" }}>
                   {card.html ? <div dangerouslySetInnerHTML={{ __html: card.html }} /> : card.fallback}
                 </div>
@@ -553,7 +1063,7 @@ const ValuesSection = () => {
     <section className="py-24 px-6 md:px-14 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
       <div className="container mx-auto max-w-5xl">
         <ScrollReveal className="text-center mb-12">
-          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
             Core Values
           </span>
           <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-3`} style={{ color: INK_ON_LIGHT }}>
@@ -570,11 +1080,11 @@ const ValuesSection = () => {
                   whileHover={{ x: 6 }}
                   className="flex items-start gap-4 p-4 rounded-xl transition-colors group"
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${BLUE}12` }}>
-                    <Icon className="w-5 h-5" style={{ color: BLUE }} />
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${YPA_BLUE}12` }}>
+                    <Icon className="w-5 h-5" style={{ color: YPA_BLUE }} />
                   </div>
                   <div>
-                    <span className={`${mono.className} text-xs font-bold`} style={{ color: BLUE }}>0{i + 1}</span>
+                    <span className={`${mono.className} text-xs font-bold`} style={{ color: YPA_BLUE }}>0{i + 1}</span>
                     <p className="leading-relaxed font-light" style={{ color: "#4B5A68" }}>{v.text}</p>
                   </div>
                 </motion.div>
@@ -604,7 +1114,7 @@ const TimelineSection = () => {
     <section className="py-24 px-6 md:px-14 border-t overflow-hidden" style={{ background: MIST, borderColor: "#EEF1F3" }}>
       <div className="container mx-auto max-w-7xl">
         <ScrollReveal className="text-center mb-12">
-          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
             Timeline
           </span>
           <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-3`} style={{ color: INK_ON_LIGHT }}>
@@ -619,11 +1129,11 @@ const TimelineSection = () => {
                 className="min-w-[240px] md:min-w-[280px] snap-start bg-white p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg"
                 style={{ borderColor: "#EEF1F3" }}
               >
-                <div className={`${mono.className} text-2xl font-medium`} style={{ color: BLUE }}>{item.year}</div>
+                <div className={`${mono.className} text-2xl font-medium`} style={{ color: YPA_BLUE }}>{item.year}</div>
                 <div className="text-base font-medium mt-1" style={{ color: INK_ON_LIGHT }}>{item.label}</div>
                 <div className="text-sm mt-1 font-light" style={{ color: MUTE_ON_LIGHT }}>{item.desc}</div>
-                <div className="mt-4 h-1 w-12 rounded-full" style={{ background: `${BLUE}20` }}>
-                  <div className="h-full w-4 rounded-full" style={{ background: BLUE }} />
+                <div className="mt-4 h-1 w-12 rounded-full" style={{ background: `${YPA_BLUE}20` }}>
+                  <div className="h-full w-4 rounded-full" style={{ background: YPA_BLUE }} />
                 </div>
               </div>
             </ScrollReveal>
@@ -649,7 +1159,7 @@ const ComplianceSection = () => {
     <section className="py-24 px-6 md:px-14 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
       <div className="container mx-auto max-w-7xl">
         <ScrollReveal className="mb-12">
-          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
             Due Diligence
           </span>
           <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-3 max-w-xl`} style={{ color: INK_ON_LIGHT }}>
@@ -667,14 +1177,14 @@ const ComplianceSection = () => {
             return (
               <ScrollReveal key={i} delay={i * 0.08}>
                 <div className="rounded-2xl border p-6 h-full" style={{ borderColor: "#EEF1F3", background: MIST }}>
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: `${BLUE}12` }}>
-                    <Icon className="h-5 w-5" style={{ color: BLUE }} />
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: `${YPA_BLUE}12` }}>
+                    <Icon className="h-5 w-5" style={{ color: YPA_BLUE }} />
                   </div>
                   <div className="text-sm font-semibold" style={{ color: INK_ON_LIGHT }}>{c.title}</div>
                   <p className="text-xs mt-2 font-light leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>{c.body}</p>
                   <div
                     className="mt-3 text-[10px] font-medium px-2.5 py-1.5 rounded-lg border border-dashed leading-snug"
-                    style={{ color: GOLD, borderColor: `${GOLD}66`, background: `${GOLD}0d` }}
+                    style={{ color: YPA_GOLD, borderColor: `${YPA_GOLD}66`, background: `${YPA_GOLD}0d` }}
                   >
                     {c.need}
                   </div>
@@ -697,7 +1207,7 @@ const ComplianceSection = () => {
                 <span
                   key={i}
                   className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full border border-dashed"
-                  style={{ color: GOLD, borderColor: `${GOLD}66` }}
+                  style={{ color: YPA_GOLD, borderColor: `${YPA_GOLD}66` }}
                 >
                   <FileText className="h-3.5 w-3.5" />
                   {doc} — add PDF link
@@ -737,14 +1247,14 @@ const OfficesSection = () => {
           {OFFICES.map((o, i) => (
             <ScrollReveal key={i} delay={i * 0.08}>
               <div className="rounded-2xl border p-6 h-full" style={{ borderColor: LINE, background: NAVY }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: `${SKY}18` }}>
-                  <MapPin className="h-5 w-5" style={{ color: SKY }} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: `${YPA_BLUE_LIGHT}18` }}>
+                  <MapPin className="h-5 w-5" style={{ color: YPA_BLUE_LIGHT }} />
                 </div>
                 <div className="text-base font-medium text-white">{o.region}</div>
                 <p className="text-xs mt-2 font-light text-white/50">{o.detail}</p>
                 <div
                   className="mt-4 text-[10px] font-medium px-2.5 py-1.5 rounded-lg border border-dashed inline-block"
-                  style={{ color: GOLD, borderColor: `${GOLD}66`, background: `${GOLD}0d` }}
+                  style={{ color: YPA_GOLD, borderColor: `${YPA_GOLD}66`, background: `${YPA_GOLD}0d` }}
                 >
                   {o.need}
                 </div>
@@ -766,7 +1276,7 @@ const PartnersSection = () => {
     <section className="py-20 px-6 md:px-14 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
       <div className="container mx-auto max-w-7xl">
         <ScrollReveal className="text-center mb-10">
-          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
             Recognition
           </span>
           <h2 className={`${display.className} text-2xl md:text-3xl font-medium mt-3`} style={{ color: INK_ON_LIGHT }}>
@@ -805,7 +1315,7 @@ const FAQSection = ({ faqs }: { faqs: any[] }) => {
     <section id="faq" className="py-24 px-6 md:px-14 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
       <div className="container mx-auto max-w-4xl">
         <ScrollReveal className="text-center mb-14">
-          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
             FAQ
           </span>
           <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-3`} style={{ color: INK_ON_LIGHT }}>
@@ -833,7 +1343,7 @@ const FAQSection = ({ faqs }: { faqs: any[] }) => {
                       <span
                         className={`${mono.className} w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors`}
                         style={{
-                          background: openFaqIndex === index ? BLUE : "#EEF1F3",
+                          background: openFaqIndex === index ? YPA_BLUE : "#EEF1F3",
                           color: openFaqIndex === index ? "#fff" : MUTE_ON_LIGHT,
                         }}
                       >
@@ -845,7 +1355,7 @@ const FAQSection = ({ faqs }: { faqs: any[] }) => {
                     </div>
                     <ChevronDown
                       className="w-5 h-5 transition-transform duration-300"
-                      style={{ color: openFaqIndex === index ? BLUE : MUTE_ON_LIGHT, transform: openFaqIndex === index ? "rotate(180deg)" : "none" }}
+                      style={{ color: openFaqIndex === index ? YPA_BLUE : MUTE_ON_LIGHT, transform: openFaqIndex === index ? "rotate(180deg)" : "none" }}
                     />
                   </button>
                   {openFaqIndex === index && (
@@ -895,12 +1405,12 @@ const Vision2030 = () => {
   return (
     <section className="py-24 px-6 md:px-14 relative overflow-hidden" style={{ background: INK }}>
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[200px]" style={{ background: SKY }} />
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full blur-[200px]" style={{ background: BLUE }} />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[200px]" style={{ background: YPA_BLUE_LIGHT }} />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full blur-[200px]" style={{ background: YPA_BLUE }} />
       </div>
       <div className="relative container mx-auto max-w-5xl text-center">
         <ScrollReveal>
-          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: SKY }}>
+          <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
             Ambition
           </span>
           <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-3 text-white`}>YPA Vision 2030</h2>
@@ -955,7 +1465,7 @@ export default function AboutPage() {
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-10 h-10 border-[3px] rounded-full"
-            style={{ borderColor: "#E3F2FD", borderTopColor: BLUE }}
+            style={{ borderColor: "#E3F2FD", borderTopColor: YPA_BLUE }}
           />
         </div>
         <Footer />
@@ -964,10 +1474,10 @@ export default function AboutPage() {
   }
 
   return (
-    <main className={`${display.variable} ${mono.variable} min-h-screen bg-white overflow-x-hidden font-sans`}>
+    <main className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white overflow-x-hidden font-sans`}>
       <Navigation />
 
-      <ParallaxHero content={content} />
+      <AboutHero content={content} />
       <VerifyStrip />
 
       <section className="py-16 px-6 md:px-14 bg-white border-b" style={{ borderColor: "#EEF1F3" }}>
@@ -995,8 +1505,8 @@ export default function AboutPage() {
       <section className="py-20 px-6 md:px-14 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
         <div className="container mx-auto max-w-3xl text-center">
           <ScrollReveal>
-            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center" style={{ background: `${BLUE}12` }}>
-              <Sparkles className="w-8 h-8" style={{ color: BLUE }} />
+            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center" style={{ background: `${YPA_BLUE}12` }}>
+              <Sparkles className="w-8 h-8" style={{ color: YPA_BLUE }} />
             </div>
             <h2 className={`${display.className} text-3xl md:text-4xl font-medium`} style={{ color: INK_ON_LIGHT }}>
               Now that you know who we are
@@ -1008,18 +1518,18 @@ export default function AboutPage() {
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-medium text-white transition-all duration-300 hover:-translate-y-0.5"
-                style={{ background: INK_ON_LIGHT }}
+                style={{ background: YPA_BLUE, boxShadow: `0 20px 40px -12px ${YPA_BLUE}66` }}
               >
                 Get in touch
-                <ArrowUpRight className="w-4 h-4" />
+                <ArrowUpRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/sacco"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-medium border transition-all duration-300"
-                style={{ color: INK_ON_LIGHT, borderColor: "#E8ECF0" }}
+                style={{ color: INK_ON_LIGHT, borderColor: "#EEF1F3" }}
               >
                 See YPA SACCO
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
           </ScrollReveal>
