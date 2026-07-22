@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef, memo } from 'react';
 import Link from 'next/link';
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -20,7 +20,8 @@ import {
   Star,
   Zap,
   Award,
-  Loader2
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 
 // ============================================================
@@ -36,11 +37,17 @@ const GOLD = "#F0B429";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
+// CONSTANTS
+// ============================================================
+const ITEMS_PER_PAGE = 12; // ⬇️ REDUCED: Fewer images per load
+const SCROLL_THRESHOLD = 500; // ⬆️ HIGHER: Load earlier
+
+// ============================================================
 // FALLBACK IMAGES
 // ============================================================
 const FALLBACK_IMAGES = {
-  gallery: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80',
-  default: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80'
+  gallery: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80',
+  default: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80'
 };
 
 // ============================================================
@@ -52,7 +59,7 @@ const FALLBACK_GALLERY = [
     title: 'Goats Programme - Central Region',
     description: 'Mubende × Boer × Kalahari goats thriving under YPA care',
     category: 'goats',
-    image: 'https://images.unsplash.com/photo-1535268647677-300d0a4c3b7b?w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1535268647677-300d0a4c3b7b?w=400&q=80',
     featured: true,
     location: 'Central Region, Uganda',
     date_created: '2026-07-15'
@@ -62,7 +69,7 @@ const FALLBACK_GALLERY = [
     title: 'Maize Harvest Season',
     description: 'Farmers celebrating a successful contract farming season',
     category: 'maize',
-    image: 'https://images.unsplash.com/photo-1593250481214-81611f9bca0f?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1593250481214-81611f9bca0f?w=400&q=80',
     featured: true,
     location: 'Western Region, Uganda',
     date_created: '2026-07-12'
@@ -72,7 +79,7 @@ const FALLBACK_GALLERY = [
     title: 'YPA SACCO Members',
     description: 'Members gathering for quarterly savings review',
     category: 'sacco',
-    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80',
     featured: true,
     location: 'Kampala, Uganda',
     date_created: '2026-07-10'
@@ -82,7 +89,7 @@ const FALLBACK_GALLERY = [
     title: 'Goat Vaccination Drive',
     description: 'Veterinary team vaccinating goats across 12 branches',
     category: 'goats',
-    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80',
     featured: false,
     location: 'Eastern Region, Uganda',
     date_created: '2026-07-08'
@@ -92,7 +99,7 @@ const FALLBACK_GALLERY = [
     title: 'Contract Farming Workshop',
     description: 'Training farmers on modern maize cultivation techniques',
     category: 'maize',
-    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80',
     featured: false,
     location: 'Northern Region, Uganda',
     date_created: '2026-07-05'
@@ -102,7 +109,7 @@ const FALLBACK_GALLERY = [
     title: 'YPA Branch Opening',
     description: 'New branch opening ceremony in Masaka',
     category: 'events',
-    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80',
     featured: false,
     location: 'Masaka, Uganda',
     date_created: '2026-07-01'
@@ -110,10 +117,85 @@ const FALLBACK_GALLERY = [
 ];
 
 // ============================================================
-// CONSTANTS
+// MEMOIZED IMAGE COMPONENT - Prevents re-renders
 // ============================================================
-const ITEMS_PER_PAGE = 20; // Reduced for better performance
-const SCROLL_THRESHOLD = 300;
+const GalleryImage = memo(({ 
+  item, 
+  onClick, 
+  viewMode, 
+  index 
+}: { 
+  item: any; 
+  onClick: () => void; 
+  viewMode: 'grid' | 'masonry';
+  index: number;
+}) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
+  const imageUrl = useMemo(() => {
+    if (!item.image) return FALLBACK_IMAGES.gallery;
+    if (item.image.startsWith('http')) return item.image;
+    return `${API_URL}/assets/${item.image}`;
+  }, [item.image]);
+
+  const isTall = viewMode === 'masonry' && index % 4 === 0;
+  const isWide = viewMode === 'masonry' && index % 3 === 0 && index > 0;
+  
+  let aspectClass = 'aspect-square';
+  if (viewMode === 'masonry') {
+    if (isTall) aspectClass = 'aspect-[3/4] md:aspect-[2/3]';
+    else if (isWide) aspectClass = 'aspect-[4/3] md:aspect-[16/9]';
+    else aspectClass = 'aspect-square';
+  }
+
+  return (
+    <div
+      onClick={onClick}
+      className={`group relative cursor-pointer overflow-hidden bg-[#F6F8FA] rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 ${aspectClass} ${viewMode === 'masonry' && isWide ? 'md:col-span-2' : ''}`}
+    >
+      <div className="absolute inset-0">
+        {/* Image Loader - Shows while image loads */}
+        {!imageLoaded && !imageError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#F6F8FA]">
+            <div className="w-8 h-8 border-2 border-[#00AEEF]/30 border-t-[#00AEEF] rounded-full animate-spin" />
+          </div>
+        )}
+        
+        <img
+          src={imageError ? FALLBACK_IMAGES.gallery : imageUrl}
+          alt={item.title}
+          className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setImageLoaded(true)}
+          onError={() => {
+            setImageError(true);
+            setImageLoaded(true);
+          }}
+        />
+      </div>
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      <div className="absolute top-2 left-2 bg-[#111111]/70 backdrop-blur-sm px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-medium text-white/80 border border-white/10">
+        {item.category}
+      </div>
+      
+      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-[#111111]/80 to-transparent translate-y-full group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <p className="text-white text-xs md:text-sm font-medium truncate">{item.title}</p>
+        {item.location && (
+          <div className="flex items-center gap-1 mt-0.5 text-[10px] text-white/50">
+            <MapPin className="w-2.5 h-2.5" />
+            {item.location}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+GalleryImage.displayName = 'GalleryImage';
 
 // ============================================================
 // MAIN GALLERY PAGE
@@ -128,7 +210,11 @@ export default function GalleryPage() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const [activeCategory, setActiveCategory] = useState('all');
+  const [loadError, setLoadError] = useState<string | null>(null);
+  
   const containerRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // ============================================================
   // FETCH IMAGES
@@ -137,7 +223,10 @@ export default function GalleryPage() {
     const fetchImages = async () => {
       try {
         const res = await fetch(`${API_URL}/items/gallery`, {
-          cache: 'no-store'
+          cache: 'no-store',
+          headers: {
+            'Accept': 'application/json',
+          }
         });
         
         if (!res.ok) {
@@ -151,6 +240,7 @@ export default function GalleryPage() {
           const initialBatch = data.data.slice(0, ITEMS_PER_PAGE);
           setDisplayedImages(initialBatch);
           setHasMore(data.data.length > ITEMS_PER_PAGE);
+          setLoadError(null);
         } else {
           setAllImages(FALLBACK_GALLERY);
           setDisplayedImages(FALLBACK_GALLERY.slice(0, ITEMS_PER_PAGE));
@@ -161,6 +251,7 @@ export default function GalleryPage() {
         setAllImages(FALLBACK_GALLERY);
         setDisplayedImages(FALLBACK_GALLERY.slice(0, ITEMS_PER_PAGE));
         setHasMore(FALLBACK_GALLERY.length > ITEMS_PER_PAGE);
+        setLoadError('Failed to load gallery. Showing sample images.');
       } finally {
         setLoading(false);
       }
@@ -170,10 +261,10 @@ export default function GalleryPage() {
   }, []);
 
   // ============================================================
-  // INFINITE SCROLL - Optimized with Intersection Observer
+  // INTERSECTION OBSERVER - Proper cleanup
   // ============================================================
   useEffect(() => {
-    if (!hasMore || loadingMore) return;
+    if (!hasMore || loadingMore || !sentinelRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -181,30 +272,34 @@ export default function GalleryPage() {
           loadMoreImages();
         }
       },
-      { threshold: 0.1, rootMargin: '100px' }
+      { 
+        threshold: 0.1,
+        rootMargin: '200px'
+      }
     );
 
-    const sentinel = document.getElementById('scroll-sentinel');
-    if (sentinel) {
-      observer.observe(sentinel);
-    }
+    observerRef.current = observer;
+    observer.observe(sentinelRef.current);
 
     return () => {
-      if (sentinel) {
-        observer.unobserve(sentinel);
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
     };
-  }, [hasMore, loadingMore, page, allImages]);
+  }, [hasMore, loadingMore, displayedImages.length]);
 
+  // ============================================================
+  // LOAD MORE - Batched and throttled
+  // ============================================================
   const loadMoreImages = useCallback(() => {
     if (!hasMore || loadingMore) return;
     
     setLoadingMore(true);
     
-    // Use requestAnimationFrame for smooth loading
+    // Use requestAnimationFrame to avoid blocking the main thread
     requestAnimationFrame(() => {
       const startIndex = page * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, allImages.length);
       const newBatch = allImages.slice(startIndex, endIndex);
       
       if (newBatch.length > 0) {
@@ -219,7 +314,7 @@ export default function GalleryPage() {
   }, [hasMore, loadingMore, page, allImages]);
 
   // ============================================================
-  // FILTER IMAGES BY CATEGORY
+  // CATEGORY FILTER
   // ============================================================
   const filteredImages = useMemo(() => {
     let filtered = displayedImages;
@@ -228,15 +323,6 @@ export default function GalleryPage() {
     }
     return filtered;
   }, [displayedImages, activeCategory]);
-
-  // ============================================================
-  // HELPERS
-  // ============================================================
-  const getImageUrl = (image: string | undefined) => {
-    if (!image) return FALLBACK_IMAGES.gallery;
-    if (image.startsWith('http')) return image;
-    return `${API_URL}/assets/${image}`;
-  };
 
   // ============================================================
   // KEYBOARD NAVIGATION
@@ -279,11 +365,7 @@ export default function GalleryPage() {
       <main className="min-h-screen bg-white">
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <motion.div 
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-10 h-10 border-3 border-[#00AEEF]/30 border-t-[#00AEEF] rounded-full"
-          />
+          <div className="w-10 h-10 border-3 border-[#00AEEF]/30 border-t-[#00AEEF] rounded-full animate-spin" />
         </div>
         <Footer />
       </main>
@@ -337,7 +419,11 @@ export default function GalleryPage() {
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => {
+                  setActiveCategory(cat);
+                  // Reset scroll position when filtering
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 className={`px-3.5 md:px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 ${
                   activeCategory === cat
                     ? 'bg-[#00AEEF] text-white shadow-sm shadow-[#00AEEF]/20'
@@ -375,6 +461,16 @@ export default function GalleryPage() {
         </div>
       </div>
 
+      {/* ===== ERROR BANNER ===== */}
+      {loadError && (
+        <div className="px-5 md:px-14 py-4 bg-[#F0B429]/10 border-b border-[#F0B429]/20">
+          <div className="container mx-auto max-w-6xl flex items-center gap-2 text-sm text-[#F0B429]">
+            <AlertCircle className="w-4 h-4" />
+            <span>{loadError}</span>
+          </div>
+        </div>
+      )}
+
       {/* ===== FEATURED SECTION ===== */}
       {featuredItems.length > 0 && activeCategory === 'all' && (
         <section className="px-5 md:px-14 py-10 md:py-16">
@@ -388,17 +484,17 @@ export default function GalleryPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 auto-rows-fr">
               {featuredItems.slice(0, 6).map((item: any, index: number) => {
                 const isLarge = index === 0;
-                const imageUrl = getImageUrl(item.image);
+                const imageUrl = useMemo(() => {
+                  if (!item.image) return FALLBACK_IMAGES.gallery;
+                  if (item.image.startsWith('http')) return item.image;
+                  return `${API_URL}/assets/${item.image}`;
+                }, [item.image]);
                 
                 return (
-                  <motion.div
+                  <div
                     key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.08 }}
-                    whileHover={{ y: -4 }}
                     onClick={() => setSelectedItem(item)}
-                    className={`group relative cursor-pointer overflow-hidden bg-[#F6F8FA] rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${
+                    className={`group relative cursor-pointer overflow-hidden bg-[#F6F8FA] rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 ${
                       isLarge 
                         ? 'md:col-span-2 row-span-2 aspect-[4/3] md:aspect-[16/9]' 
                         : 'aspect-[4/3] md:aspect-[3/4]'
@@ -410,6 +506,7 @@ export default function GalleryPage() {
                         alt={item.title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         loading="lazy"
+                        decoding="async"
                         onError={(e) => {
                           e.currentTarget.src = FALLBACK_IMAGES.gallery;
                         }}
@@ -450,7 +547,7 @@ export default function GalleryPage() {
                         )}
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -478,65 +575,28 @@ export default function GalleryPage() {
             <>
               <div 
                 ref={containerRef}
-                className={`grid gap-3 md:gap-4 auto-rows-fr will-change-transform ${
+                className={`grid gap-3 md:gap-4 auto-rows-fr ${
                   viewMode === 'grid' 
                     ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' 
                     : 'grid-cols-2 md:grid-cols-3'
                 }`}
               >
-                {filteredImages.map((item: any, index: number) => {
-                  const imageUrl = getImageUrl(item.image);
-                  const isTall = viewMode === 'masonry' && index % 4 === 0;
-                  const isWide = viewMode === 'masonry' && index % 3 === 0 && index > 0;
-                  
-                  let aspectClass = 'aspect-square';
-                  if (viewMode === 'masonry') {
-                    if (isTall) aspectClass = 'aspect-[3/4] md:aspect-[2/3]';
-                    else if (isWide) aspectClass = 'aspect-[4/3] md:aspect-[16/9]';
-                    else aspectClass = 'aspect-square';
-                  }
-
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => setSelectedItem(item)}
-                      className={`group relative cursor-pointer overflow-hidden bg-[#F6F8FA] rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 ${aspectClass} ${viewMode === 'masonry' && isWide ? 'md:col-span-2' : ''}`}
-                    >
-                      <div className="absolute inset-0">
-                        <img
-                          src={imageUrl}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.src = FALLBACK_IMAGES.gallery;
-                          }}
-                        />
-                      </div>
-                      
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      
-                      <div className="absolute top-2 left-2 bg-[#111111]/70 backdrop-blur-sm px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-medium text-white/80 border border-white/10">
-                        {item.category}
-                      </div>
-                      
-                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-[#111111]/80 to-transparent translate-y-full group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <p className="text-white text-xs md:text-sm font-medium truncate">{item.title}</p>
-                        {item.location && (
-                          <div className="flex items-center gap-1 mt-0.5 text-[10px] text-white/50">
-                            <MapPin className="w-2.5 h-2.5" />
-                            {item.location}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                {filteredImages.map((item: any, index: number) => (
+                  <GalleryImage
+                    key={item.id}
+                    item={item}
+                    onClick={() => setSelectedItem(item)}
+                    viewMode={viewMode}
+                    index={index}
+                  />
+                ))}
               </div>
 
               {/* ===== LOADING SENTINEL ===== */}
+              <div ref={sentinelRef} className="w-full h-1" />
+
               {hasMore && activeCategory === 'all' && (
-                <div id="scroll-sentinel" className="flex items-center justify-center py-8">
+                <div className="flex items-center justify-center py-8">
                   <div className="flex items-center gap-2 text-sm text-[#5B6B7A]">
                     <Loader2 className="w-4 h-4 animate-spin text-[#00AEEF]" />
                     <span>Loading more...</span>
@@ -606,7 +666,11 @@ export default function GalleryPage() {
             >
               <div className="relative rounded-2xl overflow-hidden bg-[#111111] shadow-2xl">
                 <img
-                  src={getImageUrl(selectedItem.image)}
+                  src={(() => {
+                    if (!selectedItem.image) return FALLBACK_IMAGES.gallery;
+                    if (selectedItem.image.startsWith('http')) return selectedItem.image;
+                    return `${API_URL}/assets/${selectedItem.image}`;
+                  })()}
                   alt={selectedItem.title}
                   className="w-full h-auto max-h-[75vh] object-contain"
                   onError={(e) => {
