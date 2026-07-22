@@ -10,7 +10,6 @@ import {
   AnimatePresence,
   useScroll,
   useInView,
-  useReducedMotion as useFramerReducedMotion,
 } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -90,16 +89,37 @@ const POSITIVE = "#34D399";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
+// HELPER: Get correct image URL
+// ============================================================
+const getImageUrl = (image: string | undefined, fallback: string) => {
+  if (!image) return fallback;
+  if (image.startsWith('http')) return image;
+  return `${API_URL}/assets/${image}`;
+};
+
+// ============================================================
+// FALLBACK IMAGES
+// ============================================================
+const FALLBACK_IMAGES = {
+  goats: 'https://images.unsplash.com/photo-1535268647677-300d0a4c3b7b?w=900&q=80',
+  maize: 'https://images.unsplash.com/photo-1593250481214-81611f9bca0f?w=800&q=80',
+  sacco: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+  default: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80'
+};
+
+// ============================================================
 // CUSTOM HOOK: Smart Reduced Motion for Mobile
 // ============================================================
 function useReducedMotion() {
-  const [shouldReduce, setShouldReduce] = useState(true);
+  const [shouldReduce, setShouldReduce] = useState(false);
   
   useEffect(() => {
     const checkMotion = () => {
       const isMobile = window.innerWidth < 768;
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      setShouldReduce(isMobile || prefersReduced);
+      // Only reduce for very old phones or if user prefers reduced motion
+      const isVeryOldPhone = isMobile && window.innerWidth < 320;
+      setShouldReduce(prefersReduced || isVeryOldPhone);
     };
     
     checkMotion();
@@ -354,13 +374,21 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const reduceMotion = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
 
   return (
     <motion.div
       ref={ref}
       initial={reduceMotion ? {} : { opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : reduceMotion ? {} : { opacity: 0, y: 20 }}
-      transition={{ duration: reduceMotion ? 0 : 0.5, delay: reduceMotion ? 0 : delay }}
+      transition={{ 
+        duration: reduceMotion ? 0 : (isMobile ? 0.3 : 0.5), 
+        delay: reduceMotion ? 0 : (isMobile ? delay * 0.5 : delay) 
+      }}
       className={`${className} will-change-transform`}
     >
       {children}
@@ -450,7 +478,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
         }}
       >
         <Image
-          src={item.image}
+          src={getImageUrl(item.image, FALLBACK_IMAGES.default)}
           alt={item.title}
           width={600}
           height={800}
@@ -458,7 +486,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           quality={80}
           priority
           onError={(e) => {
-            e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80";
+            e.currentTarget.src = FALLBACK_IMAGES.default;
           }}
         />
 
@@ -751,7 +779,7 @@ const ExploreRail = () => {
                 }`}
               >
                 <Image
-                  src={item.image}
+                  src={getImageUrl(item.image, FALLBACK_IMAGES.default)}
                   alt={item.label}
                   width={item.tall ? 800 : 600}
                   height={item.tall ? 600 : 400}
@@ -759,7 +787,7 @@ const ExploreRail = () => {
                   loading={i < 3 ? "eager" : "lazy"}
                   quality={75}
                   onError={(e) => {
-                    e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80";
+                    e.currentTarget.src = FALLBACK_IMAGES.default;
                   }}
                 />
                 <div
@@ -859,7 +887,7 @@ const TheLineup = () => {
                   className="group block relative rounded-2xl overflow-hidden border border-[#1F3B57] h-[340px] sm:h-[380px] lg:h-[420px]"
                 >
                   <Image
-                    src={c.image}
+                    src={getImageUrl(c.image, FALLBACK_IMAGES.goats)}
                     alt={c.name}
                     width={600}
                     height={400}
@@ -867,7 +895,7 @@ const TheLineup = () => {
                     loading={i < 2 ? "eager" : "lazy"}
                     quality={75}
                     onError={(e) => {
-                      e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=1200&q=80";
+                      e.currentTarget.src = FALLBACK_IMAGES.goats;
                     }}
                   />
                   <div
@@ -1012,7 +1040,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
                       ? featured.image 
                       : featured.image 
                         ? `${API_URL}/assets/${featured.image}` 
-                        : "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80"
+                        : FALLBACK_IMAGES.default
                   }
                   alt={featured.title}
                   width={800}
@@ -1021,7 +1049,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
                   loading="lazy"
                   quality={75}
                   onError={(e) => {
-                    e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80";
+                    e.currentTarget.src = FALLBACK_IMAGES.default;
                   }}
                 />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #060B14 10%, transparent 55%)" }} />
@@ -1055,7 +1083,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
                     loading="lazy"
                     quality={70}
                     onError={(e) => {
-                      e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80";
+                      e.currentTarget.src = FALLBACK_IMAGES.default;
                     }}
                   />
                 </div>
@@ -1443,7 +1471,7 @@ const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
                             loading="lazy"
                             quality={60}
                             onError={(e) => {
-                              e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=100&q=80";
+                              e.currentTarget.src = FALLBACK_IMAGES.default;
                             }}
                           />
                         ) : (
