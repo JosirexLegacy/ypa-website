@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef, memo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // ⬅️ USE THIS INSTEAD OF <img>
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,8 +40,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 // ============================================================
 // CONSTANTS
 // ============================================================
-const ITEMS_PER_PAGE = 12; // ⬇️ REDUCED: Fewer images per load
-const SCROLL_THRESHOLD = 500; // ⬆️ HIGHER: Load earlier
+const ITEMS_PER_PAGE = 12;
 
 // ============================================================
 // FALLBACK IMAGES
@@ -117,7 +117,26 @@ const FALLBACK_GALLERY = [
 ];
 
 // ============================================================
-// MEMOIZED IMAGE COMPONENT - Prevents re-renders
+// IMAGE URL HELPER WITH SIZE PARAMETERS
+// ============================================================
+const getOptimizedImageUrl = (image: string | undefined, width: number = 400, quality: number = 80) => {
+  if (!image) return FALLBACK_IMAGES.gallery;
+  
+  // If it's an external URL (Unsplash, etc.)
+  if (image.startsWith('http')) {
+    // Add size parameters for external images
+    if (image.includes('unsplash.com')) {
+      return `${image}&w=${width}&q=${quality}`;
+    }
+    return image;
+  }
+  
+  // For Directus images, we'll use Next.js Image optimization
+  return `${API_URL}/assets/${image}`;
+};
+
+// ============================================================
+// MEMOIZED IMAGE COMPONENT
 // ============================================================
 const GalleryImage = memo(({ 
   item, 
@@ -134,9 +153,7 @@ const GalleryImage = memo(({
   const [imageError, setImageError] = useState(false);
   
   const imageUrl = useMemo(() => {
-    if (!item.image) return FALLBACK_IMAGES.gallery;
-    if (item.image.startsWith('http')) return item.image;
-    return `${API_URL}/assets/${item.image}`;
+    return getOptimizedImageUrl(item.image, 400, 80);
   }, [item.image]);
 
   const isTall = viewMode === 'masonry' && index % 4 === 0;
@@ -155,19 +172,21 @@ const GalleryImage = memo(({
       className={`group relative cursor-pointer overflow-hidden bg-[#F6F8FA] rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 ${aspectClass} ${viewMode === 'masonry' && isWide ? 'md:col-span-2' : ''}`}
     >
       <div className="absolute inset-0">
-        {/* Image Loader - Shows while image loads */}
         {!imageLoaded && !imageError && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#F6F8FA]">
             <div className="w-8 h-8 border-2 border-[#00AEEF]/30 border-t-[#00AEEF] rounded-full animate-spin" />
           </div>
         )}
         
-        <img
+        {/* ✅ USE NEXT.JS IMAGE COMPONENT */}
+        <Image
           src={imageError ? FALLBACK_IMAGES.gallery : imageUrl}
           alt={item.title}
-          className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-          loading="lazy"
-          decoding="async"
+          fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          className={`object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          quality={80}
+          priority={index < 4}
           onLoad={() => setImageLoaded(true)}
           onError={() => {
             setImageError(true);
@@ -261,7 +280,7 @@ export default function GalleryPage() {
   }, []);
 
   // ============================================================
-  // INTERSECTION OBSERVER - Proper cleanup
+  // INTERSECTION OBSERVER
   // ============================================================
   useEffect(() => {
     if (!hasMore || loadingMore || !sentinelRef.current) return;
@@ -289,14 +308,13 @@ export default function GalleryPage() {
   }, [hasMore, loadingMore, displayedImages.length]);
 
   // ============================================================
-  // LOAD MORE - Batched and throttled
+  // LOAD MORE
   // ============================================================
   const loadMoreImages = useCallback(() => {
     if (!hasMore || loadingMore) return;
     
     setLoadingMore(true);
     
-    // Use requestAnimationFrame to avoid blocking the main thread
     requestAnimationFrame(() => {
       const startIndex = page * ITEMS_PER_PAGE;
       const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, allImages.length);
@@ -421,7 +439,6 @@ export default function GalleryPage() {
                 key={cat}
                 onClick={() => {
                   setActiveCategory(cat);
-                  // Reset scroll position when filtering
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className={`px-3.5 md:px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 ${
@@ -485,10 +502,8 @@ export default function GalleryPage() {
               {featuredItems.slice(0, 6).map((item: any, index: number) => {
                 const isLarge = index === 0;
                 const imageUrl = useMemo(() => {
-                  if (!item.image) return FALLBACK_IMAGES.gallery;
-                  if (item.image.startsWith('http')) return item.image;
-                  return `${API_URL}/assets/${item.image}`;
-                }, [item.image]);
+                  return getOptimizedImageUrl(item.image, isLarge ? 800 : 400, 80);
+                }, [item.image, isLarge]);
                 
                 return (
                   <div
@@ -501,13 +516,15 @@ export default function GalleryPage() {
                     }`}
                   >
                     <div className="absolute inset-0">
-                      <img
+                      <Image
                         src={imageUrl}
                         alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="lazy"
-                        decoding="async"
-                        onError={(e) => {
+                        fill
+                        sizes={isLarge ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 50vw, 33vw"}
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        quality={80}
+                        priority={index < 2}
+                        onError={(e: any) => {
                           e.currentTarget.src = FALLBACK_IMAGES.gallery;
                         }}
                       />
@@ -555,7 +572,7 @@ export default function GalleryPage() {
         </section>
       )}
 
-      {/* ===== ALL ITEMS - Optimized Rendering ===== */}
+      {/* ===== ALL ITEMS ===== */}
       <section className={`px-5 md:px-14 pb-10 md:pb-16 ${featuredItems.length > 0 && activeCategory === 'all' ? 'bg-[#F6F8FA]' : 'bg-white'}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="flex items-center gap-2.5 mb-5 md:mb-8">
@@ -604,7 +621,6 @@ export default function GalleryPage() {
                 </div>
               )}
 
-              {/* ===== END OF CONTENT ===== */}
               {!hasMore && displayedImages.length > 0 && activeCategory === 'all' && (
                 <div className="text-center py-8 text-sm text-[#5B6B7A]">
                   🎉 You've reached the end of the gallery
@@ -665,15 +681,14 @@ export default function GalleryPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative rounded-2xl overflow-hidden bg-[#111111] shadow-2xl">
-                <img
-                  src={(() => {
-                    if (!selectedItem.image) return FALLBACK_IMAGES.gallery;
-                    if (selectedItem.image.startsWith('http')) return selectedItem.image;
-                    return `${API_URL}/assets/${selectedItem.image}`;
-                  })()}
+                <Image
+                  src={getOptimizedImageUrl(selectedItem.image, 1200, 90)}
                   alt={selectedItem.title}
+                  width={1200}
+                  height={800}
                   className="w-full h-auto max-h-[75vh] object-contain"
-                  onError={(e) => {
+                  quality={90}
+                  onError={(e: any) => {
                     e.currentTarget.src = FALLBACK_IMAGES.gallery;
                   }}
                 />
