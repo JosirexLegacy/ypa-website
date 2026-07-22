@@ -2,11 +2,14 @@
 const nextConfig = {
   images: {
     remotePatterns: [
+      // Your live Directus backend on Render
       {
         protocol: 'https',
-        hostname: '**.onrender.com',
+        hostname: 'ypa-directus.onrender.com',
+        port: '',
         pathname: '/assets/**',
       },
+      // Keep other external sources you use
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
@@ -19,14 +22,9 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'farm6.staticflickr.com',
       },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '8055',
-        pathname: '/assets/**',
-      },
     ],
   },
+  // Keep your webpack and turbopack configs as they are
   turbopack: {},
   webpack: (config, { isServer }) => {
     if (!isServer) {
