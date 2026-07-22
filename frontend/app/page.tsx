@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Alegreya, Inter } from "next/font/google";
 import {
   motion,
   AnimatePresence,
@@ -53,19 +53,31 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
   variable: "--font-mono",
 });
+const serif = Alegreya({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-serif",
+});
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+});
 
 // ============================================================
-// DESIGN TOKENS
+// OFFICIAL YPA BRAND COLORS
 // ============================================================
-const INK = "#060B14";
+const YPA_BLUE = "#00AEEF";
+const YPA_BLUE_DARK = "#0099D6";
+const YPA_BLUE_LIGHT = "#33C1F5";
+const YPA_BLUE_SOFT = "#E6F8FD";
+const INK = "#111111";
 const NAVY = "#0E2540";
 const NAVY_SOFT = "#153455";
 const LINE = "#1F3B57";
-const BLUE = "#2196F3";
-const SKY = "#7EC8FF";
 const GOLD = "#F0B429";
 const MIST = "#F6F8FA";
-const INK_ON_LIGHT = "#0E2540";
+const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
 const POSITIVE = "#34D399";
 
@@ -127,9 +139,6 @@ async function getBlogPosts() {
   }
 }
 
-// ============================================================
-// FETCH SIGNAL ARTICLES
-// ============================================================
 async function getSignalArticles() {
   try {
     const res = await fetch(
@@ -151,7 +160,6 @@ async function getSignalArticles() {
   }
 }
 
-// Fallback articles (so the page still works if Directus is down)
 function getFallbackArticles() {
   return [
     {
@@ -193,14 +201,14 @@ const ScrollProgress = () => {
   const { scrollYProgress } = useScroll();
   return (
     <motion.div
-      style={{ scaleX: scrollYProgress, background: BLUE }}
+      style={{ scaleX: scrollYProgress, background: YPA_BLUE }}
       className="fixed top-0 left-0 right-0 h-[2px] origin-left z-[60]"
     />
   );
 };
 
 // ============================================================
-// SECTION RAIL
+// SECTION RAIL (GLASS)
 // ============================================================
 const SECTIONS = [
   { id: "hero", label: "Home" },
@@ -240,29 +248,25 @@ const SectionRail = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Rail sits on its own glass capsule, well clear of body copy, and
-  // labels only ever render inside their own frosted chip — never as
-  // bare text floating over whatever section happens to be behind it.
   return (
     <div className="fixed left-3 md:left-5 top-1/2 -translate-y-1/2 z-40 hidden lg:block">
       <div
         className="relative flex flex-col items-center gap-[14px] py-5 px-[9px] rounded-full"
         style={{
-          background: "rgba(10,20,34,0.38)",
+          background: "rgba(255,255,255,0.12)",
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
-          border: "1px solid rgba(255,255,255,0.14)",
-          boxShadow: `0 0 0 1px rgba(255,255,255,0.03), 0 8px 32px rgba(0,0,0,0.25), 0 0 24px ${BLUE}22`,
+          border: "1px solid rgba(255,255,255,0.2)",
+          boxShadow: `0 8px 32px rgba(0,0,0,0.08), 0 0 24px ${YPA_BLUE}15`,
         }}
       >
-        {/* progress fill glowing up the spine of the capsule */}
         <div
           className="absolute left-1/2 top-2 bottom-2 w-[2px] -translate-x-1/2 rounded-full overflow-hidden"
-          style={{ background: "rgba(255,255,255,0.08)" }}
+          style={{ background: "rgba(255,255,255,0.2)" }}
         >
           <motion.div
             className="w-full rounded-full"
-            style={{ background: `linear-gradient(180deg, ${SKY}, ${BLUE})`, boxShadow: `0 0 8px ${BLUE}` }}
+            style={{ background: `linear-gradient(180deg, ${YPA_BLUE_LIGHT}, ${YPA_BLUE})` }}
             animate={{ height: `${progress * 100}%` }}
             transition={{ duration: 0.2, ease: "linear" }}
           />
@@ -285,14 +289,12 @@ const SectionRail = () => {
                 animate={{
                   width: isActive ? 9 : 6,
                   height: isActive ? 9 : 6,
-                  background: isActive ? BLUE : "rgba(255,255,255,0.35)",
-                  boxShadow: isActive ? `0 0 10px ${BLUE}` : "0 0 0 rgba(0,0,0,0)",
+                  background: isActive ? YPA_BLUE : "rgba(255,255,255,0.5)",
+                  boxShadow: isActive ? `0 0 10px ${YPA_BLUE}` : "none",
                 }}
                 transition={{ duration: 0.3 }}
               />
 
-              {/* detached glass label chip — has its own background, so it
-                  never blends into whatever content sits behind the rail */}
               <AnimatePresence>
                 {(isActive || isHovered) && (
                   <motion.span
@@ -302,11 +304,11 @@ const SectionRail = () => {
                     transition={{ duration: 0.2 }}
                     className={`${mono.className} absolute left-full ml-3 whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] tracking-[0.14em] uppercase font-medium`}
                     style={{
-                      background: "rgba(10,20,34,0.9)",
+                      background: "rgba(255,255,255,0.9)",
                       backdropFilter: "blur(10px)",
-                      border: `1px solid ${isActive ? `${BLUE}55` : "rgba(255,255,255,0.12)"}`,
-                      boxShadow: isActive ? `0 0 16px ${BLUE}33` : "0 4px 16px rgba(0,0,0,0.3)",
-                      color: isActive ? "#fff" : "rgba(255,255,255,0.65)",
+                      border: `1px solid ${isActive ? YPA_BLUE : "rgba(255,255,255,0.3)"}`,
+                      boxShadow: isActive ? `0 0 16px ${YPA_BLUE}33` : "0 4px 16px rgba(0,0,0,0.05)",
+                      color: isActive ? YPA_BLUE : "#111111",
                     }}
                   >
                     {s.label}
@@ -324,7 +326,11 @@ const SectionRail = () => {
 // ============================================================
 // SCROLL REVEAL
 // ============================================================
-const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
+const ScrollReveal = ({ children, delay = 0, className = "" }: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const reduce = useReducedMotion();
@@ -343,137 +349,157 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React
 };
 
 // ============================================================
-// HERO
+// HERO — #1 Premium with Morphing Background
 // ============================================================
 const LINEUP = [
   {
     kicker: "Model 01 — Livestock",
     title: "The Goats Programme",
+    titleHighlight: "Goats",
     line: "Mubende × Boer × Kalahari, raised for guaranteed off-take.",
     specs: [
       { label: "Under care", value: "130,000+" },
       { label: "Success rate", value: "95%" },
       { label: "Market access", value: "Guaranteed" },
     ],
-    gradient: "from-[#060B14] via-[#0E2540] to-[#2196F3]/40",
+    gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/projects/goats",
-    image: `${API_URL}/assets/3012af2e-1cc2-404b-9e46-956c56cc1912`,
-    aura: SKY,
+    image: "https://cdn.vetverified.com/articles/06831ffc7fdc72391ae6f8f170b03427c588c33bf9e52fba10e22133c49e1e56.webp",
+    aura: YPA_BLUE,
+    glowColor: YPA_BLUE,
   },
   {
     kicker: "Model 02 — Cropping",
     title: "Maize Contract Farming",
+    titleHighlight: "Maize",
     line: "Modern inputs, guaranteed buyers, a return you can plan around.",
     specs: [
       { label: "Cultivated", value: "5,000+ acres" },
       { label: "Avg. return", value: "3.0×" },
       { label: "Off-take", value: "Contracted" },
     ],
-    gradient: "from-[#0E2540] via-[#153455] to-[#060B14]",
+    gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/projects/maize",
-    image: "https://tse2.mm.bing.net/th/id/OIP.WJJALakxa5_OhQvljSbsKwHaE8?r=0&w=600&h=400&rs=1&pid=ImgDetMain&o=7&rm=3",
-    aura: GOLD,
+    image: "https://thumbs.dreamstime.com/b/corn-harvesting-21773394.jpg",
+    aura: YPA_BLUE,
+    glowColor: YPA_BLUE,
   },
   {
     kicker: "Model 03 — Finance",
     title: "YPA SACCO",
+    titleHighlight: "SACCO",
     line: "Savings and credit built around the rhythm of a harvest, not a payslip.",
     specs: [
       { label: "Members", value: "1,000+" },
       { label: "Branches", value: "12" },
       { label: "Founded", value: "2014" },
     ],
-    gradient: "from-[#060B14] via-[#0E2540]/80 to-[#153455]",
+    gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/sacco",
     image: "https://farm6.staticflickr.com/5603/15475865161_634b055363.jpg",
-    aura: POSITIVE,
+    aura: YPA_BLUE,
+    glowColor: YPA_BLUE,
   },
 ];
 
 // ============================================================
-// HERO VISUAL — a real photograph per programme, staged like a
-// viewfinder rather than a rendered creature. This replaces the
-// old hand-drawn SVG animals: those needed 30+ elements animating
-// simultaneously behind an SVG blur filter, which is expensive to
-// re-rasterize every frame and was the actual source of the scroll
-// jank. This version runs on exactly two GPU-cheap transforms — a
-// crossfade and a slow zoom — full stop.
+// HERO VISUAL — Premium with Morphing Background
+// ============================================================
 const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
   const reduce = useReducedMotion();
 
   return (
-    <div className="relative w-full max-w-[440px] mx-auto aspect-[4/5]">
-      {/* glow — a single static blur that recolors on slide change via a
-          plain CSS transition, not a per-frame animation loop */}
-      <div
-        className="absolute inset-3 rounded-[2rem] blur-2xl transition-colors duration-[1200ms]"
-        style={{ background: item.aura, opacity: 0.3 }}
-      />
+    <div className="relative w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[440px] mx-auto aspect-[4/3] lg:aspect-[4/5]">
+      {/* ✅ Morphing glow blobs behind the image */}
+      <div className="absolute inset-0 -z-10">
+        <motion.div
+          className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] rounded-full blur-3xl"
+          style={{ background: `${item.aura}20` }}
+          animate={reduce ? {} : { 
+            scale: [1, 1.2, 0.9, 1],
+            x: [0, 20, -15, 0],
+            y: [0, -15, 20, 0],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[-20%] left-[-20%] w-[70%] h-[70%] rounded-full blur-3xl"
+          style={{ background: `${item.aura}15` }}
+          animate={reduce ? {} : { 
+            scale: [1, 0.8, 1.1, 1],
+            x: [0, -15, 20, 0],
+            y: [0, 20, -15, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] rounded-full blur-3xl"
+          style={{ background: `${item.aura}08` }}
+          animate={reduce ? {} : { 
+            scale: [1, 1.3, 0.8, 1],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+        />
+      </div>
 
-      {/* one slow-rotating ring for texture — a single transform, no filter */}
+      {/* Glass ring with rotation */}
       <motion.div
         className="absolute inset-[-14px] rounded-[2.4rem] border pointer-events-none"
-        style={{ borderColor: "rgba(255,255,255,0.12)" }}
+        style={{ borderColor: `${item.aura}30` }}
         animate={reduce ? {} : { rotate: 360 }}
         transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
       />
 
       <div
         className="relative w-full h-full rounded-[2rem] overflow-hidden border"
-        style={{ borderColor: "rgba(255,255,255,0.14)", boxShadow: `0 30px 70px -24px ${item.aura}55` }}
+        style={{ 
+          borderColor: `${item.aura}20`,
+          boxShadow: `0 30px 60px -20px ${item.aura}30, 0 0 0 1px ${item.aura}10 inset`
+        }}
       >
         <AnimatePresence>
           <motion.img
             key={item.image}
             src={item.image}
             alt={item.title}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, scale: reduce ? 1 : 1.1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: reduce ? 1 : 1.05 }}
+            exit={{ opacity: 0, scale: 1.1 }}
             transition={{
-              opacity: { duration: 0.7 },
-              scale: { duration: 7, ease: "linear" },
+              opacity: { duration: 0.8, ease: "easeOut" },
+              scale: { duration: 10, ease: "linear" },
             }}
             className="absolute inset-0 w-full h-full object-cover"
+            style={{ filter: "brightness(0.95) contrast(1.05)" }}
             onError={(e) => {
               e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80";
             }}
           />
         </AnimatePresence>
 
-        {/* scrim, static — keeps the tag legible over any photo */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: "linear-gradient(to top, rgba(6,11,20,0.75) 0%, transparent 42%)" }}
-        />
+        {/* Glass overlay */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: `linear-gradient(to top, rgba(6,11,20,0.6) 0%, transparent 50%, ${item.aura}05 100%)`,
+        }} />
 
-        {/* viewfinder corners — plain static SVG, zero animation cost */}
+        {/* Corner accents */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <g stroke="rgba(255,255,255,0.55)" strokeWidth="0.6" fill="none">
-            <path d="M5 16 V6 H15" />
-            <path d="M85 6 H95 V16" />
-            <path d="M95 84 V94 H85" />
-            <path d="M15 94 H5 V84" />
+          <g stroke={item.aura} strokeWidth="0.8" fill="none" opacity="0.4">
+            <path d="M6 18 V8 H16" />
+            <path d="M84 8 H94 V18" />
+            <path d="M94 82 V92 H84" />
+            <path d="M16 92 H6 V82" />
           </g>
         </svg>
-
-        <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between">
-          <span className={`${mono.className} text-[10px] tracking-[0.12em] uppercase text-white/75`}>
-            {item.kicker}
-          </span>
-          <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
-            <span
-              className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-60"
-              style={{ background: item.aura }}
-            />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: item.aura }} />
-          </span>
-        </div>
       </div>
     </div>
   );
 };
 
+// ============================================================
+// HERO — #1 Premium with Morphing Background
+// ============================================================
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 const Hero = () => {
   const [i, setI] = useState(0);
@@ -488,155 +514,320 @@ const Hero = () => {
 
   const current = LINEUP[i];
 
+  const titleParts = current.title.split(current.titleHighlight);
+  const beforeHighlight = titleParts[0] || "";
+  const afterHighlight = titleParts.slice(1).join("");
+
   return (
     <section
       id="hero"
-      className="relative min-h-screen overflow-hidden bg-[#060B14]"
+      className="relative min-h-screen overflow-hidden bg-white"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
+      {/* Background gradient with subtle movement */}
       <AnimatePresence mode="wait">
         <motion.div
           key={i}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.4, ease: "easeInOut" }}
+          transition={{ duration: 1.2, ease: EASE }}
           className={`absolute inset-0 bg-gradient-to-br ${current.gradient}`}
         />
       </AnimatePresence>
 
+      {/* ✅ MORPHING BACKGROUND BLOBS — Premium organic movement */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          animate={reduce ? {} : { x: [0, 90, -40, 0], y: [0, -70, 50, 0] }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[8%] right-[6%] w-[560px] h-[560px] rounded-full blur-3xl transition-colors duration-[1500ms]"
-          style={{ background: `${current.aura}26` }}
+          className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full blur-3xl"
+          style={{ background: `${current.aura}12` }}
+          animate={reduce ? {} : { 
+            scale: [1, 1.15, 0.9, 1],
+            x: [0, 30, -20, 0],
+            y: [0, -20, 30, 0],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          animate={reduce ? {} : { x: [0, -70, 40, 0], y: [0, 50, -60, 0] }}
-          transition={{ duration: 32, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-          className="absolute bottom-[6%] left-[4%] w-[420px] h-[420px] rounded-full blur-3xl"
-          style={{ background: `${SKY}14` }}
+          className="absolute bottom-[-5%] left-[-5%] w-[450px] h-[450px] rounded-full blur-3xl"
+          style={{ background: `${current.aura}08` }}
+          animate={reduce ? {} : { 
+            scale: [1, 0.85, 1.1, 1],
+            x: [0, -20, 30, 0],
+            y: [0, 30, -20, 0],
+          }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl"
+          style={{ background: `${current.aura}05` }}
+          animate={reduce ? {} : { 
+            scale: [1, 1.2, 0.85, 1],
+          }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
         />
       </div>
 
+      {/* Subtle dot grid */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.55) 1px, transparent 1px)",
-          backgroundSize: "34px 34px",
-          opacity: 0.1,
-          WebkitMaskImage: "radial-gradient(ellipse 65% 60% at 50% 45%, #000 0%, transparent 78%)",
-          maskImage: "radial-gradient(ellipse 65% 60% at 50% 45%, #000 0%, transparent 78%)",
+          backgroundImage: `radial-gradient(${current.aura} 1px, transparent 1px)`,
+          backgroundSize: "40px 40px",
+          opacity: 0.04,
+          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 78%)",
+          maskImage: "radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 78%)",
         }}
       />
 
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 md:px-14">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-4 lg:gap-16 items-center">
-          <AnimatePresence mode="wait">
+          <div className="order-2 lg:order-1">
+            {/* ✅ BOLD #1 RANKED BADGE — Stands out! */}
             <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -24 }}
-              transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: EASE, delay: 0.15 }}
+              className="inline-flex items-center gap-3 rounded-full px-5 py-2.5 mb-6 backdrop-blur-md shadow-xl"
+              style={{
+                background: `linear-gradient(135deg, ${current.aura}, ${current.aura}dd)`,
+                border: `1px solid ${current.aura}40`,
+                boxShadow: `0 8px 32px ${current.aura}40, 0 0 60px ${current.aura}20`,
+              }}
             >
-              <div
-                className={`${mono.className} flex items-center gap-3 text-[11px] tracking-[0.25em] uppercase text-white/50 mb-7`}
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34D399] opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34D399]" />
-                </span>
-                {current.kicker}
-              </div>
-
-              <h1
-                className={`${display.className} text-5xl md:text-6xl lg:text-7xl font-medium text-white leading-[1.03] tracking-tight max-w-xl`}
+                <Award className="h-5 w-5 text-white" />
+              </motion.div>
+              <span className={`${inter.className} text-[11px] sm:text-[13px] tracking-[0.1em] uppercase font-bold text-white`}>
+                Ranked #1 Goat Farming Programme in Africa
+              </span>
+              <motion.span
+                className="relative flex h-2 w-2"
+                animate={{ scale: [1, 1.5, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
               >
-                {current.title}
-              </h1>
-
-              <p className="mt-6 text-lg md:text-xl text-white/55 font-light max-w-xl leading-relaxed">
-                {current.line}
-              </p>
-
-              <div className={`${mono.className} mt-10 flex flex-wrap gap-x-10 gap-y-4`}>
-                {current.specs.map((s, idx) => (
-                  <div key={idx} className="flex flex-col">
-                    <span className="text-[10px] tracking-[0.15em] uppercase text-white/35">
-                      {s.label}
-                    </span>
-                    <span className="text-xl md:text-2xl text-white font-medium">{s.value}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-10 flex flex-wrap gap-4">
-                <Link
-                  href={current.href}
-                  className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white transition-all hover:-translate-y-0.5"
-                  style={{ background: BLUE, boxShadow: `0 20px 40px -12px ${BLUE}66` }}
-                >
-                  Configure this programme
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-                <Link
-                  href="/about"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-8 py-4 text-sm font-medium text-white/75 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white"
-                >
-                  <Play className="h-4 w-4" />
-                  See how YPA works
-                </Link>
-              </div>
-
-              <div className="flex gap-2 mt-12">
-                {LINEUP.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setI(idx)}
-                    aria-label={`Show ${LINEUP[idx].title}`}
-                    className="h-[3px] rounded-full transition-all duration-700"
-                    style={{
-                      width: idx === i ? "48px" : "16px",
-                      background: idx === i ? "#fff" : "rgba(255,255,255,0.25)",
-                    }}
-                  />
-                ))}
-              </div>
+                <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+              </motion.span>
             </motion.div>
-          </AnimatePresence>
 
-          <div className="hidden lg:block">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -30 }}
+                transition={{ duration: 0.7, ease: EASE }}
+              >
+                {/* Kicker with animated line */}
+                <div className="flex items-center gap-3 mb-5">
+                  <span className={`${inter.className} text-[11px] tracking-[0.25em] uppercase font-medium`} style={{ color: current.aura }}>
+                    {current.kicker}
+                  </span>
+                  <motion.span 
+                    className="h-px flex-1" 
+                    style={{ background: `${current.aura}30` }}
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 1, delay: 0.3 }}
+                  />
+                </div>
+
+                {/* ✅ Premium title with glowing highlight */}
+                <motion.h1
+                  className={`${inter.className} text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] tracking-tight max-w-xl`}
+                  style={{ color: INK_ON_LIGHT }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.6, ease: EASE }}
+                >
+                  {beforeHighlight}
+                  <span 
+                    className="relative inline-block"
+                    style={{ color: current.aura }}
+                  >
+                    {current.titleHighlight}
+                    {/* ✅ Glowing underline */}
+                    <motion.span
+                      className="absolute bottom-[-4px] left-0 h-[3px] rounded-full"
+                      style={{
+                        background: `linear-gradient(90deg, ${current.aura}, ${current.aura}80)`,
+                        boxShadow: `0 0 16px ${current.aura}`,
+                      }}
+                      initial={{ width: 0 }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 1.2, delay: 0.4, ease: "easeInOut" }}
+                    />
+                    {/* ✅ Soft glow behind the word */}
+                    <motion.span
+                      className="absolute inset-0 rounded-full blur-2xl -z-10"
+                      style={{ background: current.aura }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.25 }}
+                      transition={{ duration: 1, delay: 0.6 }}
+                    />
+                  </span>
+                  {afterHighlight}
+                </motion.h1>
+
+                <motion.p
+                  className={`${inter.className} mt-5 text-lg md:text-xl font-light max-w-xl leading-relaxed`}
+                  style={{ color: MUTE_ON_LIGHT }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                >
+                  {current.line}
+                </motion.p>
+
+                {/* Premium specs */}
+                <div className={`${inter.className} mt-8 flex flex-wrap gap-x-10 gap-y-3`}>
+                  {current.specs.map((s, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -15 }}
+                      transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
+                      className="flex flex-col group cursor-default"
+                    >
+                      <span className="text-[10px] tracking-[0.15em] uppercase font-medium" style={{ color: MUTE_ON_LIGHT }}>
+                        {s.label}
+                      </span>
+                      <span 
+                        className="text-2xl md:text-3xl font-semibold transition-colors duration-300 group-hover:text-[#00AEEF]"
+                        style={{ color: INK_ON_LIGHT }}
+                      >
+                        {s.value}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Premium buttons */}
+                <div className="mt-10 flex flex-wrap gap-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 15 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                  >
+                    <Link
+                      href={current.href}
+                      className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl active:scale-[0.98]"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${current.aura}, ${current.aura}cc)`,
+                        boxShadow: `0 20px 40px -12px ${current.aura}55`,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = `0 25px 50px -12px ${current.aura}77`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = `0 20px 40px -12px ${current.aura}55`;
+                      }}
+                    >
+                      Configure this programme
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 15 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                  >
+                    <Link
+                      href="/about"
+                      className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium transition-all duration-300 hover:-translate-y-1 hover:shadow-lg active:scale-[0.98]"
+                      style={{ 
+                        border: `2px solid ${current.aura}30`,
+                        color: INK_ON_LIGHT,
+                        background: "rgba(255,255,255,0.5)",
+                        backdropFilter: "blur(10px)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = current.aura;
+                        e.currentTarget.style.color = "#fff";
+                        e.currentTarget.style.borderColor = current.aura;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.5)";
+                        e.currentTarget.style.color = INK_ON_LIGHT;
+                        e.currentTarget.style.borderColor = `${current.aura}30`;
+                      }}
+                    >
+                      <Play className="h-4 w-4" />
+                      See how YPA works
+                    </Link>
+                  </motion.div>
+                </div>
+
+                {/* Slide indicators */}
+                <div className="flex gap-2 mt-12">
+                  {LINEUP.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setI(idx)}
+                      aria-label={`Show ${LINEUP[idx].title}`}
+                      className="rounded-full transition-all duration-700 relative group"
+                      style={{
+                        width: idx === i ? "48px" : "14px",
+                        height: "3px",
+                        background: idx === i ? current.aura : "rgba(6,11,20,0.12)",
+                      }}
+                    >
+                      {idx === i && (
+                        <motion.span
+                          className="absolute inset-0 rounded-full"
+                          style={{ background: current.aura }}
+                          layoutId="activePill"
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="order-1 lg:order-2 mb-2 lg:mb-0">
             <HeroVisual item={current} />
           </div>
         </div>
       </div>
 
+      {/* Scroll indicator */}
       <motion.a
         href="#index"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2"
+        transition={{ delay: 1.6 }}
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 group"
       >
-        <span className={`${mono.className} text-[10px] tracking-[0.3em] uppercase text-white/30`}>
-          The Field Index
+        <span className={`${inter.className} text-[9px] tracking-[0.3em] uppercase font-medium transition-colors duration-300`} style={{ color: MUTE_ON_LIGHT }}>
+          Explore
         </span>
         <motion.div
           animate={reduce ? {} : { y: [0, 6, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="transition-colors duration-300 group-hover:text-[#00AEEF]"
+          style={{ color: MUTE_ON_LIGHT }}
         >
-          <ChevronDown className="h-4 w-4 text-white/40" />
+          <ChevronDown className="h-4 w-4" />
         </motion.div>
       </motion.a>
     </section>
   );
 };
-
 // ============================================================
-// FIELD INDEX
+// FIELD INDEX — REMOVED GREEN, USING YPA BLUE
 // ============================================================
 const FIELD_INDEX = [
   { label: "Goats under care", value: "130,000+", delta: "95% success" },
@@ -653,13 +844,13 @@ const FieldIndex = () => {
   const track = [...FIELD_INDEX, ...FIELD_INDEX];
 
   return (
-    <section id="index" className="relative overflow-hidden" style={{ background: NAVY }}>
+    <section id="index" className="relative overflow-hidden" style={{ background: YPA_BLUE }}>
       <div className="flex items-center gap-2.5 px-6 md:px-14 pt-6">
         <span className="relative flex h-1.5 w-1.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34D399] opacity-75" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34D399]" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
         </span>
-        <span className={`${display.className} text-[13px] text-white/45`}>
+        <span className={`${display.className} text-[13px] text-white/90`}>
           The Field Index — a live read across all 12 branches
         </span>
       </div>
@@ -674,15 +865,15 @@ const FieldIndex = () => {
             <div
               key={idx}
               className="flex items-center gap-3 shrink-0 rounded-2xl pl-5 pr-4 py-3 border transition-colors duration-300 hover:border-white/20"
-              style={{ borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}
+              style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.08)" }}
             >
               <div className="flex flex-col">
-                <span className="text-[11px] text-white/40">{m.label}</span>
+                <span className="text-[11px] text-white/70">{m.label}</span>
                 <span className={`${mono.className} text-lg text-white font-medium`}>{m.value}</span>
               </div>
               <span
                 className="text-[10px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap"
-                style={{ color: POSITIVE, background: `${POSITIVE}14` }}
+                style={{ color: YPA_BLUE_LIGHT, background: `${YPA_BLUE}25` }}
               >
                 {m.delta}
               </span>
@@ -691,11 +882,11 @@ const FieldIndex = () => {
         </motion.div>
         <div
           className="absolute inset-y-0 left-0 w-16 md:w-28 pointer-events-none"
-          style={{ background: `linear-gradient(to right, ${NAVY}, transparent)` }}
+          style={{ background: `linear-gradient(to right, ${YPA_BLUE}, transparent)` }}
         />
         <div
           className="absolute inset-y-0 right-0 w-16 md:w-28 pointer-events-none"
-          style={{ background: `linear-gradient(to left, ${NAVY}, transparent)` }}
+          style={{ background: `linear-gradient(to left, ${YPA_BLUE}, transparent)` }}
         />
       </div>
     </section>
@@ -787,7 +978,7 @@ const ExploreRail = () => {
                 />
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: `linear-gradient(135deg, ${BLUE}22, transparent 60%)` }}
+                  style={{ background: `linear-gradient(135deg, ${YPA_BLUE}22, transparent 60%)` }}
                 />
 
                 <div className="relative h-full flex flex-col justify-end p-6">
@@ -800,7 +991,7 @@ const ExploreRail = () => {
                     </span>
                     <span
                       className="flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 shrink-0"
-                      style={{ background: BLUE }}
+                      style={{ background: YPA_BLUE }}
                     >
                       <ArrowUpRight className="h-4 w-4 text-white" />
                     </span>
@@ -921,7 +1112,7 @@ const TheLineup = () => {
                         <ul className="mt-4 space-y-1.5 pt-4 border-t border-white/10">
                           {c.specs.map((s, si) => (
                             <li key={si} className="flex items-center gap-2 text-xs text-white/65">
-                              <span className="h-1 w-1 rounded-full" style={{ background: BLUE }} />
+                              <span className="h-1 w-1 rounded-full" style={{ background: YPA_BLUE }} />
                               {s}
                             </li>
                           ))}
@@ -966,9 +1157,9 @@ const TrustBar = () => {
                 <div className="rounded-2xl border p-6 bg-white h-full" style={{ borderColor: "#E8ECF0" }}>
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-                    style={{ background: `${BLUE}12` }}
+                    style={{ background: `${YPA_BLUE}12` }}
                   >
-                    <Icon className="h-5 w-5" style={{ color: BLUE }} />
+                    <Icon className="h-5 w-5" style={{ color: YPA_BLUE }} />
                   </div>
                   <div className={`${mono.className} text-[10px] tracking-[0.15em] uppercase`} style={{ color: MUTE_ON_LIGHT }}>
                     {t.label}
@@ -990,7 +1181,7 @@ const TrustBar = () => {
 };
 
 // ============================================================
-// SIGNAL — with "View all stories" link
+// SIGNAL
 // ============================================================
 const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
   if (!signalArticles || signalArticles.length === 0) return null;
@@ -1013,7 +1204,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
           <Link
             href="/signal"
             className="inline-flex items-center gap-2 text-sm font-medium group transition-all hover:gap-3"
-            style={{ color: BLUE }}
+            style={{ color: YPA_BLUE }}
           >
             View all stories
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -1038,7 +1229,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
                 <div className="absolute bottom-0 p-7">
                   <span
                     className="inline-block rounded-full px-3 py-1 text-[10px] font-medium text-white mb-4"
-                    style={{ background: BLUE }}
+                    style={{ background: YPA_BLUE }}
                   >
                     {featured.tag}
                   </span>
@@ -1067,7 +1258,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
                   />
                 </div>
                 <div>
-                  <span className="text-[10px] font-medium tracking-wide uppercase" style={{ color: BLUE }}>
+                  <span className="text-[10px] font-medium tracking-wide uppercase" style={{ color: YPA_BLUE }}>
                     {item.tag}
                   </span>
                   <h4 className={`${display.className} text-lg font-medium leading-snug mt-1`} style={{ color: INK_ON_LIGHT }}>
@@ -1086,6 +1277,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
     </section>
   );
 };
+
 // ============================================================
 // MEMBER VOICES
 // ============================================================
@@ -1153,7 +1345,7 @@ const PressSignal = ({ pressItems }: { pressItems: any[] }) => {
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-sm font-medium group"
-            style={{ color: BLUE }}
+            style={{ color: YPA_BLUE }}
           >
             Open the media center
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -1169,9 +1361,9 @@ const PressSignal = ({ pressItems }: { pressItems: any[] }) => {
               <Link href={item.link || "#"} target="_blank" className="group flex items-center gap-5 py-6">
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: `${BLUE}12` }}
+                  style={{ background: `${YPA_BLUE}12` }}
                 >
-                  <Icon className="h-4 w-4" style={{ color: BLUE }} />
+                  <Icon className="h-4 w-4" style={{ color: YPA_BLUE }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4
@@ -1190,217 +1382,6 @@ const PressSignal = ({ pressItems }: { pressItems: any[] }) => {
           );
         })}
       </div>
-    </section>
-  );
-};
-
-// ============================================================
-// LIVE PANEL
-// ============================================================
-const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
-  const facts = [
-    { icon: Target, title: "Our Mission", description: "Empowering Africa's youth through sustainable agribusiness and financial inclusion." },
-    { icon: Heart, title: "Our Impact", description: "130,000+ goats under care. 1,000+ SACCO members. 12 branches across Uganda." },
-    { icon: Lightbulb, title: "Our Vision", description: "A prosperous Africa where every young farmer has the tools to succeed." },
-    { icon: Shield, title: "Our Promise", description: "100% transparency. No hidden fees. Registered with URSB." },
-  ];
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setActive((p) => (p + 1) % facts.length), 4500);
-    return () => clearInterval(t);
-  }, [facts.length]);
-
-  const isEventSoon = (dateString: string) => {
-    const eventDate = new Date(dateString);
-    const now = new Date();
-    const diff = (eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-    return diff >= 0 && diff <= 3;
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 30 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 0.3 }}
-      className="fixed right-6 top-24 z-40 hidden xl:block w-80 max-h-[78vh] overflow-y-auto"
-      style={{ scrollbarWidth: "thin" }}
-    >
-      <div
-        className="rounded-3xl p-6 shadow-2xl border"
-        style={{ background: "rgba(14,37,64,0.85)", backdropFilter: "blur(20px)", borderColor: "rgba(255,255,255,0.1)" }}
-      >
-        <div className="mb-6">
-          <div className={`${mono.className} flex items-center gap-2 mb-4 text-[10px] tracking-[0.2em] uppercase text-white/50`}>
-            <span className="w-1 h-4 rounded-full" style={{ background: BLUE }} />
-            About YPA
-          </div>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div
-                className="w-11 h-11 rounded-2xl flex items-center justify-center mb-3"
-                style={{ background: `${BLUE}22` }}
-              >
-                {(() => {
-                  const Icon = facts[active].icon;
-                  return <Icon className="w-5 h-5" style={{ color: SKY }} />;
-                })()}
-              </div>
-              <h4 className="text-base font-medium text-white">{facts[active].title}</h4>
-              <p className="mt-2 text-sm text-white/55 font-light leading-relaxed">{facts[active].description}</p>
-              <div className="flex gap-1.5 mt-4">
-                {facts.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActive(i)}
-                    className="h-1 rounded-full transition-all duration-500"
-                    style={{ width: i === active ? "22px" : "10px", background: i === active ? BLUE : "rgba(255,255,255,0.2)" }}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {events?.length > 0 && (
-          <>
-            <div className="border-t my-4" style={{ borderColor: "rgba(255,255,255,0.1)" }} />
-            <div className="mb-6">
-              <div className={`${mono.className} flex items-center gap-2 mb-3 text-[10px] tracking-[0.2em] uppercase text-white/50`}>
-                <span className="w-1 h-4 rounded-full" style={{ background: SKY }} />
-                Upcoming Events
-              </div>
-              <div className="space-y-2">
-                {events.slice(0, 3).map((event, i) => {
-                  const soon = isEventSoon(event.date);
-                  return (
-                    <Link key={i} href={`/events/${event.slug}`}>
-                      <motion.div
-                        whileHover={{ x: 4 }}
-                        className={`p-3 rounded-xl border transition-all duration-300 ${
-                          soon ? "ring-2 ring-[#F0B429] ring-opacity-60 animate-pulse" : ""
-                        }`}
-                        style={{
-                          background: "rgba(255,255,255,0.05)",
-                          borderColor: soon ? "rgba(240,180,41,0.4)" : "rgba(255,255,255,0.08)",
-                        }}
-                      >
-                        <div className="text-sm font-medium text-white line-clamp-1">{event.title}</div>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-white/40">
-                          <Calendar className="h-3 w-3 shrink-0" />
-                          <span>{event.date ? new Date(event.date).toLocaleDateString() : "TBD"}</span>
-                          <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
-                          <MapPin className="h-3 w-3 shrink-0" />
-                          <span className="truncate">{event.location || "Uganda"}</span>
-                          {soon && <span className="ml-auto text-[10px] font-medium text-[#F0B429]">Soon</span>}
-                        </div>
-                      </motion.div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </>
-        )}
-
-        {blogs?.length > 0 && (
-          <>
-            <div className="border-t my-4" style={{ borderColor: "rgba(255,255,255,0.1)" }} />
-            <div>
-              <div className={`${mono.className} flex items-center gap-2 mb-3 text-[10px] tracking-[0.2em] uppercase text-white/50`}>
-                <span className="w-1 h-4 rounded-full" style={{ background: GOLD }} />
-                Popular Blogs
-              </div>
-              <div className="space-y-2">
-                {blogs.slice(0, 3).map((blog, i) => (
-                  <Link key={i} href={`/blog/${blog.slug}`}>
-                    <motion.div
-                      whileHover={{ x: 4 }}
-                      className="flex items-start gap-3 p-3 rounded-xl border transition-all duration-300"
-                      style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.08)" }}
-                    >
-                      <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0" style={{ background: NAVY_SOFT }}>
-                        {blog.featured_image ? (
-                          <img
-                            src={`${API_URL}/assets/${blog.featured_image}`}
-                            alt={blog.title}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=100&q=80";
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-white/20">
-                            <BookOpen className="h-4 w-4" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-white line-clamp-2">{blog.title}</div>
-                        <div className="text-[11px] text-white/35 mt-0.5">
-                          {blog.published_at ? new Date(blog.published_at).toLocaleDateString() : "Recent"}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </motion.div>
-  );
-};
-
-// ============================================================
-// FINAL CTA
-// ============================================================
-const FinalCTA = () => {
-  return (
-    <section id="cta" className="relative px-6 py-32 overflow-hidden" style={{ background: INK }}>
-      <div className="absolute inset-0">
-        <div className="absolute top-[-50%] right-[-15%] w-[700px] h-[700px] rounded-full blur-3xl" style={{ background: `${BLUE}14` }} />
-        <div className="absolute bottom-[-50%] left-[-15%] w-[700px] h-[700px] rounded-full blur-3xl" style={{ background: `${SKY}10` }} />
-      </div>
-
-      <ScrollReveal className="relative z-10 max-w-2xl mx-auto text-center">
-        <div
-          className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border"
-          style={{ borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}
-        >
-          <Sparkles className="h-6 w-6" style={{ color: SKY }} />
-        </div>
-        <h2 className={`${display.className} text-4xl md:text-5xl font-medium tracking-tight text-white mb-4`}>
-          What would a decade in agribusiness do for your income?
-        </h2>
-        <p className="text-white/40 font-light mb-10 max-w-md mx-auto text-sm">
-          Over 1,000 members are already finding out. Registered with URSB, built on transparency, running since 2014.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="/projects"
-            className="group rounded-full px-8 py-3.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5"
-            style={{ background: BLUE, boxShadow: `0 20px 40px -12px ${BLUE}66` }}
-          >
-            Explore the Lineup
-            <ArrowRight className="inline-block h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link
-            href="/contact"
-            className="rounded-full border px-8 py-3.5 text-sm font-medium text-white/80 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white"
-            style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.03)" }}
-          >
-            Ask us a question
-          </Link>
-        </div>
-      </ScrollReveal>
     </section>
   );
 };
@@ -1464,6 +1445,233 @@ const SocialMedia = () => {
 };
 
 // ============================================================
+// FINAL CTA
+// ============================================================
+const FinalCTA = () => {
+  return (
+    <section id="cta" className="relative px-6 py-32 overflow-hidden" style={{ background: INK }}>
+      <div className="absolute inset-0">
+        <div className="absolute top-[-50%] right-[-15%] w-[700px] h-[700px] rounded-full blur-3xl" style={{ background: `${YPA_BLUE}14` }} />
+        <div className="absolute bottom-[-50%] left-[-15%] w-[700px] h-[700px] rounded-full blur-3xl" style={{ background: `${YPA_BLUE_LIGHT}10` }} />
+      </div>
+
+      <ScrollReveal className="relative z-10 max-w-2xl mx-auto text-center">
+        <div
+          className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border"
+          style={{ borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}
+        >
+          <Sparkles className="h-6 w-6" style={{ color: YPA_BLUE }} />
+        </div>
+        <h2 className={`${display.className} text-4xl md:text-5xl font-medium tracking-tight text-white mb-4`}>
+          What would a decade in agribusiness do for your income?
+        </h2>
+        <p className="text-white/40 font-light mb-10 max-w-md mx-auto text-sm">
+          Over 1,000 members are already finding out. Registered with URSB, built on transparency, running since 2014.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/projects"
+            className="group rounded-full px-8 py-3.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5"
+            style={{ background: YPA_BLUE, boxShadow: `0 20px 40px -12px ${YPA_BLUE}66` }}
+          >
+            Explore the Lineup
+            <ArrowRight className="inline-block h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+          </Link>
+          <Link
+            href="/contact"
+            className="rounded-full border px-8 py-3.5 text-sm font-medium text-white/80 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white"
+            style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.03)" }}
+          >
+            Ask us a question
+          </Link>
+        </div>
+      </ScrollReveal>
+    </section>
+  );
+};
+
+// ============================================================
+// LIVE PANEL — Glass with YPA Blue & Gold Accents
+// ============================================================
+const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
+  const GOLD = "#F0B429";
+  
+  const facts = [
+    { icon: Target, title: "Our Mission", description: "Empowering Africa's youth through sustainable agribusiness and financial inclusion." },
+    { icon: Heart, title: "Our Impact", description: "130,000+ goats under care. 1,000+ SACCO members. 12 branches across Uganda." },
+    { icon: Lightbulb, title: "Our Vision", description: "A prosperous Africa where every young farmer has the tools to succeed." },
+    { icon: Shield, title: "Our Promise", description: "100% transparency. No hidden fees. Registered with URSB." },
+  ];
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setActive((p) => (p + 1) % facts.length), 4500);
+    return () => clearInterval(t);
+  }, [facts.length]);
+
+  const isEventSoon = (dateString: string) => {
+    const eventDate = new Date(dateString);
+    const now = new Date();
+    const diff = (eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+    return diff >= 0 && diff <= 3;
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 30 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
+      className="fixed right-6 top-24 z-40 hidden xl:block w-80 max-h-[78vh] overflow-y-auto"
+      style={{ scrollbarWidth: "thin" }}
+    >
+      {/* ✅ Glass with YPA Blue background and Gold accents */}
+      <div
+        className="rounded-3xl p-6 shadow-2xl border"
+        style={{ 
+          background: "rgba(255,255,255,0.10)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          borderColor: "rgba(255,255,255,0.15)",
+          boxShadow: `0 8px 32px rgba(0,0,0,0.08), 0 0 0 1px ${YPA_BLUE}15 inset, 0 0 40px ${YPA_BLUE}08, 0 0 20px ${GOLD}05`,
+        }}
+      >
+        <div className="mb-6">
+          <div className={`${mono.className} flex items-center gap-2 mb-4 text-[10px] tracking-[0.2em] uppercase text-white/80`}>
+            <span className="w-1 h-4 rounded-full" style={{ background: `linear-gradient(to bottom, ${YPA_BLUE}, ${GOLD})` }} />
+            About YPA
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div
+                className="w-11 h-11 rounded-2xl flex items-center justify-center mb-3"
+                style={{ background: `linear-gradient(135deg, ${YPA_BLUE}30, ${GOLD}20)` }}
+              >
+                {(() => {
+                  const Icon = facts[active].icon;
+                  return <Icon className="w-5 h-5" style={{ color: YPA_BLUE }} />;
+                })()}
+              </div>
+              <h4 className="text-base font-medium text-white">{facts[active].title}</h4>
+              <p className="mt-2 text-sm text-white/70 font-light leading-relaxed">{facts[active].description}</p>
+              <div className="flex gap-1.5 mt-4">
+                {facts.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActive(i)}
+                    className="h-1 rounded-full transition-all duration-500"
+                    style={{ 
+                      width: i === active ? "22px" : "10px", 
+                      background: i === active ? `linear-gradient(90deg, ${YPA_BLUE}, ${GOLD})` : "rgba(255,255,255,0.2)" 
+                    }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {events?.length > 0 && (
+          <>
+            <div className="border-t my-4" style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+            <div className="mb-6">
+              <div className={`${mono.className} flex items-center gap-2 mb-3 text-[10px] tracking-[0.2em] uppercase text-white/70`}>
+                <span className="w-1 h-4 rounded-full" style={{ background: GOLD }} />
+                Upcoming Events
+              </div>
+              <div className="space-y-2">
+                {events.slice(0, 3).map((event, i) => {
+                  const soon = isEventSoon(event.date);
+                  return (
+                    <Link key={i} href={`/events/${event.slug}`}>
+                      <motion.div
+                        whileHover={{ x: 4 }}
+                        className={`p-3 rounded-xl border transition-all duration-300 ${
+                          soon ? "ring-2 ring-[#F0B429] ring-opacity-60 animate-pulse" : ""
+                        }`}
+                        style={{
+                          background: "rgba(255,255,255,0.06)",
+                          borderColor: soon ? "rgba(240,180,41,0.5)" : "rgba(255,255,255,0.1)",
+                        }}
+                      >
+                        <div className="text-sm font-medium text-white line-clamp-1">{event.title}</div>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-white/50">
+                          <Calendar className="h-3 w-3 shrink-0" />
+                          <span>{event.date ? new Date(event.date).toLocaleDateString() : "TBD"}</span>
+                          <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{event.location || "Uganda"}</span>
+                          {soon && <span className="ml-auto text-[10px] font-medium text-[#F0B429]">Soon</span>}
+                        </div>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+
+        {blogs?.length > 0 && (
+          <>
+            <div className="border-t my-4" style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+            <div>
+              <div className={`${mono.className} flex items-center gap-2 mb-3 text-[10px] tracking-[0.2em] uppercase text-white/70`}>
+                <span className="w-1 h-4 rounded-full" style={{ background: YPA_BLUE }} />
+                Popular Blogs
+              </div>
+              <div className="space-y-2">
+                {blogs.slice(0, 3).map((blog, i) => (
+                  <Link key={i} href={`/blog/${blog.slug}`}>
+                    <motion.div
+                      whileHover={{ x: 4 }}
+                      className="flex items-start gap-3 p-3 rounded-xl border transition-all duration-300"
+                      style={{
+                        background: "rgba(255,255,255,0.06)",
+                        borderColor: "rgba(255,255,255,0.1)",
+                      }}
+                    >
+                      <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0" style={{ 
+                        background: `linear-gradient(135deg, ${YPA_BLUE}40, ${GOLD}20)` 
+                      }}>
+                        {blog.featured_image ? (
+                          <img
+                            src={`${API_URL}/assets/${blog.featured_image}`}
+                            alt={blog.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=100&q=80";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white/20">
+                            <BookOpen className="h-4 w-4" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-white line-clamp-2">{blog.title}</div>
+                        <div className="text-[11px] text-white/50 mt-0.5">
+                          {blog.published_at ? new Date(blog.published_at).toLocaleDateString() : "Recent"}
+                        </div>
+                      </div>
+                    </motion.div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+// ============================================================
 // MAIN PAGE
 // ============================================================
 export default function Home() {
@@ -1504,7 +1712,7 @@ export default function Home() {
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-10 h-10 border-[3px] rounded-full"
-            style={{ borderColor: "#E3F2FD", borderTopColor: BLUE }}
+            style={{ borderColor: "#E3F2FD", borderTopColor: YPA_BLUE }}
           />
         </div>
         <Footer />
@@ -1514,7 +1722,7 @@ export default function Home() {
 
   return (
     <main
-      className={`${display.variable} ${mono.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#2196F3]/30`}
+      className={`${display.variable} ${mono.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
     >
       <ScrollProgress />
       <Navigation />
