@@ -689,9 +689,9 @@ const StorySection = ({ content }: { content: any }) => {
   const [activeImage, setActiveImage] = useState(0);
   const reduce = useReducedMotion();
   const images = [
-    { src: "http://localhost:8055/assets/c5fc9c26-92d2-41b2-90d0-7c785f0d8011?key=system-medium-cover&modified=2026-07-08T12:40:16https://res.cloudinary.com/owwvyprb/image/upload/v1784716480/587e2393-e360-4ac2-bae3-22b7cec94705.jpg", label: "Community" },
+    { src: "https://res.cloudinary.com/owwvyprb/image/upload/v1784714736/27b30d55-18ea-4197-b073-9a2c6dae3100.jpg", label: "Community" },
     { src: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716326/acc94e42-c5d5-489c-b335-6ee5353253be.jpg", label: "Goats" },
-    { src: "http://localhost:8055/assets/5fff51d7-fece-4b04-b0da-86ad019675d7?key=system-medium-cover&modified=2026-07-01T23:23:13", label: "Farm" },
+    { src: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716480/587e2393-e360-4ac2-bae3-22b7cec94705.jpg", label: "Farm" },
   ];
 
   useEffect(() => {
