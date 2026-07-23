@@ -82,12 +82,10 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
   const [allCommentsLoaded, setAllCommentsLoaded] = useState(false);
   const [debugInfo, setDebugInfo] = useState('');
 
-  // ✅ Debug: Log what postId is being used
   useEffect(() => {
     console.log('🔍 Comments component mounted with:', { postId, postSlug, type: typeof postId });
   }, [postId, postSlug]);
 
-  // ✅ Fetch comments with proper filtering
   const fetchComments = useCallback(async (resetPage: boolean = true) => {
     if (!postId) {
       console.error('❌ No postId provided to Comments component');
@@ -100,15 +98,11 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
       const sort = sortOrder === 'newest' ? '-created_at' : 'created_at';
       const offset = (currentPage - 1) * COMMENTS_PER_PAGE;
       
-      // ✅ Convert postId to number for filtering
       const numericPostId = Number(postId);
-      
-      // ✅ Use the correct filter format for integer post_id
       const filterQuery = `filter[post_id][_eq]=${numericPostId}&filter[status][_eq]=approved`;
       const url = `${API_URL}/items/comments?${filterQuery}&sort[]=${sort}&limit=${COMMENTS_PER_PAGE}&offset=${offset}`;
       
       console.log('📡 Fetching comments for post_id:', numericPostId);
-      console.log('📡 URL:', url);
       
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) {
@@ -119,7 +113,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
       const data = await res.json();
       
       console.log('📥 Comments fetched:', data.data?.length || 0, 'comments');
-      console.log('📥 Raw data:', data);
       
       // Get total count
       const totalRes = await fetch(
@@ -154,7 +147,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
     }
   }, [postId, sortOrder, page, comments.length]);
 
-  // ✅ Load more comments
   const loadMoreComments = async () => {
     if (loadingMore || allCommentsLoaded) return;
     setLoadingMore(true);
@@ -163,7 +155,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
     await fetchComments(false);
   };
 
-  // ✅ Initial load and sort changes
   useEffect(() => {
     if (postId) {
       console.log('🔄 Refreshing comments for post:', postId);
@@ -174,7 +165,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
     }
   }, [postId, sortOrder]);
 
-  // ✅ Handle new comment submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -196,6 +186,16 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
 
     try {
       const numericPostId = Number(postId);
+      
+      // ✅ First, check if the post exists
+      const checkPost = await fetch(`${API_URL}/items/posts/${numericPostId}`, { cache: 'no-store' });
+      if (!checkPost.ok) {
+        setErrorMessage(`Post with ID ${numericPostId} does not exist. Please refresh.`);
+        setFormStatus('error');
+        setSubmitting(false);
+        return;
+      }
+      
       const payload = {
         name: formData.name.trim(),
         email: formData.email.trim() || null,
@@ -206,7 +206,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
       };
 
       console.log('📤 Submitting comment with post_id:', numericPostId);
-      console.log('📤 Payload:', payload);
 
       const res = await fetch(`${API_URL}/items/comments`, {
         method: 'POST',
@@ -234,7 +233,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
       setFormData({ name: '', email: '', content: '' });
       setShowForm(false);
       
-      // Refresh comments after 2 seconds
       setTimeout(() => {
         setPage(1);
         fetchComments(true);
@@ -258,12 +256,11 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
 
   return (
     <div className="space-y-8">
-      {/* ===== DEBUG INFO (Remove after testing) ===== */}
-      <div className="text-xs text-gray-400 bg-gray-50 p-2 rounded">
-        Debug: {debugInfo} | Post ID: {postId} | Total: {totalComments}
+      {/* ===== DEBUG INFO ===== */}
+      <div className="text-xs text-gray-400 bg-gray-50 p-2 rounded font-mono">
+        <span className="font-bold">Debug:</span> {debugInfo} | <span className="font-bold">Post ID:</span> {postId} | <span className="font-bold">Total:</span> {totalComments}
       </div>
 
-      {/* ===== HEADER ===== */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: YPA_BLUE_SOFT }}>
@@ -307,7 +304,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
         </div>
       </div>
 
-      {/* ===== COMMENT FORM ===== */}
       <AnimatePresence>
         {showForm && (
           <motion.div
@@ -408,7 +404,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
         )}
       </AnimatePresence>
 
-      {/* ===== COMMENTS LIST ===== */}
       {comments.length === 0 ? (
         <div className="text-center py-12" style={{ color: MUTE_ON_LIGHT }}>
           <div className="text-4xl mb-3 opacity-30">💬</div>
@@ -443,7 +438,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
             </div>
           ))}
           
-          {/* ===== LOAD MORE ===== */}
           {hasMore && !allCommentsLoaded && (
             <div className="flex justify-center pt-4">
               <button
@@ -471,11 +465,10 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
             </div>
           )}
           
-          {/* ===== END OF COMMENTS ===== */}
           {allCommentsLoaded && comments.length > 0 && (
             <div className="text-center pt-4">
               <p className="text-xs" style={{ color: MUTE_ON_LIGHT }}>
-                🎉 You've seen all {totalComments} comments
+                 You've seen all {totalComments} comments
               </p>
             </div>
           )}
