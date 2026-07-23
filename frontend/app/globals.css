@@ -26,40 +26,6 @@ body {
 }
 
 /* ============================================
-   🚀 PERFORMANCE OPTIMIZATIONS
-   ============================================ */
-
-/* GPU acceleration for all animated elements */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Optimize animations - prevent layout shifts */
-.will-change-transform {
-  will-change: transform;
-}
-
-/* Prevent layout shifts from images */
-img, video, iframe {
-  content-visibility: auto;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Optimize hover transitions */
-.group-hover\:scale-105 {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-}
-
-/* ============================================
    🎯 YPA CUSTOM ANIMATIONS
    ============================================ */
 
@@ -291,50 +257,50 @@ html {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* YPA Gradient Text - Updated to YPA Blue */
+/* YPA Gradient Text */
 .text-gradient-blue {
-  background: linear-gradient(135deg, #00AEEF, #33C1F5);
+  background: linear-gradient(135deg, #2196F3, #64B5F6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-dark {
-  background: linear-gradient(135deg, #0E2540, #00AEEF);
+  background: linear-gradient(135deg, #1A3A5C, #2196F3);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* YPA Button Styles - Updated to YPA Blue */
+/* YPA Button Styles */
 .btn-primary {
-  background: linear-gradient(135deg, #00AEEF, #33C1F5);
+  background: linear-gradient(135deg, #2196F3, #42A5F5);
   color: white;
   padding: 12px 24px;
   border-radius: 16px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 174, 239, 0.3);
+  box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
 }
 
 .btn-primary:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 30px rgba(0, 174, 239, 0.4);
+  box-shadow: 0 8px 30px rgba(33, 150, 243, 0.4);
 }
 
 .btn-secondary {
   background: transparent;
-  color: #0E2540;
+  color: #1A3A5C;
   padding: 12px 24px;
   border-radius: 16px;
   font-weight: 600;
-  border: 2px solid #E6F8FD;
+  border: 2px solid #E3F2FD;
   transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
-  border-color: #00AEEF;
-  color: #00AEEF;
+  border-color: #2196F3;
+  color: #2196F3;
 }
 
 /* YPA Card Styles */
@@ -344,10 +310,10 @@ html {
 
 .card-hover:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 174, 239, 0.1);
+  box-shadow: 0 20px 40px rgba(33, 150, 243, 0.1);
 }
 
-/* Scrollbar Styling - Updated to YPA Blue */
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -357,23 +323,28 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #00AEEF;
+  background: #2196F3;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0099D6;
+  background: #1976D2;
 }
 
-/* Selection Color - Updated to YPA Blue */
+/* Selection Color */
 ::selection {
-  background: #00AEEF;
+  background: #2196F3;
   color: white;
 }
 
-/* Focus Styles - Updated to YPA Blue */
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus Styles */
 *:focus-visible {
-  outline: 2px solid #00AEEF;
+  outline: 2px solid #2196F3;
   outline-offset: 2px;
 }
 
@@ -394,18 +365,15 @@ html {
   margin-left: auto;
   margin-right: auto;
 }
+/* ========== PREMIUM TEXT ANIMATIONS ========== */
 
-/* ============================================
-   🎯 PREMIUM TEXT ANIMATIONS
-   ============================================ */
-
-/* Gentle glow pulse - Updated to YPA Blue */
+/* Gentle glow pulse */
 @keyframes textGlow {
   0%, 100% {
-    text-shadow: 0 0 20px rgba(0, 174, 239, 0.1);
+    text-shadow: 0 0 20px rgba(33, 150, 243, 0.1);
   }
   50% {
-    text-shadow: 0 0 40px rgba(0, 174, 239, 0.2), 0 0 60px rgba(0, 174, 239, 0.05);
+    text-shadow: 0 0 40px rgba(33, 150, 243, 0.2), 0 0 60px rgba(33, 150, 243, 0.05);
   }
 }
 
@@ -444,10 +412,39 @@ html {
     transform: translateX(100%);
   }
 }
+/* ========== PREMIUM TEXT ANIMATIONS ========== */
 
-/* ============================================
-   🎯 FAQ ANSWER STYLING
-   ============================================ */
+/* Gentle glow pulse for "Welcome to" */
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(33, 150, 243, 0.1);
+  }
+  50% {
+    text-shadow: 0 0 40px rgba(33, 150, 243, 0.2), 0 0 60px rgba(33, 150, 243, 0.05);
+  }
+}
+
+.animate-text-glow {
+  animation: textGlow 3s ease-in-out infinite;
+}
+
+/* Smooth gradient flow - like a gentle wave */
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-flow {
+  animation: gradientFlow 4s ease-in-out infinite;
+}
+/* FAQ Answer Styling */
 .faq-answer p {
   margin-bottom: 0.5rem;
   line-height: 1.7;
@@ -466,70 +463,28 @@ html {
 }
 
 .faq-answer strong {
-  color: #0E2540;
+  color: #1A3A5C;
   font-weight: 600;
 }
 
 .faq-answer h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: #0E2540;
+  color: #1A3A5C;
   margin-top: 0.75rem;
   margin-bottom: 0.25rem;
 }
+/* globals.css */
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
-/* ============================================
-   🎯 GRADIENT FLOW UTILITY
-   ============================================ */
 .animate-gradient-flow {
   background-size: 200% auto;
   animation: gradient-flow 4s ease infinite;
 }
-
-/* ============================================
-   🚀 IMAGE PERFORMANCE OPTIMIZATIONS
-   ============================================ */
-
-/* Optimize image loading */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Prevent layout shift from images */
-img:not([src$=".svg"]) {
-  content-visibility: auto;
-}
-
-/* Smooth image transitions */
-.image-transition {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* Image loading placeholder */
-.image-loading {
-  background: #F6F8FA;
-  position: relative;
-  overflow: hidden;
-}
-
-.image-loading::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  animation: shimmer 1.5s infinite;
-}
-
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+html {
+  scroll-behavior: smooth;
 }
