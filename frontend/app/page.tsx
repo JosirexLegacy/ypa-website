@@ -101,10 +101,10 @@ const getImageUrl = (image: string | undefined, fallback: string) => {
 // FALLBACK IMAGES
 // ============================================================
 const FALLBACK_IMAGES = {
-  goats: 'https://images.unsplash.com/photo-1535268647677-300d0a4c3b7b?w=900&q=80',
-  maize: 'https://images.unsplash.com/photo-1593250481214-81611f9bca0f?w=800&q=80',
-  sacco: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
-  default: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80'
+  goats: 'https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg',
+  maize: 'https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg',
+  sacco: 'https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/sacco_kkke6y.jpg',
+  default: 'https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/default_kkke6y.jpg'
 };
 
 // ============================================================
@@ -412,7 +412,7 @@ const LINEUP = [
     ],
     gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/projects/goats",
-    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784802619/obed_goats_f8unko.jpg",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg",
     aura: YPA_BLUE,
     glowColor: YPA_BLUE,
   },
