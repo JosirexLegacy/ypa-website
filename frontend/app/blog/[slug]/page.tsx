@@ -1,4 +1,4 @@
-// frontend/src/app/blog/[slug]/page.tsx
+// frontend/app/blog/[slug]/page.tsx
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,12 +15,27 @@ import {
   Tag,
   ChevronRight,
   ArrowRight,
+  MessageCircle,
+  Heart,
+  Share2,
+  Bookmark,
+  Eye,
+  ThumbsUp,
+  Reply,
+  MoreHorizontal,
+  CheckCircle,
+  AlertCircle,
+  X,
+  Send,
+  Mail
 } from "lucide-react";
 import { ShareButtons } from "./ShareButtons";
 import { SaveButton } from "./SaveButton";
+import { Comments } from "./Comments";
+import { Metadata } from "next";
 
 // ============================================================
-// FONTS – same as homepage and signal detail
+// FONTS
 // ============================================================
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -39,24 +54,27 @@ const serif = Source_Serif_4({
 });
 
 // ============================================================
-// DESIGN TOKENS – mirror homepage & signal
+// YPA BRAND COLORS - Fully Defined
 // ============================================================
-const INK = "#060B14";
+const YPA_BLUE = "#00AEEF";
+const YPA_BLUE_LIGHT = "#33C1F5";
+const YPA_BLUE_SOFT = "#E6F8FD";
+const YPA_GOLD = "#F0B429";
+const YPA_GOLD_LIGHT = "#FFE08A";
+const INK = "#111111";
 const NAVY = "#0E2540";
 const NAVY_SOFT = "#153455";
 const LINE = "#1F3B57";
-const BLUE = "#2196F3";
-const SKY = "#7EC8FF";
-const GOLD = "#F0B429";
 const MIST = "#F6F8FA";
-const INK_ON_LIGHT = "#0E2540";
+const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
 const POSITIVE = "#34D399";
+const BODY_TEXT = "#1E2A3A";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
-// CATEGORIES (unchanged)
+// CATEGORIES
 // ============================================================
 const CATEGORIES = [
   { value: "all", label: "All Posts", color: "bg-gray-100 text-gray-700" },
@@ -70,9 +88,10 @@ const CATEGORIES = [
 ];
 
 // ============================================================
-// VIDEO EMBED (unchanged)
+// VIDEO EMBED
 // ============================================================
 function getVideoEmbedUrl(url: string) {
+  if (!url) return null;
   const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
   if (youtubeMatch) {
     return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
@@ -85,7 +104,7 @@ function getVideoEmbedUrl(url: string) {
 }
 
 // ============================================================
-// DATA FETCHING (unchanged – server component)
+// DATA FETCHING
 // ============================================================
 async function getPost(slug: string) {
   try {
@@ -101,8 +120,74 @@ async function getPost(slug: string) {
   }
 }
 
+async function getRelatedPosts(category: string, currentId: string) {
+  try {
+    const res = await fetch(
+      `${API_URL}/items/posts?filter[status][_eq]=published&filter[category][_eq]=${category}&filter[id][_neq]=${currentId}&sort[]=-published_at&limit=3`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data || [];
+  } catch (error) {
+    return [];
+  }
+}
+
 // ============================================================
-// MAIN PAGE COMPONENT (server component – keep async)
+// METADATA FOR SEO
+// ============================================================
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(slug);
+  
+  if (!post) {
+    return {
+      title: "Post Not Found",
+      description: "The requested blog post could not be found.",
+    };
+  }
+
+  const imageUrl = post.featured_image 
+    ? `${API_URL}/assets/${post.featured_image}`
+    : `${API_URL}/assets/default-og-image.jpg`;
+
+  return {
+    title: post.title,
+    description: post.excerpt || post.title,
+    keywords: post.tags?.join(", ") || post.category || "YPA, Youth Platform Africa, agribusiness",
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || post.title,
+      url: `https://ypa-website-b3uh-ashy.vercel.app/blog/${slug}`,
+      siteName: "Youth Platform Africa",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      type: "article",
+      publishedTime: post.published_at,
+      authors: post.author ? [post.author] : ["YPA Team"],
+      tags: post.tags || [post.category],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt || post.title,
+      images: [imageUrl],
+    },
+    alternates: {
+      canonical: `https://ypa-website-b3uh-ashy.vercel.app/blog/${slug}`,
+    },
+  };
+}
+
+// ============================================================
+// MAIN PAGE COMPONENT
 // ============================================================
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -115,40 +200,44 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const videoEmbedUrl = post.video_url ? getVideoEmbedUrl(post.video_url) : null;
   const readingTime = Math.ceil((post.content?.length || 500) / 1000);
   const category = CATEGORIES.find((c) => c.value === post.category);
+  const relatedPosts = await getRelatedPosts(post.category, post.id);
 
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${serif.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#2196F3]/30`}
+      className={`${display.variable} ${mono.variable} ${serif.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
     >
       <Navigation />
 
-      {/* ===== FLOATING GLASS CHIP – same as signal detail ===== */}
-      <div className="sticky top-24 z-30 flex justify-center px-4">
+      {/* ===== FLOATING GLASS NAV ===== */}
+      <div className="sticky top-20 z-30 flex justify-center px-4 py-3">
         <div
-          className="inline-flex items-center justify-between w-full max-w-3xl px-6 py-3 rounded-full transition-all duration-300"
+          className="inline-flex items-center justify-between w-full max-w-3xl px-4 md:px-6 py-2.5 md:py-3 rounded-full transition-all duration-300"
           style={{
-            background: "rgba(14,37,64,0.65)",
+            background: "rgba(14,37,64,0.85)",
             backdropFilter: "blur(20px) saturate(1.3)",
-            boxShadow: "0 8px 40px rgba(33,150,243,0.30), inset 0 1px 0 rgba(255,255,255,0.10)",
+            boxShadow: "0 8px 40px rgba(0,174,239,0.25), inset 0 1px 0 rgba(255,255,255,0.10)",
             border: "1px solid rgba(255,255,255,0.08)",
           }}
         >
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-all group"
+            className="inline-flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-white/80 hover:text-white transition-all group"
           >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:-translate-x-1 transition-transform" />
             <span>Back to blog</span>
           </Link>
-          <span className={`${mono.className} text-[10px] tracking-[0.15em] uppercase text-white/50 hidden sm:block`}>
-            {readingTime} min read
-          </span>
+          <div className="flex items-center gap-3 md:gap-4">
+            <span className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.15em] uppercase text-white/50 hidden sm:block`}>
+              {readingTime} min read
+            </span>
+            <SaveButton slug={post.slug} />
+          </div>
         </div>
       </div>
 
-      {/* ===== HERO – with top padding and rounded corners (mirror signal) ===== */}
-      <div className="relative w-full pt-6 md:pt-8 px-6 md:px-14">
-        <div className="relative w-full aspect-[21/9] max-h-[70vh] min-h-[400px] overflow-hidden rounded-3xl shadow-2xl">
+      {/* ===== HERO ===== */}
+      <div className="relative w-full px-5 md:px-14">
+        <div className="relative w-full aspect-[21/9] max-h-[70vh] min-h-[300px] md:min-h-[400px] overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl">
           {post.featured_image ? (
             <img
               src={`${API_URL}/assets/${post.featured_image}`}
@@ -163,43 +252,43 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           <div className="absolute inset-0 bg-gradient-to-t from-[#060B14] via-[#060B14]/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#060B14]/40 to-transparent" />
 
-          <div className="absolute inset-x-0 bottom-0 z-10 px-8 md:px-12 pb-10 md:pb-12">
-            <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="absolute inset-x-0 bottom-0 z-10 px-5 md:px-10 pb-6 md:pb-10">
+            <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3 md:mb-4">
               {post.category && category && (
                 <span
-                  className={`${mono.className} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-[0.08em] uppercase bg-blue-500/30 backdrop-blur-sm text-blue-200 border border-white/10`}
+                  className={`${mono.className} inline-flex items-center gap-1 px-2.5 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-semibold tracking-[0.08em] uppercase bg-[#00AEEF]/30 backdrop-blur-sm text-[#33C1F5] border border-white/10`}
                 >
-                  <Tag className="w-3 h-3" />
+                  <Tag className="w-2.5 h-2.5 md:w-3 md:h-3" />
                   {category.label}
                 </span>
               )}
-              <span className={`${mono.className} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-[0.08em] uppercase bg-white/10 backdrop-blur-sm text-white/60 border border-white/5`}>
-                <Clock className="w-3 h-3" />
+              <span className={`${mono.className} inline-flex items-center gap-1 px-2.5 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-semibold tracking-[0.08em] uppercase bg-white/10 backdrop-blur-sm text-white/60 border border-white/5`}>
+                <Clock className="w-2.5 h-2.5 md:w-3 md:h-3" />
                 {readingTime} min read
               </span>
             </div>
             <h1
-              className={`${display.className} text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium text-white tracking-tight leading-[1.05] max-w-4xl drop-shadow-xl`}
+              className={`${display.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-medium text-white tracking-tight leading-[1.05] max-w-4xl drop-shadow-xl`}
             >
               {post.title}
             </h1>
-            <div className="flex items-center gap-4 mt-6">
+            <div className="flex items-center gap-3 md:gap-4 mt-3 md:mt-6">
               <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-medium text-base shrink-0 border-2 border-white/20"
-                style={{ background: `linear-gradient(135deg, ${BLUE}, ${SKY})` }}
+                className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-medium text-xs md:text-sm shrink-0 border-2 border-white/20"
+                style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
               >
                 {post.author ? post.author.charAt(0).toUpperCase() : "Y"}
               </div>
               <div>
-                <div className="text-base font-medium text-white">{post.author || "YPA Team"}</div>
-                <div className={`${mono.className} flex items-center gap-3 text-xs text-white/50`}>
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {post.published_at ? format(new Date(post.published_at), "MMMM d, yyyy") : "Recent"}
+                <div className="text-sm md:text-base font-medium text-white">{post.author || "YPA Team"}</div>
+                <div className={`${mono.className} flex items-center gap-2 text-[10px] md:text-xs text-white/50`}>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                    {post.published_at ? format(new Date(post.published_at), "MMM d, yyyy") : "Recent"}
                   </span>
                   <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
                     {readingTime} min read
                   </span>
                 </div>
@@ -210,11 +299,11 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       </div>
 
       {/* ===== ARTICLE CONTENT ===== */}
-      <article className="px-6 md:px-14 py-16 md:py-20">
+      <article className="px-5 md:px-14 py-10 md:py-16">
         <div className="container mx-auto max-w-3xl">
           {/* ===== VIDEO EMBED ===== */}
           {videoEmbedUrl && (
-            <div className="relative rounded-3xl overflow-hidden bg-[#0A1628] mb-12 shadow-xl">
+            <div className="relative rounded-2xl md:rounded-3xl overflow-hidden bg-[#0A1628] mb-8 md:mb-12 shadow-xl">
               <div className="aspect-video">
                 <iframe
                   src={videoEmbedUrl}
@@ -224,28 +313,28 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                   allowFullScreen
                 />
               </div>
-              <div className="absolute top-3 left-3 flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                <Play className="w-3.5 h-3.5 text-white/60" />
-                <span className={`${mono.className} text-white/60 text-[10px] font-medium`}>Video</span>
+              <div className="absolute top-3 left-3 flex items-center gap-2 bg-black/60 backdrop-blur-sm px-2.5 md:px-3 py-1 md:py-1.5 rounded-full">
+                <Play className="w-3 h-3 md:w-3.5 md:h-3.5 text-white/60" />
+                <span className={`${mono.className} text-white/60 text-[8px] md:text-[10px] font-medium`}>Video</span>
               </div>
             </div>
           )}
 
           {/* ===== GALLERY IMAGES ===== */}
           {post.gallery_images && Array.isArray(post.gallery_images) && post.gallery_images.length > 0 && (
-            <div className="mb-12">
+            <div className="mb-8 md:mb-12">
               <h3
-                className={`${mono.className} text-[11px] tracking-[0.2em] uppercase mb-4 flex items-center gap-2`}
+                className={`${mono.className} text-[10px] md:text-[11px] tracking-[0.2em] uppercase mb-3 md:mb-4 flex items-center gap-2`}
                 style={{ color: MUTE_ON_LIGHT }}
               >
                 <span className="w-8 h-px" style={{ background: "#E8ECF0" }} />
                 Gallery
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {post.gallery_images.map((image: any, index: number) => (
                   <div
                     key={index}
-                    className="relative aspect-square rounded-2xl overflow-hidden bg-[#F5F9FF] hover:shadow-lg transition-shadow group"
+                    className="relative aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-[#F5F9FF] hover:shadow-lg transition-shadow group"
                   >
                     <img
                       src={`${API_URL}/assets/${image}`}
@@ -258,112 +347,116 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          {/* ===== CONTENT – with serif body (mirror signal) ===== */}
+          {/* ===== CONTENT ===== */}
           <div
-            className={`${serif.className} prose prose-lg max-w-none
-              prose-headings:font-sans prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-[#0E2540]
-              prose-h1:text-5xl prose-h1:mt-14 prose-h1:mb-8
-              prose-h2:text-4xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-100
-              prose-h3:text-3xl prose-h3:mt-10 prose-h3:mb-5
-              prose-h4:text-2xl prose-h4:mt-8 prose-h4:mb-4
-              prose-p:text-[19px] prose-p:leading-[1.9] prose-p:mb-7 prose-p:text-[#1E2A3A] prose-p:font-light
-              prose-strong:font-semibold prose-strong:text-[#0E2540]
-              prose-a:text-[#2196F3] hover:prose-a:underline
-              prose-ul:text-[19px] prose-ul:leading-[1.9] prose-ul:mb-7 prose-ul:pl-7 prose-ul:text-[#1E2A3A]
-              prose-li:text-[19px] prose-li:leading-[1.9] prose-li:text-[#1E2A3A] prose-li:marker:text-[#2196F3]
-              prose-blockquote:border-l-4 prose-blockquote:border-l-[#2196F3] prose-blockquote:bg-[#F5F9FF] prose-blockquote:px-8 prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[20px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#0E2540] prose-blockquote:shadow-sm
-              prose-blockquote:mx-0 prose-blockquote:my-10
+            className={`${serif.className} prose prose-base md:prose-lg max-w-none
+              prose-headings:font-sans prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-[#111111]
+              prose-h1:text-4xl md:prose-h1:text-5xl prose-h1:mt-12 prose-h1:mb-6
+              prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-10 prose-h2:mb-5 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-100
+              prose-h3:text-2xl md:prose-h3:text-3xl prose-h3:mt-8 prose-h3:mb-4
+              prose-h4:text-xl md:prose-h4:text-2xl prose-h4:mt-6 prose-h4:mb-3
+              prose-p:text-[17px] md:prose-p:text-[19px] prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-[#1E2A3A] prose-p:font-light
+              prose-strong:font-semibold prose-strong:text-[#111111]
+              prose-a:text-[#00AEEF] hover:prose-a:underline
+              prose-ul:text-[17px] md:prose-ul:text-[19px] prose-ul:leading-[1.8] prose-ul:mb-6 prose-ul:pl-6 prose-ul:text-[#1E2A3A]
+              prose-li:text-[17px] md:prose-li:text-[19px] prose-li:leading-[1.8] prose-li:text-[#1E2A3A] prose-li:marker:text-[#00AEEF]
+              prose-blockquote:border-l-4 prose-blockquote:border-l-[#00AEEF] prose-blockquote:bg-[#E6F8FD] prose-blockquote:px-5 md:prose-blockquote:px-8 prose-blockquote:py-4 md:prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[18px] md:prose-blockquote:text-[20px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#111111] prose-blockquote:shadow-sm
+              prose-blockquote:mx-0 prose-blockquote:my-8
               prose-blockquote:before:content-none prose-blockquote:after:content-none
-              prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-10
-              prose-hr:my-16 prose-hr:border-gray-200
+              prose-img:rounded-2xl md:prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-8
+              prose-hr:my-12 prose-hr:border-gray-200
               [&_*]:text-[#1E2A3A]
-              [&_h1]:!text-[#0E2540] [&_h2]:!text-[#0E2540] [&_h3]:!text-[#0E2540] [&_h4]:!text-[#0E2540]
-              [&_strong]:!text-[#0E2540]
+              [&_h1]:!text-[#111111] [&_h2]:!text-[#111111] [&_h3]:!text-[#111111] [&_h4]:!text-[#111111]
+              [&_strong]:!text-[#111111]
               [&_p]:!text-[#1E2A3A]
               [&_li]:!text-[#1E2A3A]
-              [&_blockquote]:!text-[#0E2540]`}
+              [&_blockquote]:!text-[#111111]`}
             style={
               {
                 "--tw-prose-body": "#1E2A3A",
-                "--tw-prose-bold": "#0E2540",
-                "--tw-prose-headings": "#0E2540",
-                "--tw-prose-links": BLUE,
-                "--tw-prose-bullets": BLUE,
-                "--tw-prose-quotes": "#0E2540",
-                "--tw-prose-quote-borders": BLUE,
+                "--tw-prose-bold": "#111111",
+                "--tw-prose-headings": "#111111",
+                "--tw-prose-links": YPA_BLUE,
+                "--tw-prose-bullets": YPA_BLUE,
+                "--tw-prose-quotes": "#111111",
+                "--tw-prose-quote-borders": YPA_BLUE,
               } as React.CSSProperties
             }
           >
             <div
-              className="[&_blockquote]:bg-[#F5F9FF] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
+              className="[&_blockquote]:bg-[#E6F8FD] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </div>
 
-          {/* ===== DIVIDER ===== */}
-          <div className="relative my-20">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t" style={{ borderColor: "#E8ECF0" }} />
-            </div>
-            <div className="relative flex justify-center">
-              <span className={`${mono.className} px-6 bg-white text-sm tracking-[0.4em]`} style={{ color: `${BLUE}40` }}>
-                ✦ ✦ ✦
+          {/* ===== TAGS ===== */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="mt-8 md:mt-10 flex flex-wrap items-center gap-2 border-t pt-6 md:pt-8" style={{ borderColor: "#E8ECF0" }}>
+              <span className={`${mono.className} text-[10px] tracking-[0.15em] uppercase text-[#5B6B7A] mr-2`}>
+                Tags:
               </span>
+              {post.tags.map((tag: string) => (
+                <Link
+                  key={tag}
+                  href={`/blog?tag=${tag}`}
+                  className="px-3 py-1 rounded-full text-xs font-medium transition-all hover:bg-[#00AEEF]/10 hover:text-[#00AEEF]"
+                  style={{ background: "#F6F8FA", color: "#5B6B7A" }}
+                >
+                  #{tag}
+                </Link>
+              ))}
             </div>
-          </div>
+          )}
 
           {/* ===== SHARE & SAVE ===== */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4 mt-8 md:mt-10 pt-6 md:pt-8 border-t" style={{ borderColor: "#E8ECF0" }}>
             <ShareButtons slug={post.slug} title={post.title} />
             <SaveButton slug={post.slug} />
           </div>
 
-          {/* ===== RELATED CONTENT CTA ===== */}
-          <div className="mt-12 pt-8 border-t" style={{ borderColor: "#E8ECF0" }}>
-            <div
-              className="rounded-3xl p-8 border"
-              style={{ borderColor: "#E8ECF0", background: MIST }}
-            >
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                  <h3 className={`${display.className} text-lg font-medium`} style={{ color: INK_ON_LIGHT }}>
-                    Enjoyed this article?
-                  </h3>
-                  <p className="text-sm" style={{ color: MUTE_ON_LIGHT }}>
-                    Explore more stories from Youth Platform Africa
-                  </p>
-                </div>
-                <Link
-                  href="/blog"
-                  className="inline-flex items-center gap-2 text-white px-6 py-3 rounded-full text-sm font-medium transition-all hover:-translate-y-0.5 flex-shrink-0"
-                  style={{ background: BLUE, boxShadow: `0 20px 40px -12px ${BLUE}66` }}
-                >
-                  Browse all posts
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* ===== MORE IN CATEGORY ===== */}
-          {post.category && (
-            <div className="mt-10 pt-8 border-t" style={{ borderColor: "#E8ECF0" }}>
-              <div className="flex items-center justify-between">
-                <h4 className={`${display.className} text-lg font-medium`} style={{ color: INK_ON_LIGHT }}>
-                  More in{" "}
-                  <span style={{ color: BLUE }}>{category?.label || post.category}</span>
-                </h4>
-                <Link
-                  href={`/blog?category=${post.category}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium transition-all hover:gap-2.5"
-                  style={{ color: BLUE }}
-                >
-                  View all
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
+          {/* ===== RELATED POSTS ===== */}
+          {relatedPosts.length > 0 && (
+            <div className="mt-12 md:mt-16 pt-8 md:pt-10 border-t" style={{ borderColor: "#E8ECF0" }}>
+              <h3 className={`${display.className} text-xl md:text-2xl font-medium mb-4 md:mb-6`} style={{ color: INK_ON_LIGHT }}>
+                Related Posts
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                {relatedPosts.map((related: any) => (
+                  <Link
+                    key={related.id}
+                    href={`/blog/${related.slug}`}
+                    className="group block rounded-xl md:rounded-2xl overflow-hidden border shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                    style={{ borderColor: "#E8ECF0", background: "white" }}
+                  >
+                    <div className="relative aspect-[16/9] overflow-hidden bg-[#F6F8FA]">
+                      {related.featured_image ? (
+                        <img
+                          src={`${API_URL}/assets/${related.featured_image}`}
+                          alt={related.title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[#5B6B7A]/30">
+                          <span className="text-3xl">📄</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 md:p-4">
+                      <h4 className="text-sm md:text-base font-medium line-clamp-2 group-hover:text-[#00AEEF] transition-colors" style={{ color: INK_ON_LIGHT }}>
+                        {related.title}
+                      </h4>
+                      <p className="text-xs text-[#5B6B7A] mt-1 line-clamp-1">{related.excerpt}</p>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           )}
+
+          {/* ===== COMMENTS SECTION ===== */}
+          <div className="mt-12 md:mt-16 pt-8 md:pt-10 border-t" style={{ borderColor: "#E8ECF0" }}>
+            <Comments postId={post.id} postSlug={post.slug} />
+          </div>
         </div>
       </article>
 

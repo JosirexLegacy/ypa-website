@@ -1,56 +1,22 @@
-// frontend/src/app/blog/[slug]/SaveButton.tsx
-'use client';
+"use client";
 
-import { Bookmark, BookmarkCheck } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { Bookmark } from 'lucide-react';
 
-interface SaveButtonProps {
-  slug?: string;
-}
-
-export function SaveButton({ slug }: SaveButtonProps) {
-  const [isSaved, setIsSaved] = useState(false);
-
-  // Check if already saved on mount
-  useEffect(() => {
-    if (slug && typeof window !== 'undefined') {
-      const saved = localStorage.getItem(`saved_${slug}`);
-      setIsSaved(saved === 'true');
-    }
-  }, [slug]);
-
-  const handleSave = () => {
-    if (slug && typeof window !== 'undefined') {
-      const newState = !isSaved;
-      setIsSaved(newState);
-      localStorage.setItem(`saved_${slug}`, String(newState));
-      
-      // You could also dispatch an event or make an API call here
-      // For example: fetch('/api/save', { method: 'POST', body: JSON.stringify({ slug, saved: newState }) })
-    }
-  };
+export function SaveButton({ slug }: { slug: string }) {
+  const [saved, setSaved] = useState(false);
 
   return (
-    <button 
-      onClick={handleSave}
-      className={`flex items-center gap-2 text-sm transition-colors group ${
-        isSaved 
-          ? 'text-[#2196F3]' 
-          : 'text-gray-400 hover:text-[#1A3A5C]'
-      }`}
-      aria-label={isSaved ? 'Unsave article' : 'Save article'}
+    <button
+      onClick={() => setSaved(!saved)}
+      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105"
+      style={{ 
+        background: saved ? '#00AEEF' : '#F6F8FA', 
+        color: saved ? 'white' : '#5B6B7A' 
+      }}
     >
-      {isSaved ? (
-        <>
-          <BookmarkCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          <span>Saved</span>
-        </>
-      ) : (
-        <>
-          <Bookmark className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          <span>Save</span>
-        </>
-      )}
+      <Bookmark className="w-3.5 h-3.5" fill={saved ? 'white' : 'none'} />
+      {saved ? 'Saved' : 'Save'}
     </button>
   );
 }
