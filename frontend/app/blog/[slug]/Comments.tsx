@@ -7,7 +7,8 @@ import {
   Send, 
   X,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 
 const YPA_BLUE = "#00AEEF";
@@ -45,10 +46,13 @@ export function Comments({ postId, postSlug }: { postId: string; postSlug: strin
     email: '',
     content: '',
   });
-  const [formStatus, setFormStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [formStatus, setFormStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    fetchComments();
+    if (postId) {
+      fetchComments();
+    }
   }, [postId]);
 
   const fetchComments = async () => {
@@ -69,36 +73,67 @@ export function Comments({ postId, postSlug }: { postId: string; postSlug: strin
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.content.trim()) return;
+    
+    if (!formData.name.trim() || !formData.content.trim()) {
+      setErrorMessage('Please fill in your name and comment.');
+      setFormStatus('error');
+      return;
+    }
+
+    if (!postId) {
+      setErrorMessage('Post ID is missing. Please refresh the page.');
+      setFormStatus('error');
+      return;
+    }
 
     setSubmitting(true);
-    setFormStatus('idle');
+    setFormStatus('loading');
+    setErrorMessage('');
 
     try {
+      // ✅ Ensure post_id is sent as a string (UUID)
       const payload = {
         name: formData.name.trim(),
-        email: formData.email.trim() || undefined,
+        email: formData.email.trim() || null,
         content: formData.content.trim(),
-        post_id: postId,
+        post_id: String(postId), // ✅ Ensure it's a string
         post_slug: postSlug,
         status: 'pending',
       };
 
+      console.log('📤 Submitting comment:', payload);
+
       const res = await fetch(`${API_URL}/items/comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error('Failed to submit comment');
+      const responseData = await res.json();
 
+      if (!res.ok) {
+        console.error('❌ Directus error response:', responseData);
+        const errorMsg = responseData.errors?.[0]?.message || 
+                        responseData.message || 
+                        'Failed to submit comment. Please try again.';
+        setErrorMessage(errorMsg);
+        setFormStatus('error');
+        return;
+      }
+
+      console.log('✅ Comment submitted successfully:', responseData);
       setFormStatus('success');
       setFormData({ name: '', email: '', content: '' });
       setShowForm(false);
       
+      // Refresh comments after 2 seconds
       setTimeout(fetchComments, 2000);
     } catch (error) {
-      console.error('Error submitting comment:', error);
+      console.error('❌ Network error submitting comment:', error);
+      setErrorMessage('Network error. Please check your connection and try again.');
       setFormStatus('error');
     } finally {
       setSubmitting(false);
@@ -126,7 +161,11 @@ export function Comments({ postId, postSlug }: { postId: string; postSlug: strin
           </span>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            setShowForm(!showForm);
+            setFormStatus('idle');
+            setErrorMessage('');
+          }}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white transition-all hover:-translate-y-0.5"
           style={{ background: YPA_BLUE, boxShadow: `0 20px 40px -12px ${YPA_BLUE}66` }}
         >
@@ -197,6 +236,13 @@ export function Comments({ postId, postSlug }: { postId: string; postSlug: strin
                   />
                 </div>
 
+                {formStatus === 'loading' && (
+                  <div className="flex items-center gap-2 text-sm text-[#00AEEF] bg-[#E6F8FD] px-4 py-3 rounded-xl">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Submitting your comment...</span>
+                  </div>
+                )}
+
                 {formStatus === 'success' && (
                   <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-4 py-3 rounded-xl">
                     <CheckCircle className="w-4 h-4" />
@@ -207,7 +253,7 @@ export function Comments({ postId, postSlug }: { postId: string; postSlug: strin
                 {formStatus === 'error' && (
                   <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-4 py-3 rounded-xl">
                     <AlertCircle className="w-4 h-4" />
-                    <span>Something went wrong. Please try again.</span>
+                    <span>{errorMessage || 'Something went wrong. Please try again.'}</span>
                   </div>
                 )}
 
