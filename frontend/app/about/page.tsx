@@ -661,27 +661,51 @@ const NumberCounter = ({ target, label, suffix = "" }: { target: number; label: 
 };
 
 // ============================================================
-// STORY SECTION
+// STORY SECTION — Smooth, Modern Slideshow
 // ============================================================
 const StorySection = ({ content }: { content: any }) => {
   const [activeImage, setActiveImage] = useState(0);
   const reduce = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
   const images = [
     { src: "https://res.cloudinary.com/owwvyprb/image/upload/v1784714736/27b30d55-18ea-4197-b073-9a2c6dae3100.jpg", label: "Community" },
     { src: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716326/acc94e42-c5d5-489c-b335-6ee5353253be.jpg", label: "Goats" },
     { src: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716480/587e2393-e360-4ac2-bae3-22b7cec94705.jpg", label: "Farm" },
   ];
 
+  // Auto-play with smooth timing
   useEffect(() => {
     if (reduce) return;
-    const interval = setInterval(() => setActiveImage((p) => (p + 1) % images.length), 5000);
+    const interval = setInterval(() => {
+      setActiveImage((prev) => (prev + 1) % images.length);
+    }, 5000);
     return () => clearInterval(interval);
   }, [reduce]);
+
+  // Go to specific image
+  const goToImage = (index: number) => {
+    setActiveImage(index);
+  };
+
+  // Go to next/previous
+  const nextImage = () => {
+    setActiveImage((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = () => {
+    setActiveImage((prev) => (prev - 1 + images.length) % images.length);
+  };
 
   return (
     <section id="story" className="py-16 md:py-24 px-5 md:px-14 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
       <div className="container mx-auto max-w-7xl">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-16 items-center">
+          {/* Text Content */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
             <motion.span
               variants={fadeInUp}
@@ -690,10 +714,18 @@ const StorySection = ({ content }: { content: any }) => {
             >
               Our Story
             </motion.span>
-            <motion.h2 variants={fadeInUp} className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium mt-2 md:mt-3 leading-[1.1]`} style={{ color: INK_ON_LIGHT }}>
+            <motion.h2 
+              variants={fadeInUp} 
+              className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium mt-2 md:mt-3 leading-[1.1]`} 
+              style={{ color: INK_ON_LIGHT }}
+            >
               From a village group to a Pan-African movement
             </motion.h2>
-            <motion.div variants={fadeInUp} className="mt-4 md:mt-6 leading-relaxed space-y-3 md:space-y-4 font-light text-sm md:text-base" style={{ color: "#4B5A68" }}>
+            <motion.div 
+              variants={fadeInUp} 
+              className="mt-4 md:mt-6 leading-relaxed space-y-3 md:space-y-4 font-light text-sm md:text-base" 
+              style={{ color: "#4B5A68" }}
+            >
               {content?.story ? (
                 <div dangerouslySetInnerHTML={{ __html: content.story }} />
               ) : (
@@ -731,36 +763,114 @@ const StorySection = ({ content }: { content: any }) => {
             </motion.div>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn} className="relative">
+          {/* Smooth Slideshow - NO WHITE SPACE */}
+          <motion.div 
+            initial="hidden" 
+            whileInView="visible" 
+            viewport={{ once: true }} 
+            variants={scaleIn} 
+            className="relative"
+          >
+            {/* Decorative glow */}
             <div className="absolute -inset-4 rounded-3xl blur-2xl" style={{ background: `linear-gradient(135deg, ${YPA_BLUE}14, ${YPA_BLUE_LIGHT}14)` }} />
+            
             <div className="relative h-[300px] md:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-              <AnimatePresence mode="wait">
+              {/* All images stacked - only active one visible */}
+              {images.map((img, index) => (
                 <motion.div
-                  key={activeImage}
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 1 }}
+                  key={index}
                   className="absolute inset-0"
+                  initial={false}
+                  animate={{
+                    opacity: activeImage === index ? 1 : 0,
+                    scale: activeImage === index ? 1 : 1.05,
+                  }}
+                  transition={{
+                    opacity: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+                    scale: { duration: 1.2, ease: [0.22, 1, 0.36, 1] },
+                  }}
                 >
-                  <img src={images[activeImage].src} alt={images[activeImage].label} className="w-full h-full object-cover" />
+                  <img 
+                    src={img.src} 
+                    alt={img.label} 
+                    className="w-full h-full object-cover"
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
                 </motion.div>
-              </AnimatePresence>
+              ))}
+
+              {/* Overlay gradient */}
               <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.4), transparent 50%)" }} />
+              
+              {/* Bottom controls */}
               <div className="absolute bottom-4 md:bottom-6 left-4 md:left-6 right-4 md:right-6 flex items-end justify-between">
-                <div className="bg-white/95 backdrop-blur-sm rounded-xl px-3 md:px-5 py-2 md:py-3 inline-block shadow-lg">
-                  <p className="text-xs md:text-sm font-medium" style={{ color: INK_ON_LIGHT }}>{images[activeImage].label}</p>
+                {/* Current image label */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-xl px-3 md:px-5 py-2 md:py-3 shadow-lg">
+                  <p className="text-xs md:text-sm font-medium" style={{ color: INK_ON_LIGHT }}>
+                    {images[activeImage].label}
+                  </p>
                 </div>
-                <div className="flex gap-1.5 md:gap-2">
-                  {images.map((_, i) => (
+                
+                {/* Navigation controls */}
+                <div className="flex items-center gap-3">
+                  {/* Dots */}
+                  <div className="flex gap-1.5 md:gap-2">
+                    {images.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => goToImage(i)}
+                        className="transition-all duration-500 rounded-full"
+                        style={{
+                          width: activeImage === i ? "20px" : "8px",
+                          height: "6px",
+                          background: activeImage === i 
+                            ? `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` 
+                            : "rgba(255,255,255,0.3)",
+                          boxShadow: activeImage === i ? `0 0 12px ${YPA_BLUE}40` : "none",
+                        }}
+                        aria-label={`Go to image ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Arrow buttons - visible on hover */}
+                  <div className="flex gap-1.5">
                     <button
-                      key={i}
-                      onClick={() => setActiveImage(i)}
-                      className="h-1.5 rounded-full transition-all duration-500"
-                      style={{ width: i === activeImage ? "24px" : "10px", background: i === activeImage ? "#fff" : "rgba(255,255,255,0.3)" }}
-                    />
-                  ))}
+                      onClick={prevImage}
+                      className="w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm hover:bg-white/40 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                      aria-label="Previous image"
+                    >
+                      <svg className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm hover:bg-white/40 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                      aria-label="Next image"
+                    >
+                      <svg className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
+              </div>
+
+              {/* Progress bar at top */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-white/20">
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{
+                    duration: 5,
+                    ease: "linear",
+                    repeat: Infinity,
+                  }}
+                  key={activeImage} // Restarts animation on image change
+                />
               </div>
             </div>
           </motion.div>
@@ -769,7 +879,6 @@ const StorySection = ({ content }: { content: any }) => {
     </section>
   );
 };
-
 // ============================================================
 // LEADERSHIP — Enhanced with Better Image Cropping
 // ============================================================
@@ -942,7 +1051,7 @@ const LeadershipSection = () => {
             border: `1px solid ${YPA_BLUE}15`
           }}>
             <span className={`${mono.className} text-[9px] md:text-[10px] font-light`} style={{ color: MUTE_ON_LIGHT }}>
-              💡 Add photos to Directus → Files → copy file ID into the leader's `image` field
+              
             </span>
           </div>
         </ScrollReveal>
