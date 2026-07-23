@@ -412,7 +412,7 @@ const LINEUP = [
     ],
     gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/projects/goats",
-    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784802619/obed_goats_f8unko.jpg",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg",
     aura: YPA_BLUE,
     glowColor: YPA_BLUE,
   },
