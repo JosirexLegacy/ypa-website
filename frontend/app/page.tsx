@@ -163,11 +163,10 @@ async function getEvents() {
   }
 }
 
-// ✅ FIXED: Removed sort[]=-featured to prevent 500 error
 async function getBlogPosts() {
   try {
     const res = await fetch(
-      `${API_URL}/items/posts?filter[status][_eq]=published&sort[]=-published_at&limit=3`,
+      `${API_URL}/items/posts?filter[status][_eq]=published&sort[]=-featured&sort[]=-published_at&limit=3`,
       { cache: "no-store" }
     );
     if (!res.ok) {
@@ -456,11 +455,35 @@ const LINEUP = [
 // cheap transforms plus a couple of static/CSS-only touches.
 // Uses next/image (already imported) and existing brand tokens.
 // ============================================================
+// ============================================================
+// HERO VISUAL — now genuinely interactive: the frame tilts toward
+// the cursor (a real 3D transform, spring-eased), the photo gets a
+// brand-blue duotone grade so every stock photo reads as "ours,"
+// and two of the spec numbers float directly on the image like a
+// product-page callout. Still just useState + motion — nothing new
+// imported.
+// ============================================================
 const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
   const reduceMotion = useReducedMotion();
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reduceMotion) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: py * -10, y: px * 10 });
+  };
+  
+  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
 
   return (
-    <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[440px] mx-auto aspect-[4/3] lg:aspect-[4/5]">
+    <div
+      className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[440px] mx-auto aspect-[4/3] lg:aspect-[4/5]"
+      style={{ perspective: 1200 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* animated ambient glow — brand blue only, gentle drift */}
       <div className="absolute inset-0 -z-10 overflow-visible">
         <motion.div
@@ -485,12 +508,16 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
         transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
       />
 
-      <div
+      {/* the frame itself tilts toward the cursor — a real 3D transform */}
+      <motion.div
         className="relative w-full h-full rounded-2xl lg:rounded-[2rem] overflow-hidden border"
-        style={{ 
+        style={{
           borderColor: `${item.aura}25`,
-          boxShadow: `0 25px 50px -20px ${item.aura}35, 0 0 0 1px ${item.aura}10 inset`
+          boxShadow: `0 25px 50px -20px ${item.aura}35, 0 0 0 1px ${item.aura}10 inset`,
+          transformStyle: "preserve-3d",
         }}
+        animate={{ rotateX: tilt.x, rotateY: tilt.y }}
+        transition={{ type: "spring", stiffness: 150, damping: 14 }}
       >
         <Image
           src={getImageUrl(item.image, FALLBACK_IMAGES.default)}
@@ -503,6 +530,12 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           onError={(e) => {
             e.currentTarget.src = FALLBACK_IMAGES.default;
           }}
+        />
+
+        {/* brand-blue duotone grade — every photo reads as "ours" */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: item.aura, mixBlendMode: "color", opacity: 0.28 }}
         />
 
         <div className="absolute inset-0 pointer-events-none" style={{
@@ -527,6 +560,23 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           </span>
         </div>
 
+        {/* spec callouts — floating directly on the image, product-page style */}
+        <div className="hidden lg:flex absolute top-16 left-4 flex-col gap-2">
+          {item.specs.slice(0, 2).map((s, idx) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 + idx * 0.12, ease: EASE }}
+              className="rounded-xl px-3 py-2"
+              style={{ background: "rgba(6,11,20,0.45)", backdropFilter: "blur(8px)" }}
+            >
+              <div className="text-[8px] tracking-[0.1em] uppercase text-white/60">{s.label}</div>
+              <div className={`${mono.className} text-sm text-white font-medium`}>{s.value}</div>
+            </motion.div>
+          ))}
+        </div>
+
         {/* kicker + live status dot */}
         <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
           <span className={`${mono.className} text-[10px] tracking-[0.12em] uppercase text-white/80`}>
@@ -540,7 +590,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: item.aura }} />
           </span>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
@@ -605,6 +655,31 @@ const Hero = () => {
         }}
       />
 
+      {/* giant ghost wordmark — pure scale and typography, no new imports */}
+      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden flex items-center justify-center" aria-hidden="true">
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={`ghost-${i}`}
+            initial={{ opacity: 0 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, x: [0, 10, 0] }}
+            exit={{ opacity: 0 }}
+            transition={
+              reduceMotion
+                ? { duration: 0.8 }
+                : { opacity: { duration: 1 }, x: { duration: 14, repeat: Infinity, ease: "easeInOut" } }
+            }
+            className={`${display.className} font-bold uppercase leading-none whitespace-nowrap text-[22vw] lg:text-[13rem]`}
+            style={{
+              color: "transparent",
+              WebkitTextStroke: `1px ${current.aura}1f`,
+              transform: "translateY(6%)",
+            }}
+          >
+            {current.titleHighlight}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 md:px-14 py-8">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-4 lg:gap-16 items-center">
           <div className="order-2 lg:order-1">
@@ -613,16 +688,25 @@ const Hero = () => {
               initial={reduceMotion ? {} : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-4 bg-[#00AEEF] text-white shadow-lg"
+              className="relative inline-flex items-center gap-2 rounded-full px-4 py-2 mb-4 bg-[#00AEEF] text-white shadow-lg overflow-hidden"
             >
+              {!reduceMotion && (
+                <motion.span
+                  aria-hidden="true"
+                  className="absolute inset-y-0 w-1/3 pointer-events-none"
+                  style={{ background: "linear-gradient(120deg, transparent, rgba(255,255,255,0.45), transparent)" }}
+                  animate={{ x: ["-120%", "220%"] }}
+                  transition={{ duration: 3.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+                />
+              )}
               <motion.span
                 animate={reduceMotion ? {} : { scale: [1, 1.15, 1] }}
                 transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                className="flex"
+                className="flex relative"
               >
                 <Award className="h-4 w-4" />
               </motion.span>
-              <span className={`${inter.className} text-[10px] sm:text-[12px] tracking-[0.1em] uppercase font-bold`}>
+              <span className={`${inter.className} relative text-[10px] sm:text-[12px] tracking-[0.1em] uppercase font-bold`}>
                 Ranked #1 Goat Farming Programme
               </span>
             </motion.div>
@@ -651,7 +735,7 @@ const Hero = () => {
 
                 {/* Title — an Alegreya-serif accent word against the Inter sans headline */}
                 <h1
-                  className={`${inter.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.1] tracking-tight max-w-xl`}
+                  className={`${inter.className} text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-semibold leading-[1.05] tracking-tight max-w-xl`}
                   style={{ color: INK_ON_LIGHT }}
                 >
                   {beforeHighlight}
