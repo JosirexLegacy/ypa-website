@@ -451,12 +451,7 @@ const LINEUP = [
 ];
 
 // ============================================================
-// HERO VISUAL — now genuinely interactive: the frame tilts toward
-// the cursor (a real 3D transform, spring-eased), the photo gets a
-// brand-blue duotone grade so every stock photo reads as "ours,"
-// and two of the spec numbers float directly on the image like a
-// product-page callout. Still just useState + motion — nothing new
-// imported.
+// HERO VISUAL 
 // ============================================================
 const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
   const reduceMotion = useReducedMotion();
@@ -479,7 +474,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* animated ambient glow — brand blue only, gentle drift */}
       <div className="absolute inset-0 -z-10 overflow-visible">
         <motion.div
           animate={reduceMotion ? {} : { x: [0, 14, 0], y: [0, -10, 0] }}
@@ -495,7 +489,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
         />
       </div>
 
-      {/* slow rotating ring for texture — one transform, no filter */}
       <motion.div
         className="absolute inset-[-10px] rounded-2xl lg:rounded-[2.2rem] border pointer-events-none"
         style={{ borderColor: `${item.aura}28` }}
@@ -503,7 +496,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
         transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
       />
 
-      {/* the frame itself tilts toward the cursor — a real 3D transform */}
       <motion.div
         className="relative w-full h-full rounded-2xl lg:rounded-[2rem] overflow-hidden border"
         style={{
@@ -514,6 +506,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
         animate={{ rotateX: tilt.x, rotateY: tilt.y }}
         transition={{ type: "spring", stiffness: 150, damping: 14 }}
       >
+        {/* ✅ Hero uses next/image - working fine */}
         <Image
           src={getImageUrl(item.image, FALLBACK_IMAGES.default)}
           alt={item.title}
@@ -527,7 +520,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           }}
         />
 
-        {/* brand-blue duotone grade — every photo reads as "ours" */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ background: item.aura, mixBlendMode: "color", opacity: 0.28 }}
@@ -537,7 +529,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           background: `linear-gradient(to top, rgba(6,11,20,0.65) 0%, transparent 46%)`,
         }} />
 
-        {/* viewfinder corners — static SVG, sits on the photo, zero animation cost */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
           <g stroke="rgba(255,255,255,0.6)" strokeWidth="0.6" fill="none">
             <path d="M6 18 V8 H16" />
@@ -547,7 +538,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           </g>
         </svg>
 
-        {/* award chip — white / brand-blue / ink, static */}
         <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-white shadow-sm">
           <Award className="h-3 w-3" style={{ color: item.aura }} />
           <span className={`${mono.className} text-[9px] tracking-[0.1em] uppercase font-medium`} style={{ color: INK }}>
@@ -555,7 +545,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           </span>
         </div>
 
-        {/* spec callouts — floating directly on the image, product-page style */}
         <div className="hidden lg:flex absolute top-16 left-4 flex-col gap-2">
           {item.specs.slice(0, 2).map((s, idx) => (
             <motion.div
@@ -572,7 +561,6 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           ))}
         </div>
 
-        {/* kicker + live status dot */}
         <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
           <span className={`${mono.className} text-[10px] tracking-[0.12em] uppercase text-white/80`}>
             {item.kicker}
@@ -619,10 +607,8 @@ const Hero = () => {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* base wash */}
       <div className="absolute inset-0 bg-gradient-to-br from-white via-[#F0F9FE] to-[#E6F8FD]" />
 
-      {/* animated ambient light — brand blue family only */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={reduceMotion ? {} : { x: [0, 60, -30, 0], y: [0, -50, 30, 0] }}
@@ -638,7 +624,6 @@ const Hero = () => {
         />
       </div>
 
-      {/* faint brand-blue dot texture, masked to a soft vignette */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -650,7 +635,6 @@ const Hero = () => {
         }}
       />
 
-      {/* giant ghost wordmark — pure scale and typography, no new imports */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden flex items-center justify-center" aria-hidden="true">
         <AnimatePresence mode="wait">
           <motion.span
@@ -678,7 +662,6 @@ const Hero = () => {
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 md:px-14 py-8">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-4 lg:gap-16 items-center">
           <div className="order-2 lg:order-1">
-            {/* Badge — permanent, doesn't rotate with the slides */}
             <motion.div
               initial={reduceMotion ? {} : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -714,7 +697,6 @@ const Hero = () => {
                 exit={reduceMotion ? {} : { opacity: 0, y: -20 }}
                 transition={{ duration: reduceMotion ? 0 : 0.5, ease: EASE }}
               >
-                {/* Kicker with live status dot */}
                 <div className="flex items-center gap-2 mb-3">
                   <span className="relative flex h-1.5 w-1.5">
                     <span
@@ -728,7 +710,6 @@ const Hero = () => {
                   </span>
                 </div>
 
-                {/* Title — an Alegreya-serif accent word against the Inter sans headline */}
                 <h1
                   className={`${inter.className} text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-semibold leading-[1.05] tracking-tight max-w-xl`}
                   style={{ color: INK_ON_LIGHT }}
@@ -752,7 +733,6 @@ const Hero = () => {
                   {current.line}
                 </p>
 
-                {/* Specs - responsive grid */}
                 <div className={`${inter.className} mt-6 flex flex-wrap gap-x-6 gap-y-2`}>
                   {current.specs.map((s, idx) => (
                     <div key={idx} className="flex flex-col">
@@ -766,7 +746,6 @@ const Hero = () => {
                   ))}
                 </div>
 
-                {/* Buttons - stacked on mobile */}
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href={current.href}
@@ -784,7 +763,6 @@ const Hero = () => {
                   </Link>
                 </div>
 
-                {/* Slide indicators */}
                 <div className="flex gap-1.5 mt-8">
                   {LINEUP.map((_, idx) => (
                     <button
@@ -810,7 +788,6 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Scroll indicator - hidden on mobile, now with a gentle bounce */}
       <div className="hidden md:block absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
         <a href="#index" className="flex flex-col items-center gap-1 group">
           <span className={`${inter.className} text-[9px] tracking-[0.3em] uppercase font-medium text-[#5B6B7A]`}>
@@ -887,7 +864,7 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// EXPLORE RAIL — FIXED: Direct Cloudinary URLs
+// EXPLORE RAIL — ✅ FIXED: Using regular <img> tags
 // ============================================================
 const EXPLORE = [
   {
@@ -957,14 +934,11 @@ const ExploreRail = () => {
                   item.tall ? "min-h-[280px] sm:min-h-[320px]" : "min-h-[200px] sm:min-h-[220px]"
                 }`}
               >
-                <Image
+                {/* ✅ Using regular <img> instead of next/image */}
+                <img
                   src={item.image}
                   alt={item.label}
-                  width={item.tall ? 800 : 600}
-                  height={item.tall ? 600 : 400}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading={i < 3 ? "eager" : "lazy"}
-                  quality={75}
                   onError={(e) => {
                     e.currentTarget.src = FALLBACK_IMAGES.default;
                   }}
@@ -1003,7 +977,7 @@ const ExploreRail = () => {
 };
 
 // ============================================================
-// THE LINEUP — Mobile Optimized with Symmetrical Heights
+// THE LINEUP — ✅ FIXED: Using regular <img> tags
 // ============================================================
 const CONFIG_CARDS = [
   {
@@ -1065,14 +1039,11 @@ const TheLineup = () => {
                   onMouseLeave={() => setHover(null)}
                   className="group block relative rounded-2xl overflow-hidden border border-[#1F3B57] h-[340px] sm:h-[380px] lg:h-[420px]"
                 >
-                  <Image
+                  {/* ✅ Using regular <img> instead of next/image */}
+                  <img
                     src={c.image}
                     alt={c.name}
-                    width={600}
-                    height={400}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading={i < 2 ? "eager" : "lazy"}
-                    quality={75}
                     onError={(e) => {
                       e.currentTarget.src = FALLBACK_IMAGES.goats;
                     }}
