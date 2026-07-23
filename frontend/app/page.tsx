@@ -451,7 +451,7 @@ const LINEUP = [
 ];
 
 // ============================================================
-// HERO VISUAL 
+// HERO VISUAL — Fixed with regular <img> and smooth animations
 // ============================================================
 const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
   const reduceMotion = useReducedMotion();
@@ -474,6 +474,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
+      {/* animated ambient glow */}
       <div className="absolute inset-0 -z-10 overflow-visible">
         <motion.div
           animate={reduceMotion ? {} : { x: [0, 14, 0], y: [0, -10, 0] }}
@@ -489,6 +490,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
         />
       </div>
 
+      {/* slow rotating ring */}
       <motion.div
         className="absolute inset-[-10px] rounded-2xl lg:rounded-[2.2rem] border pointer-events-none"
         style={{ borderColor: `${item.aura}28` }}
@@ -496,6 +498,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
         transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
       />
 
+      {/* the frame itself tilts toward the cursor */}
       <motion.div
         className="relative w-full h-full rounded-2xl lg:rounded-[2rem] overflow-hidden border"
         style={{
@@ -506,20 +509,17 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
         animate={{ rotateX: tilt.x, rotateY: tilt.y }}
         transition={{ type: "spring", stiffness: 150, damping: 14 }}
       >
-        {/* ✅ Hero uses next/image - working fine */}
-        <Image
-          src={getImageUrl(item.image, FALLBACK_IMAGES.default)}
+        {/* ✅ Using regular <img> instead of next/image */}
+        <img
+          src={item.image}
           alt={item.title}
-          width={600}
-          height={800}
-          className="w-full h-full object-cover"
-          quality={80}
-          priority
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           onError={(e) => {
             e.currentTarget.src = FALLBACK_IMAGES.default;
           }}
         />
 
+        {/* brand-blue duotone grade */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ background: item.aura, mixBlendMode: "color", opacity: 0.28 }}
@@ -529,6 +529,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           background: `linear-gradient(to top, rgba(6,11,20,0.65) 0%, transparent 46%)`,
         }} />
 
+        {/* viewfinder corners */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
           <g stroke="rgba(255,255,255,0.6)" strokeWidth="0.6" fill="none">
             <path d="M6 18 V8 H16" />
@@ -538,6 +539,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           </g>
         </svg>
 
+        {/* award chip */}
         <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-white shadow-sm">
           <Award className="h-3 w-3" style={{ color: item.aura }} />
           <span className={`${mono.className} text-[9px] tracking-[0.1em] uppercase font-medium`} style={{ color: INK }}>
@@ -545,6 +547,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           </span>
         </div>
 
+        {/* spec callouts */}
         <div className="hidden lg:flex absolute top-16 left-4 flex-col gap-2">
           {item.specs.slice(0, 2).map((s, idx) => (
             <motion.div
@@ -561,6 +564,7 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           ))}
         </div>
 
+        {/* kicker + live status dot */}
         <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
           <span className={`${mono.className} text-[10px] tracking-[0.12em] uppercase text-white/80`}>
             {item.kicker}
