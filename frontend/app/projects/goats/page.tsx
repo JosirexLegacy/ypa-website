@@ -80,16 +80,17 @@ const NAVY_SOFT = "#153455";
 const LINE = "#1F3B57";
 const MIST = "#F6F8FA";
 const INK_ON_LIGHT = "#111111";
-const MUTE_ON_LIGHT = "#5B6B7A";
+const MUTE_ON_LIGHT = "#4A5A68"; // ✅ Fixed: Darker for better readability
+const BODY_TEXT = "#2D3748"; // ✅ Added: Better body text color
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
 // IMAGE URLs
 // ============================================================
-const HERO_IMAGE = "https://images.unsplash.com/photo-1535268647677-300d0a4c3b7b?w=1600&q=80";
-const ABOUT_IMAGE = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=1200&q=80";
-const BREED_IMAGE = "https://images.unsplash.com/photo-1535268647677-300d0a4c3b7b?w=1200&q=80";
+const HERO_IMAGE = "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg";
+const ABOUT_IMAGE = "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg";
+const BREED_IMAGE = "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg";
 
 // ============================================================
 // FETCH FUNCTION
@@ -342,7 +343,7 @@ export default function GoatsPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-sm md:text-base lg:text-lg text-white/50 max-w-xl leading-relaxed mt-3 md:mt-4"
+              className="text-sm md:text-base lg:text-lg text-white/60 max-w-xl leading-relaxed mt-3 md:mt-4"
             >
               With a focus on breeding, we empower farmers to improve livestock productivity and profitability.
             </motion.p>
@@ -528,20 +529,23 @@ export default function GoatsPage() {
                   transition={{ duration: 0.3 }}
                 >
                   {activeTab === 'overview' && (
-                    <div className="prose prose-sm max-w-none prose-p:text-[#4A5A6A] prose-p:leading-relaxed prose-p:mb-3 md:prose-p:mb-4">
+                    <div className="space-y-3 md:space-y-4">
                       {content?.description ? (
-                        <div dangerouslySetInnerHTML={{ __html: content.description }} />
+                        <div 
+                          className="text-sm md:text-base leading-relaxed text-[#2D3748]"
+                          dangerouslySetInnerHTML={{ __html: content.description }} 
+                        />
                       ) : (
                         <>
-                          <p className="text-sm md:text-base leading-relaxed">
+                          <p className="text-sm md:text-base leading-relaxed text-[#2D3748]">
                             The Goats Agribusiness Project stands as our <strong className="text-[#0E2540]">flagship project</strong> and a key pillar in our mission to economically empower individuals through agribusiness. Managed by the <strong className="text-[#0E2540]">number one goat farmers in Uganda</strong>, this initiative is designed to provide individuals, groups, and companies with a <strong className="text-[#0E2540]">complete, end-to-end solution</strong> for launching and managing successful goat farming ventures.
                           </p>
 
-                          <p className="text-sm md:text-base leading-relaxed">
+                          <p className="text-sm md:text-base leading-relaxed text-[#2D3748]">
                             Through this program, clients can purchase high-quality goats directly from YPA, carefully selected for health, resilience, and productivity. We ensure access to a wide range of improved pasture species, offering the best varieties of nutritious grass essential for optimal animal growth.
                           </p>
 
-                          <p className="text-sm md:text-base leading-relaxed">
+                          <p className="text-sm md:text-base leading-relaxed text-[#2D3748]">
                             In addition to inputs, members receive <strong className="text-[#0E2540]">practical, hands-on training</strong> in modern goat rearing techniques, pasture management, and overall agribusiness operations.
                           </p>
                         </>
@@ -563,7 +567,7 @@ export default function GoatsPage() {
                           ].map((item, i) => (
                             <div key={i} className="flex items-center gap-2">
                               <Check className="w-3 h-3 md:w-3.5 md:h-3.5" style={{ color: YPA_BLUE }} />
-                              <span className={`${mono.className} text-[10px] md:text-[11px]`} style={{ color: MUTE_ON_LIGHT }}>
+                              <span className={`${mono.className} text-[10px] md:text-[11px] text-[#2D3748]`}>
                                 {item}
                               </span>
                             </div>
@@ -574,7 +578,7 @@ export default function GoatsPage() {
                       {/* End-to-End Solution Badge */}
                       <div className="mt-4 md:mt-6 inline-flex items-center gap-2 md:gap-3 px-4 md:px-5 py-2 md:py-3 rounded-full border" style={{ borderColor: `${YPA_BLUE}20`, background: `${YPA_BLUE}08` }}>
                         <Zap className="w-3 h-3 md:w-4 md:h-4" style={{ color: YPA_GOLD }} />
-                        <span className={`${mono.className} text-[9px] md:text-[11px] tracking-[0.08em] uppercase`} style={{ color: INK_ON_LIGHT }}>
+                        <span className={`${mono.className} text-[9px] md:text-[11px] tracking-[0.08em] uppercase text-[#2D3748]`}>
                           Complete End-to-End Solution
                         </span>
                       </div>
@@ -583,7 +587,7 @@ export default function GoatsPage() {
 
                   {activeTab === 'impact' && (
                     <div>
-                      <p className="text-sm md:text-base leading-relaxed text-[#4A5A6A] mb-4">
+                      <p className="text-sm md:text-base leading-relaxed text-[#2D3748] mb-4">
                         The YPA Goats Project has created lasting impact across Uganda, transforming lives and building sustainable livelihoods.
                       </p>
                       <div className="grid grid-cols-2 gap-3 md:gap-4">
@@ -609,7 +613,7 @@ export default function GoatsPage() {
 
                   {activeTab === 'process' && (
                     <div>
-                      <p className="text-sm md:text-base leading-relaxed text-[#4A5A6A] mb-4">
+                      <p className="text-sm md:text-base leading-relaxed text-[#2D3748] mb-4">
                         The YPA Goats Experience is a complete journey from selection to returns.
                       </p>
                       <div className="space-y-3 md:space-y-4">
@@ -626,7 +630,7 @@ export default function GoatsPage() {
                               <h4 className={`${display.className} text-sm md:text-base font-medium`} style={{ color: INK_ON_LIGHT }}>
                                 {item.title}
                               </h4>
-                              <p className="text-xs md:text-sm leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>
+                              <p className="text-xs md:text-sm leading-relaxed text-[#2D3748]">
                                 {item.desc}
                               </p>
                             </div>
@@ -657,7 +661,7 @@ export default function GoatsPage() {
             <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight`} style={{ color: INK_ON_LIGHT }}>
               Mubende × Boer × Kalahari
             </h2>
-            <p className="text-xs md:text-sm mt-2 max-w-2xl mx-auto" style={{ color: MUTE_ON_LIGHT }}>
+            <p className="text-xs md:text-sm mt-2 max-w-2xl mx-auto text-[#2D3748]">
               A custom-made crossbreed combining the best traits of three distinct and highly valued breeds
             </p>
           </ScrollReveal>
@@ -699,10 +703,10 @@ export default function GoatsPage() {
                     <h4 className={`${display.className} text-base md:text-lg font-medium`} style={{ color: INK_ON_LIGHT }}>
                       {breed.name}
                     </h4>
-                    <div className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.1em] uppercase`} style={{ color: MUTE_ON_LIGHT }}>
+                    <div className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.1em] uppercase text-[#4A5A68]`}>
                       {breed.origin}
                     </div>
-                    <p className="text-xs md:text-sm mt-1 md:mt-2 leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>
+                    <p className="text-xs md:text-sm mt-1 md:mt-2 leading-relaxed text-[#2D3748]">
                       {breed.desc}
                     </p>
                   </div>
@@ -726,10 +730,10 @@ export default function GoatsPage() {
                       <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300" style={{ background: `${YPA_BLUE}12` }}>
                         <Icon className="w-4 h-4 md:w-5 md:h-5" style={{ color: YPA_BLUE }} />
                       </div>
-                      <h4 className={`${display.className} text-sm md:text-base font-medium`} style={{ color: INK_ON_LIGHT }}>
+                      <h4 className={`${display.className} text-sm md:text-base font-medium text-[#111111]`}>
                         {item.title}
                       </h4>
-                      <p className="text-xs md:text-sm mt-1 leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>
+                      <p className="text-xs md:text-sm mt-1 leading-relaxed text-[#2D3748]">
                         {item.desc}
                       </p>
                     </div>
@@ -789,7 +793,7 @@ export default function GoatsPage() {
             <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight`} style={{ color: INK_ON_LIGHT }}>
               Choose Your Path
             </h2>
-            <p className="text-xs md:text-sm mt-2 max-w-2xl mx-auto" style={{ color: MUTE_ON_LIGHT }}>
+            <p className="text-xs md:text-sm mt-2 max-w-2xl mx-auto text-[#2D3748]">
               Two tailored models designed for different needs and levels of involvement
             </p>
           </ScrollReveal>
@@ -809,14 +813,14 @@ export default function GoatsPage() {
                   <h3 className={`${display.className} text-xl md:text-2xl font-medium mt-1 mb-2 md:mb-3`} style={{ color: INK_ON_LIGHT }}>
                     Passive
                   </h3>
-                  <p className="text-xs md:text-sm leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>
+                  <p className="text-xs md:text-sm leading-relaxed text-[#2D3748]">
                     Ideal for individuals who may not have land, time, or the technical know-how to manage a farm. YPA takes full responsibility for managing the farm — including land, goat care, staffing, and marketing — while you receive regular reports and returns.
                   </p>
                   <div className="mt-4 space-y-1.5 md:space-y-2">
                     {['YPA manages everything', 'Regular reports and returns', 'Stress-free investment'].map((item, i) => (
                       <div key={i} className="flex items-start gap-2 md:gap-3">
                         <Check className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: YPA_BLUE }} />
-                        <p className={`${mono.className} text-[10px] md:text-[11px]`} style={{ color: MUTE_ON_LIGHT }}>{item}</p>
+                        <p className={`${mono.className} text-[10px] md:text-[11px] text-[#2D3748]`}>{item}</p>
                       </div>
                     ))}
                   </div>
@@ -838,14 +842,14 @@ export default function GoatsPage() {
                   <h3 className={`${display.className} text-xl md:text-2xl font-medium mt-1 mb-2 md:mb-3`} style={{ color: INK_ON_LIGHT }}>
                     Active
                   </h3>
-                  <p className="text-xs md:text-sm leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>
+                  <p className="text-xs md:text-sm leading-relaxed text-[#2D3748]">
                     Designed for farmers who already have their own land and want to actively participate in rearing goats while still receiving professional support.
                   </p>
                   <div className="mt-4 space-y-1.5 md:space-y-2">
                     {['You manage day-to-day operations', 'Expert guidance and support', 'Higher profit potential'].map((item, i) => (
                       <div key={i} className="flex items-start gap-2 md:gap-3">
                         <Check className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: YPA_GOLD }} />
-                        <p className={`${mono.className} text-[10px] md:text-[11px]`} style={{ color: MUTE_ON_LIGHT }}>{item}</p>
+                        <p className={`${mono.className} text-[10px] md:text-[11px] text-[#2D3748]`}>{item}</p>
                       </div>
                     ))}
                   </div>
@@ -871,7 +875,7 @@ export default function GoatsPage() {
             <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight`} style={{ color: INK_ON_LIGHT }}>
               Goat Prices
             </h2>
-            <p className="text-xs md:text-sm mt-2" style={{ color: MUTE_ON_LIGHT }}>
+            <p className="text-xs md:text-sm mt-2 text-[#2D3748]">
               Carefully selected goats for optimal performance and returns
             </p>
           </ScrollReveal>
@@ -880,7 +884,7 @@ export default function GoatsPage() {
             {pricing.map((item, i) => (
               <ScrollReveal key={i} delay={i * 0.08}>
                 <div className="bg-white p-5 md:p-6 rounded-2xl border shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300" style={{ borderColor: "#E8ECF0" }}>
-                  <div className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.15em] uppercase`} style={{ color: MUTE_ON_LIGHT }}>
+                  <div className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.15em] uppercase text-[#4A5A68]`}>
                     {item.age}
                   </div>
                   <div className={`${display.className} text-base md:text-lg font-medium mt-1`} style={{ color: INK_ON_LIGHT }}>
@@ -889,7 +893,7 @@ export default function GoatsPage() {
                   <div className={`${display.className} text-xl md:text-2xl font-medium mt-2`} style={{ color: YPA_BLUE }}>
                     {item.price}
                   </div>
-                  <p className="text-xs md:text-sm mt-2 leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>
+                  <p className="text-xs md:text-sm mt-2 leading-relaxed text-[#2D3748]">
                     {item.description}
                   </p>
                 </div>
@@ -915,7 +919,7 @@ export default function GoatsPage() {
               <h2 className={`${display.className} text-xl md:text-2xl lg:text-3xl font-medium tracking-tight mb-2`} style={{ color: INK_ON_LIGHT }}>
                 10 Goats × UGX 750,000
               </h2>
-              <p className="text-xs md:text-sm mb-4 md:mb-6" style={{ color: MUTE_ON_LIGHT }}>
+              <p className="text-xs md:text-sm mb-4 md:mb-6 text-[#2D3748]">
                 Annual returns from kids over the 3-year project cycle
               </p>
               <div className="space-y-3 md:space-y-4">
@@ -925,7 +929,7 @@ export default function GoatsPage() {
                       <div className={`${display.className} text-sm font-medium`} style={{ color: YPA_BLUE }}>
                         Year {item.year}
                       </div>
-                      <div className={`${mono.className} text-[10px] md:text-[11px]`} style={{ color: MUTE_ON_LIGHT }}>
+                      <div className={`${mono.className} text-[10px] md:text-[11px] text-[#4A5A68]`}>
                         {item.kids} Kids
                       </div>
                     </div>
@@ -935,7 +939,7 @@ export default function GoatsPage() {
                   </div>
                 ))}
                 <div className="p-3 md:p-4 rounded-xl border" style={{ background: `${YPA_BLUE}08`, borderColor: `${YPA_BLUE}20` }}>
-                  <div className={`${mono.className} text-[10px] md:text-[11px]`} style={{ color: MUTE_ON_LIGHT }}>
+                  <div className={`${mono.className} text-[10px] md:text-[11px] text-[#4A5A68]`}>
                     Mother Stock Value (if sold)
                   </div>
                   <div className={`${display.className} text-base md:text-lg font-medium`} style={{ color: INK_ON_LIGHT }}>
@@ -967,7 +971,7 @@ export default function GoatsPage() {
                     return (
                       <li key={i} className="flex items-start gap-2 md:gap-3">
                         <Icon className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: YPA_BLUE }} />
-                        <span className={`${mono.className} text-[10px] md:text-[11px]`} style={{ color: MUTE_ON_LIGHT }}>
+                        <span className={`${mono.className} text-[10px] md:text-[11px] text-[#2D3748]`}>
                           {item.text}
                         </span>
                       </li>
@@ -1015,7 +1019,7 @@ export default function GoatsPage() {
                       <h3 className={`${display.className} text-base md:text-lg font-medium`} style={{ color: INK_ON_LIGHT }}>
                         {item.title}
                       </h3>
-                      <p className="text-xs md:text-sm mt-1 md:mt-2 leading-relaxed" style={{ color: MUTE_ON_LIGHT }}>
+                      <p className="text-xs md:text-sm mt-1 md:mt-2 leading-relaxed text-[#2D3748]">
                         {item.desc}
                       </p>
                     </div>
@@ -1056,7 +1060,7 @@ export default function GoatsPage() {
                 <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-white mb-2 md:mb-3`}>
                   Ready to get started?
                 </h2>
-                <p className="text-xs md:text-sm max-w-2xl mx-auto" style={{ color: `${MUTE_ON_LIGHT}cc` }}>
+                <p className="text-xs md:text-sm max-w-2xl mx-auto text-white/60">
                   Join the Goats Project and start your agribusiness journey
                 </p>
                 <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-6 md:mt-8">
