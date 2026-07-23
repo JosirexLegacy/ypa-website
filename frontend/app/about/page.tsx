@@ -804,28 +804,28 @@ interface Leader {
 
 const LEADERSHIP: Leader[] = [
   { 
-    role: "Executive Director", 
-    name: "JB Magezi", 
+    role: "MANAGING DIRECTOR", 
+    name: "OBED BEN", 
     bio: "Visionary leader with over 15 years of experience in agribusiness and community development. Founded YPA to empower African youth through sustainable agriculture.", 
-    image: "http://localhost:8055/assets/e7aac9fd-faed-481d-b991-cd02e893332f?key=system-medium-cover&modified=2026-07-22T11:19:37" // Add file ID or image URL here
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716326/acc94e42-c5d5-489c-b335-6ee5353253be.jpg" // Add file ID or image URL here
   },
   { 
-    role: "Chief Operations Officer", 
-    name: "—", 
+    role: "EXECUTIVE DIRECTOR", 
+    name: "JB MAGEZI", 
     bio: "Add role summary and years with YPA.",
-    image: ""
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716480/587e2393-e360-4ac2-bae3-22b7cec94705.jpg"
   },
   { 
-    role: "Head of SACCO & Finance", 
-    name: "—", 
+    role: "GENERAL MANAGER", 
+    name: "CHARLES KALEMERA", 
     bio: "Add role summary and relevant credentials.",
-    image: ""
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716382/5fd55b99-ec2f-4990-b3c7-8a5b69837aad.jpg"
   },
   { 
-    role: "Head of Agribusiness Programmes", 
+    role: "", 
     name: "—", 
     bio: "Add role summary and relevant credentials.",
-    image: ""
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726254/3P0D0022_gqfkkg.jpg"
   },
 ];
 
