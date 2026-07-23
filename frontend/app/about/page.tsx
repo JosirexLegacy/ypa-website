@@ -175,7 +175,7 @@ const AboutHero = ({ content }: { content: any }) => {
   }, []);
 
   // Hero background image - using a dynamic, engaging image
-  const heroImage = "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1600&q=80"; // African farmers/community
+  const heroImage = "https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg"; // African farmers/community
 
   return (
     <section
