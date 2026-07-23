@@ -101,10 +101,10 @@ const getImageUrl = (image: string | undefined, fallback: string) => {
 // FALLBACK IMAGES
 // ============================================================
 const FALLBACK_IMAGES = {
-  goats: 'https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg',
-  maize: 'https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg',
-  sacco: 'https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/sacco_kkke6y.jpg',
-  default: 'https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/default_kkke6y.jpg'
+  goats: 'https://images.unsplash.com/photo-1535268647677-300d0a4c3b7b?w=900&q=80',
+  maize: 'https://images.unsplash.com/photo-1593250481214-81611f9bca0f?w=800&q=80',
+  sacco: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80',
+  default: 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80'
 };
 
 // ============================================================
@@ -412,7 +412,7 @@ const LINEUP = [
     ],
     gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/projects/goats",
-    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784802619/obed_goats_f8unko.jpg",
     aura: YPA_BLUE,
     glowColor: YPA_BLUE,
   },
@@ -887,7 +887,7 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// EXPLORE RAIL — Mobile Optimized with Symmetrical Layout
+// EXPLORE RAIL — FIXED: Direct Cloudinary URLs
 // ============================================================
 const EXPLORE = [
   {
@@ -958,7 +958,7 @@ const ExploreRail = () => {
                 }`}
               >
                 <Image
-                  src={item.image} // ✅ Direct Cloudinary URL
+                  src={item.image}
                   alt={item.label}
                   width={item.tall ? 800 : 600}
                   height={item.tall ? 600 : 400}
@@ -1001,6 +1001,7 @@ const ExploreRail = () => {
     </section>
   );
 };
+
 // ============================================================
 // THE LINEUP — Mobile Optimized with Symmetrical Heights
 // ============================================================
@@ -1065,7 +1066,7 @@ const TheLineup = () => {
                   className="group block relative rounded-2xl overflow-hidden border border-[#1F3B57] h-[340px] sm:h-[380px] lg:h-[420px]"
                 >
                   <Image
-                    src={getImageUrl(c.image, FALLBACK_IMAGES.goats)}
+                    src={c.image}
                     alt={c.name}
                     width={600}
                     height={400}
