@@ -163,10 +163,11 @@ async function getEvents() {
   }
 }
 
+// ✅ FIXED: Removed sort[]=-featured to prevent 500 error
 async function getBlogPosts() {
   try {
     const res = await fetch(
-      `${API_URL}/items/posts?filter[status][_eq]=published&sort[]=-featured&sort[]=-published_at&limit=3`,
+      `${API_URL}/items/posts?filter[status][_eq]=published&sort[]=-published_at&limit=3`,
       { cache: "no-store" }
     );
     if (!res.ok) {
@@ -429,8 +430,8 @@ const LINEUP = [
     gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/projects/maize",
     image: "https://thumbs.dreamstime.com/b/corn-harvesting-21773394.jpg",
-    aura: YPA_BLUE,
-    glowColor: YPA_BLUE,
+    aura: YPA_BLUE_DARK,
+    glowColor: YPA_BLUE_DARK,
   },
   {
     kicker: "Model 03 — Finance",
@@ -445,36 +446,50 @@ const LINEUP = [
     gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/sacco",
     image: "https://farm6.staticflickr.com/5603/15475865161_634b055363.jpg",
-    aura: YPA_BLUE,
-    glowColor: YPA_BLUE,
+    aura: YPA_BLUE_LIGHT,
+    glowColor: YPA_BLUE_LIGHT,
   },
 ];
 
 // ============================================================
-// HERO VISUAL — Mobile Optimized
+// HERO VISUAL — restored motion and framing, still just two
+// cheap transforms plus a couple of static/CSS-only touches.
+// Uses next/image (already imported) and existing brand tokens.
 // ============================================================
 const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
   const reduceMotion = useReducedMotion();
 
   return (
     <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[440px] mx-auto aspect-[4/3] lg:aspect-[4/5]">
-      {/* Simplified glow on mobile */}
-      <div className="absolute inset-0 -z-10">
-        <div
-          className="absolute top-[-20%] right-[-20%] w-[70%] h-[70%] rounded-full blur-3xl"
-          style={{ background: `${item.aura}20` }}
+      {/* animated ambient glow — brand blue only, gentle drift */}
+      <div className="absolute inset-0 -z-10 overflow-visible">
+        <motion.div
+          animate={reduceMotion ? {} : { x: [0, 14, 0], y: [0, -10, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-18%] right-[-18%] w-[70%] h-[70%] rounded-full blur-3xl"
+          style={{ background: `${item.aura}22` }}
         />
-        <div
-          className="absolute bottom-[-20%] left-[-20%] w-[60%] h-[60%] rounded-full blur-3xl"
-          style={{ background: `${item.aura}15` }}
+        <motion.div
+          animate={reduceMotion ? {} : { x: [0, -12, 0], y: [0, 10, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-[-18%] left-[-18%] w-[60%] h-[60%] rounded-full blur-3xl"
+          style={{ background: `${YPA_BLUE_LIGHT}18` }}
         />
       </div>
+
+      {/* slow rotating ring for texture — one transform, no filter */}
+      <motion.div
+        className="absolute inset-[-10px] rounded-2xl lg:rounded-[2.2rem] border pointer-events-none"
+        style={{ borderColor: `${item.aura}28` }}
+        animate={reduceMotion ? {} : { rotate: 360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+      />
 
       <div
         className="relative w-full h-full rounded-2xl lg:rounded-[2rem] overflow-hidden border"
         style={{ 
-          borderColor: `${item.aura}20`,
-          boxShadow: `0 20px 40px -20px ${item.aura}30, 0 0 0 1px ${item.aura}10 inset`
+          borderColor: `${item.aura}25`,
+          boxShadow: `0 25px 50px -20px ${item.aura}35, 0 0 0 1px ${item.aura}10 inset`
         }}
       >
         <Image
@@ -490,10 +505,41 @@ const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
           }}
         />
 
-        {/* Glass overlay - simplified */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: `linear-gradient(to top, rgba(6,11,20,0.4) 0%, transparent 50%, ${item.aura}05 100%)`,
+          background: `linear-gradient(to top, rgba(6,11,20,0.65) 0%, transparent 46%)`,
         }} />
+
+        {/* viewfinder corners — static SVG, sits on the photo, zero animation cost */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <g stroke="rgba(255,255,255,0.6)" strokeWidth="0.6" fill="none">
+            <path d="M6 18 V8 H16" />
+            <path d="M84 8 H94 V18" />
+            <path d="M94 82 V92 H84" />
+            <path d="M16 92 H6 V82" />
+          </g>
+        </svg>
+
+        {/* award chip — white / brand-blue / ink, static */}
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-white shadow-sm">
+          <Award className="h-3 w-3" style={{ color: item.aura }} />
+          <span className={`${mono.className} text-[9px] tracking-[0.1em] uppercase font-medium`} style={{ color: INK }}>
+            #1 in Africa
+          </span>
+        </div>
+
+        {/* kicker + live status dot */}
+        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+          <span className={`${mono.className} text-[10px] tracking-[0.12em] uppercase text-white/80`}>
+            {item.kicker}
+          </span>
+          <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
+            <span
+              className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-70"
+              style={{ background: item.aura }}
+            />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: item.aura }} />
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -528,19 +574,58 @@ const Hero = () => {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Background - simplified on mobile */}
+      {/* base wash */}
       <div className="absolute inset-0 bg-gradient-to-br from-white via-[#F0F9FE] to-[#E6F8FD]" />
+
+      {/* animated ambient light — brand blue family only */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={reduceMotion ? {} : { x: [0, 60, -30, 0], y: [0, -50, 30, 0] }}
+          transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[6%] right-[4%] w-[420px] h-[420px] rounded-full blur-3xl"
+          style={{ background: `${current.aura}14` }}
+        />
+        <motion.div
+          animate={reduceMotion ? {} : { x: [0, -50, 30, 0], y: [0, 40, -40, 0] }}
+          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="hidden sm:block absolute bottom-[4%] left-[2%] w-[340px] h-[340px] rounded-full blur-3xl"
+          style={{ background: `${YPA_BLUE_LIGHT}10` }}
+        />
+      </div>
+
+      {/* faint brand-blue dot texture, masked to a soft vignette */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(${YPA_BLUE} 1px, transparent 1px)`,
+          backgroundSize: "32px 32px",
+          opacity: 0.05,
+          WebkitMaskImage: "radial-gradient(ellipse 65% 60% at 50% 40%, #000 0%, transparent 78%)",
+          maskImage: "radial-gradient(ellipse 65% 60% at 50% 40%, #000 0%, transparent 78%)",
+        }}
+      />
 
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 md:px-14 py-8">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-4 lg:gap-16 items-center">
           <div className="order-2 lg:order-1">
-            {/* Badge - visible on all devices */}
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-4 bg-[#00AEEF] text-white shadow-lg">
-              <Award className="h-4 w-4" />
+            {/* Badge — permanent, doesn't rotate with the slides */}
+            <motion.div
+              initial={reduceMotion ? {} : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-4 bg-[#00AEEF] text-white shadow-lg"
+            >
+              <motion.span
+                animate={reduceMotion ? {} : { scale: [1, 1.15, 1] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                className="flex"
+              >
+                <Award className="h-4 w-4" />
+              </motion.span>
               <span className={`${inter.className} text-[10px] sm:text-[12px] tracking-[0.1em] uppercase font-bold`}>
                 Ranked #1 Goat Farming Programme
               </span>
-            </div>
+            </motion.div>
 
             <AnimatePresence mode="wait">
               <motion.div
@@ -550,24 +635,35 @@ const Hero = () => {
                 exit={reduceMotion ? {} : { opacity: 0, y: -20 }}
                 transition={{ duration: reduceMotion ? 0 : 0.5, ease: EASE }}
               >
-                {/* Kicker */}
-                <div className="flex items-center gap-3 mb-3">
-                  <span className={`${inter.className} text-[10px] tracking-[0.25em] uppercase font-medium text-[#00AEEF]`}>
+                {/* Kicker with live status dot */}
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span
+                      className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+                      style={{ background: current.aura }}
+                    />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: current.aura }} />
+                  </span>
+                  <span className={`${inter.className} text-[10px] tracking-[0.25em] uppercase font-medium`} style={{ color: current.aura }}>
                     {current.kicker}
                   </span>
                 </div>
 
-                {/* Title - responsive font sizes */}
+                {/* Title — an Alegreya-serif accent word against the Inter sans headline */}
                 <h1
                   className={`${inter.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.1] tracking-tight max-w-xl`}
                   style={{ color: INK_ON_LIGHT }}
                 >
                   {beforeHighlight}
-                  <span className="relative inline-block text-[#00AEEF]">
+                  <span className={`${serif.className} relative inline-block italic`} style={{ color: current.aura }}>
                     {current.titleHighlight}
-                    <span
-                      className="absolute bottom-0 left-0 h-[3px] w-full rounded-full"
-                      style={{ background: `linear-gradient(90deg, #00AEEF, #00AEEF80)` }}
+                    <motion.span
+                      key={`underline-${i}`}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
+                      className="absolute bottom-0 left-0 h-[3px] w-full rounded-full origin-left"
+                      style={{ background: `linear-gradient(90deg, ${current.aura}, ${current.aura}80)` }}
                     />
                   </span>
                   {afterHighlight}
@@ -595,14 +691,14 @@ const Hero = () => {
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href={current.href}
-                    className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 active:scale-[0.98] bg-[#00AEEF] shadow-lg"
+                    className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] bg-[#00AEEF] shadow-lg"
                   >
                     Configure this programme
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/about"
-                    className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all hover:-translate-y-0.5 active:scale-[0.98] border-2 border-[#00AEEF]/30 text-[#111111] bg-white/50 backdrop-blur-sm"
+                    className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] border-2 border-[#00AEEF]/30 text-[#111111] bg-white/50 backdrop-blur-sm"
                   >
                     <Play className="h-4 w-4" />
                     See how YPA works
@@ -635,13 +731,18 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Scroll indicator - hidden on mobile */}
+      {/* Scroll indicator - hidden on mobile, now with a gentle bounce */}
       <div className="hidden md:block absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
         <a href="#index" className="flex flex-col items-center gap-1 group">
           <span className={`${inter.className} text-[9px] tracking-[0.3em] uppercase font-medium text-[#5B6B7A]`}>
             Explore
           </span>
-          <ChevronDown className="h-4 w-4 text-[#5B6B7A]" />
+          <motion.div
+            animate={reduceMotion ? {} : { y: [0, 6, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ChevronDown className="h-4 w-4 text-[#5B6B7A]" />
+          </motion.div>
         </a>
       </div>
     </section>
