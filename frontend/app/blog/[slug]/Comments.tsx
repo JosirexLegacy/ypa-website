@@ -20,7 +20,7 @@ const MIST = "#F6F8FA";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 interface Comment {
-  id: string;
+  id: number; // Changed from string to number since your IDs are integers
   name: string;
   email?: string;
   content: string;
@@ -29,6 +29,7 @@ interface Comment {
 }
 
 function formatDate(dateString: string) {
+  if (!dateString) return 'Just now';
   return new Date(dateString).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -36,7 +37,7 @@ function formatDate(dateString: string) {
   });
 }
 
-export function Comments({ postId, postSlug }: { postId: string; postSlug: string }) {
+export function Comments({ postId, postSlug }: { postId: string | number; postSlug: string }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -57,11 +58,16 @@ export function Comments({ postId, postSlug }: { postId: string; postSlug: strin
 
   const fetchComments = async () => {
     try {
+      // ✅ Use the correct filter format for integer IDs
       const res = await fetch(
         `${API_URL}/items/comments?filter[post_id][_eq]=${postId}&filter[status][_eq]=approved&sort[]=created_at`,
         { cache: 'no-store' }
       );
-      if (!res.ok) throw new Error('Failed to fetch comments');
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('❌ Directus error (GET):', errorData);
+        throw new Error('Failed to fetch comments');
+      }
       const data = await res.json();
       setComments(data.data || []);
     } catch (error) {
@@ -91,12 +97,12 @@ export function Comments({ postId, postSlug }: { postId: string; postSlug: strin
     setErrorMessage('');
 
     try {
-      // ✅ Ensure post_id is sent as a string (UUID)
+      // ✅ Ensure post_id is sent as a number (integer)
       const payload = {
         name: formData.name.trim(),
         email: formData.email.trim() || null,
         content: formData.content.trim(),
-        post_id: String(postId), // ✅ Ensure it's a string
+        post_id: Number(postId), // ✅ Convert to number
         post_slug: postSlug,
         status: 'pending',
       };
