@@ -451,11 +451,6 @@ const LINEUP = [
 ];
 
 // ============================================================
-// HERO VISUAL — restored motion and framing, still just two
-// cheap transforms plus a couple of static/CSS-only touches.
-// Uses next/image (already imported) and existing brand tokens.
-// ============================================================
-// ============================================================
 // HERO VISUAL — now genuinely interactive: the frame tilts toward
 // the cursor (a real 3D transform, spring-eased), the photo gets a
 // brand-blue duotone grade so every stock photo reads as "ours,"
@@ -907,7 +902,7 @@ const EXPLORE = [
     label: "Maize & Contract Farming",
     href: "/projects/maize",
     tall: false,
-    image: "https://tse2.mm.bing.net/th/id/OIP.WJJALakxa5_OhQvljSbsKwHaE8?r=0&w=600&h=400&rs=1&pid=ImgDetMain&o=7&rm=3",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
   },
   {
     q: "What if your savings account understood harvest season?",
@@ -1020,7 +1015,7 @@ const CONFIG_CARDS = [
     statLabel: "under care",
     specs: ["Mubende × Boer × Kalahari", "95% member success rate", "Guaranteed market access"],
     href: "/projects/goats",
-    image: `${API_URL}/assets/3012af2e-1cc2-404b-9e46-956c56cc1912`,
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
   },
   {
     icon: Leaf,
@@ -1030,7 +1025,7 @@ const CONFIG_CARDS = [
     statLabel: "acres cultivated",
     specs: ["Contracted off-take", "Average 3.0× return", "Modern input support"],
     href: "/projects/maize",
-    image: "https://tse2.mm.bing.net/th/id/OIP.WJJALakxa5_OhQvljSbsKwHaE8?r=0&w=600&h=400&rs=1&pid=ImgDetMain&o=7&rm=3",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
   },
   {
     icon: Users,
@@ -1040,7 +1035,7 @@ const CONFIG_CARDS = [
     statLabel: "members",
     specs: ["12 branches nationwide", "Loans built for farmers", "Member-owned since 2014"],
     href: "/sacco",
-    image: "https://farm6.staticflickr.com/5603/15475865161_634b055363.jpg",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717198/508159ef-6c90-4578-b1fb-dff1534873f4.jpg",
   },
 ];
 
