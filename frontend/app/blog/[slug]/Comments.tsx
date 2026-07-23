@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, 
@@ -8,19 +8,38 @@ import {
   X,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  User,
+  Calendar,
+  ThumbsUp,
+  Reply,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
+// ============================================================
+// YPA BRAND COLORS - Premium Dark Theme
+// ============================================================
 const YPA_BLUE = "#00AEEF";
 const YPA_BLUE_LIGHT = "#33C1F5";
+const YPA_BLUE_SOFT = "#E6F8FD";
+const YPA_GOLD = "#F0B429";
+const NAVY = "#0E2540";
+const NAVY_SOFT = "#153455";
+const LINE = "#1F3B57";
+const MIST = "#F6F8FA";
 const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
-const MIST = "#F6F8FA";
+const POSITIVE = "#34D399";
+const TEXT_PRIMARY = "#0A1628";
+const TEXT_SECONDARY = "#2D3748";
+const CARD_BG = "#FFFFFF";
+const BORDER_LIGHT = "#E8ECF0";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 interface Comment {
-  id: number; // Changed from string to number since your IDs are integers
+  id: number;
   name: string;
   email?: string;
   content: string;
@@ -28,9 +47,21 @@ interface Comment {
   status: 'pending' | 'approved' | 'rejected';
 }
 
+// ============================================================
+// SCALABLE PAGINATION CONSTANTS
+// ============================================================
+const COMMENTS_PER_PAGE = 20; // Load more at a time
+
 function formatDate(dateString: string) {
   if (!dateString) return 'Just now';
-  return new Date(dateString).toLocaleDateString('en-US', {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
+  
+  if (diff < 1) return 'Today';
+  if (diff < 2) return 'Yesterday';
+  if (diff < 7) return `${Math.floor(diff)} days ago`;
+  return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -40,6 +71,7 @@ function formatDate(dateString: string) {
 export function Comments({ postId, postSlug }: { postId: string | number; postSlug: string }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -49,18 +81,23 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
   });
   const [formStatus, setFormStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalComments, setTotalComments] = useState(0);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [allCommentsLoaded, setAllCommentsLoaded] = useState(false);
+  
+  const commentsEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (postId) {
-      fetchComments();
-    }
-  }, [postId]);
-
-  const fetchComments = async () => {
+  // ✅ Fetch comments with pagination
+  const fetchComments = useCallback(async (resetPage: boolean = true) => {
     try {
-      // ✅ Use the correct filter format for integer IDs
+      const currentPage = resetPage ? 1 : page;
+      const sort = sortOrder === 'newest' ? '-created_at' : 'created_at';
+      const offset = (currentPage - 1) * COMMENTS_PER_PAGE;
+      
       const res = await fetch(
-        `${API_URL}/items/comments?filter[post_id][_eq]=${postId}&filter[status][_eq]=approved&sort[]=created_at`,
+        `${API_URL}/items/comments?filter[post_id][_eq]=${postId}&filter[status][_eq]=approved&sort[]=${sort}&limit=${COMMENTS_PER_PAGE}&offset=${offset}`,
         { cache: 'no-store' }
       );
       if (!res.ok) {
@@ -69,14 +106,57 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
         throw new Error('Failed to fetch comments');
       }
       const data = await res.json();
-      setComments(data.data || []);
+      
+      // Get total count
+      const totalRes = await fetch(
+        `${API_URL}/items/comments?filter[post_id][_eq]=${postId}&filter[status][_eq]=approved&aggregate[count]=*`,
+        { cache: 'no-store' }
+      );
+      const totalData = await totalRes.json();
+      const total = totalData.data?.[0]?.count || 0;
+      setTotalComments(total);
+      
+      const newComments = data.data || [];
+      
+      if (resetPage) {
+        setComments(newComments);
+        setPage(1);
+        setHasMore(newComments.length < total);
+        setAllCommentsLoaded(newComments.length >= total);
+      } else {
+        // Append new comments
+        setComments(prev => [...prev, ...newComments]);
+        setHasMore(comments.length + newComments.length < total);
+        setAllCommentsLoaded(comments.length + newComments.length >= total);
+      }
     } catch (error) {
       console.error('Error fetching comments:', error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  }, [postId, sortOrder, page]);
+
+  // ✅ Load more comments
+  const loadMoreComments = async () => {
+    if (loadingMore || allCommentsLoaded) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    await fetchComments(false);
   };
 
+  // ✅ Initial load and sort changes
+  useEffect(() => {
+    if (postId) {
+      setLoading(true);
+      setPage(1);
+      setComments([]);
+      fetchComments(true);
+    }
+  }, [postId, sortOrder]);
+
+  // ✅ Handle new comment submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -97,17 +177,14 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
     setErrorMessage('');
 
     try {
-      // ✅ Ensure post_id is sent as a number (integer)
       const payload = {
         name: formData.name.trim(),
         email: formData.email.trim() || null,
         content: formData.content.trim(),
-        post_id: Number(postId), // ✅ Convert to number
+        post_id: Number(postId),
         post_slug: postSlug,
         status: 'pending',
       };
-
-      console.log('📤 Submitting comment:', payload);
 
       const res = await fetch(`${API_URL}/items/comments`, {
         method: 'POST',
@@ -130,13 +207,15 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
         return;
       }
 
-      console.log('✅ Comment submitted successfully:', responseData);
       setFormStatus('success');
       setFormData({ name: '', email: '', content: '' });
       setShowForm(false);
       
       // Refresh comments after 2 seconds
-      setTimeout(fetchComments, 2000);
+      setTimeout(() => {
+        setPage(1);
+        fetchComments(true);
+      }, 2000);
     } catch (error) {
       console.error('❌ Network error submitting comment:', error);
       setErrorMessage('Network error. Please check your connection and try again.');
@@ -148,38 +227,60 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
+      <div className="flex items-center justify-center py-12">
         <div className="w-8 h-8 border-3 border-[#00AEEF]/30 border-t-[#00AEEF] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5" style={{ color: YPA_BLUE }} />
-          <h3 className="text-xl md:text-2xl font-medium" style={{ color: INK_ON_LIGHT }}>
-            Comments
-          </h3>
-          <span className="text-sm" style={{ color: MUTE_ON_LIGHT }}>
-            ({comments.length})
-          </span>
+    <div className="space-y-8">
+      {/* ===== HEADER ===== */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: YPA_BLUE_SOFT }}>
+            <MessageCircle className="w-5 h-5" style={{ color: YPA_BLUE }} />
+          </div>
+          <div>
+            <h3 className="text-xl md:text-2xl font-medium" style={{ color: TEXT_PRIMARY }}>
+              Comments
+            </h3>
+            <p className="text-sm" style={{ color: MUTE_ON_LIGHT }}>
+              {totalComments} {totalComments === 1 ? 'comment' : 'comments'}
+            </p>
+          </div>
         </div>
-        <button
-          onClick={() => {
-            setShowForm(!showForm);
-            setFormStatus('idle');
-            setErrorMessage('');
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white transition-all hover:-translate-y-0.5"
-          style={{ background: YPA_BLUE, boxShadow: `0 20px 40px -12px ${YPA_BLUE}66` }}
-        >
-          {showForm ? 'Cancel' : 'Add Comment'}
-          {showForm ? <X className="w-4 h-4" /> : <Send className="w-4 h-4" />}
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Sort toggle */}
+          <button
+            onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105"
+            style={{ 
+              background: MIST,
+              color: MUTE_ON_LIGHT,
+              border: `1px solid ${BORDER_LIGHT}`
+            }}
+          >
+            {sortOrder === 'newest' ? 'Newest first' : 'Oldest first'}
+            {sortOrder === 'newest' ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
+          </button>
+          
+          <button
+            onClick={() => {
+              setShowForm(!showForm);
+              setFormStatus('idle');
+              setErrorMessage('');
+            }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-white transition-all hover:-translate-y-0.5 shadow-lg"
+            style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})`, boxShadow: `0 20px 40px -12px ${YPA_BLUE}66` }}
+          >
+            {showForm ? 'Cancel' : 'Add Comment'}
+            {showForm ? <X className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
+      {/* ===== COMMENT FORM ===== */}
       <AnimatePresence>
         {showForm && (
           <motion.div
@@ -189,10 +290,10 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
             className="overflow-hidden"
           >
             <div
-              className="p-4 md:p-6 rounded-2xl border"
-              style={{ borderColor: "#E8ECF0", background: MIST }}
+              className="p-6 md:p-8 rounded-2xl border shadow-sm"
+              style={{ borderColor: BORDER_LIGHT, background: MIST }}
             >
-              <h4 className="text-base font-medium mb-4" style={{ color: INK_ON_LIGHT }}>
+              <h4 className="text-base font-medium mb-4" style={{ color: TEXT_PRIMARY }}>
                 Join the Conversation
               </h4>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -207,7 +308,7 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-[#00AEEF]/20 focus:border-[#00AEEF] outline-none transition-all"
-                      style={{ borderColor: "#E8ECF0", background: "white" }}
+                      style={{ borderColor: BORDER_LIGHT, background: CARD_BG }}
                       placeholder="Your name"
                       required
                     />
@@ -222,7 +323,7 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-[#00AEEF]/20 focus:border-[#00AEEF] outline-none transition-all"
-                      style={{ borderColor: "#E8ECF0", background: "white" }}
+                      style={{ borderColor: BORDER_LIGHT, background: CARD_BG }}
                       placeholder="your@email.com"
                     />
                   </div>
@@ -236,7 +337,7 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
                     value={formData.content}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-[#00AEEF]/20 focus:border-[#00AEEF] outline-none transition-all resize-y min-h-[120px]"
-                    style={{ borderColor: "#E8ECF0", background: "white" }}
+                    style={{ borderColor: BORDER_LIGHT, background: CARD_BG }}
                     placeholder="Share your thoughts..."
                     required
                   />
@@ -280,39 +381,115 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
         )}
       </AnimatePresence>
 
+      {/* ===== COMMENTS LIST ===== */}
       {comments.length === 0 ? (
-        <div className="text-center py-8" style={{ color: MUTE_ON_LIGHT }}>
+        <div className="text-center py-12" style={{ color: MUTE_ON_LIGHT }}>
+          <div className="text-4xl mb-3 opacity-30">💬</div>
           <p className="text-sm">No comments yet. Be the first to share your thoughts!</p>
         </div>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => (
-            <div key={comment.id} className="p-4 rounded-2xl border" style={{ borderColor: "#E8ECF0", background: "white" }}>
-              <div className="flex items-start gap-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
-                >
-                  {comment.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium text-sm" style={{ color: INK_ON_LIGHT }}>
-                      {comment.name}
-                    </span>
-                    <span className="text-[10px]" style={{ color: MUTE_ON_LIGHT }}>
-                      {formatDate(comment.created_at)}
-                    </span>
-                  </div>
-                  <p className="text-sm leading-relaxed mt-1" style={{ color: "#1E2A3A" }}>
-                    {comment.content}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <CommentItem key={comment.id} comment={comment} />
           ))}
+          
+          {/* ===== LOAD MORE ===== */}
+          {hasMore && !allCommentsLoaded && (
+            <div className="flex justify-center pt-4">
+              <button
+                onClick={loadMoreComments}
+                disabled={loadingMore}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all hover:-translate-y-0.5"
+                style={{ 
+                  background: MIST,
+                  color: TEXT_PRIMARY,
+                  border: `1px solid ${BORDER_LIGHT}`
+                }}
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    Load more comments
+                    <ChevronDown className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+          
+          {/* ===== END OF COMMENTS ===== */}
+          {allCommentsLoaded && comments.length > 0 && (
+            <div className="text-center pt-4">
+              <p className="text-xs" style={{ color: MUTE_ON_LIGHT }}>
+                🎉 You've seen all {totalComments} comments
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
+  );
+}
+
+// ============================================================
+// COMMENT ITEM COMPONENT
+// ============================================================
+function CommentItem({ comment }: { comment: Comment }) {
+  const [liked, setLiked] = useState(false);
+  const [showReply, setShowReply] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-5 rounded-2xl border transition-all hover:shadow-sm"
+      style={{ borderColor: BORDER_LIGHT, background: CARD_BG }}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm shrink-0"
+          style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
+        >
+          {comment.name.charAt(0).toUpperCase()}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-medium text-sm" style={{ color: TEXT_PRIMARY }}>
+              {comment.name}
+            </span>
+            <span className="text-[10px]" style={{ color: MUTE_ON_LIGHT }}>
+              {formatDate(comment.created_at)}
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed mt-1" style={{ color: TEXT_SECONDARY }}>
+            {comment.content}
+          </p>
+          
+          {/* ===== COMMENT ACTIONS ===== */}
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t" style={{ borderColor: BORDER_LIGHT }}>
+            <button
+              onClick={() => setLiked(!liked)}
+              className="inline-flex items-center gap-1 text-xs transition-all hover:scale-105"
+              style={{ color: liked ? YPA_BLUE : MUTE_ON_LIGHT }}
+            >
+              <ThumbsUp className="w-3.5 h-3.5" fill={liked ? YPA_BLUE : 'none'} />
+              {liked ? 'Liked' : 'Like'}
+            </button>
+            <button
+              onClick={() => setShowReply(!showReply)}
+              className="inline-flex items-center gap-1 text-xs transition-all hover:scale-105"
+              style={{ color: MUTE_ON_LIGHT }}
+            >
+              <Reply className="w-3.5 h-3.5" />
+              Reply
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
