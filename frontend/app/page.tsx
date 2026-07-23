@@ -948,7 +948,6 @@ const ExploreRail = () => {
         </div>
       </ScrollReveal>
 
-      {/* Symmetrical grid with fixed heights */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
         {EXPLORE.map((item, i) => (
           <ScrollReveal key={i} delay={i * 0.04} className={item.tall ? "sm:row-span-2" : ""}>
@@ -959,7 +958,7 @@ const ExploreRail = () => {
                 }`}
               >
                 <Image
-                  src={getImageUrl(item.image, FALLBACK_IMAGES.default)}
+                  src={item.image} // ✅ Direct Cloudinary URL
                   alt={item.label}
                   width={item.tall ? 800 : 600}
                   height={item.tall ? 600 : 400}
@@ -1002,7 +1001,6 @@ const ExploreRail = () => {
     </section>
   );
 };
-
 // ============================================================
 // THE LINEUP — Mobile Optimized with Symmetrical Heights
 // ============================================================
