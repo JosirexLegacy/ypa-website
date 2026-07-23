@@ -18,19 +18,15 @@ import {
 } from 'lucide-react';
 
 // ============================================================
-// YPA BRAND COLORS - Premium Dark Theme
+// YPA BRAND COLORS
 // ============================================================
 const YPA_BLUE = "#00AEEF";
 const YPA_BLUE_LIGHT = "#33C1F5";
 const YPA_BLUE_SOFT = "#E6F8FD";
 const YPA_GOLD = "#F0B429";
-const NAVY = "#0E2540";
-const NAVY_SOFT = "#153455";
-const LINE = "#1F3B57";
 const MIST = "#F6F8FA";
 const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
-const POSITIVE = "#34D399";
 const TEXT_PRIMARY = "#0A1628";
 const TEXT_SECONDARY = "#2D3748";
 const CARD_BG = "#FFFFFF";
@@ -45,12 +41,10 @@ interface Comment {
   content: string;
   created_at: string;
   status: 'pending' | 'approved' | 'rejected';
+  post_id: number;
 }
 
-// ============================================================
-// SCALABLE PAGINATION CONSTANTS
-// ============================================================
-const COMMENTS_PER_PAGE = 20; // Load more at a time
+const COMMENTS_PER_PAGE = 20;
 
 function formatDate(dateString: string) {
   if (!dateString) return 'Just now';
@@ -86,20 +80,37 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
   const [totalComments, setTotalComments] = useState(0);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [allCommentsLoaded, setAllCommentsLoaded] = useState(false);
-  
-  const commentsEndRef = useRef<HTMLDivElement>(null);
+  const [debugInfo, setDebugInfo] = useState('');
 
-  // ✅ Fetch comments with pagination
+  // ✅ Debug: Log what postId is being used
+  useEffect(() => {
+    console.log('🔍 Comments component mounted with:', { postId, postSlug, type: typeof postId });
+  }, [postId, postSlug]);
+
+  // ✅ Fetch comments with proper filtering
   const fetchComments = useCallback(async (resetPage: boolean = true) => {
+    if (!postId) {
+      console.error('❌ No postId provided to Comments component');
+      setLoading(false);
+      return;
+    }
+
     try {
       const currentPage = resetPage ? 1 : page;
       const sort = sortOrder === 'newest' ? '-created_at' : 'created_at';
       const offset = (currentPage - 1) * COMMENTS_PER_PAGE;
       
-      const res = await fetch(
-        `${API_URL}/items/comments?filter[post_id][_eq]=${postId}&filter[status][_eq]=approved&sort[]=${sort}&limit=${COMMENTS_PER_PAGE}&offset=${offset}`,
-        { cache: 'no-store' }
-      );
+      // ✅ Convert postId to number for filtering
+      const numericPostId = Number(postId);
+      
+      // ✅ Use the correct filter format for integer post_id
+      const filterQuery = `filter[post_id][_eq]=${numericPostId}&filter[status][_eq]=approved`;
+      const url = `${API_URL}/items/comments?${filterQuery}&sort[]=${sort}&limit=${COMMENTS_PER_PAGE}&offset=${offset}`;
+      
+      console.log('📡 Fetching comments for post_id:', numericPostId);
+      console.log('📡 URL:', url);
+      
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) {
         const errorData = await res.json();
         console.error('❌ Directus error (GET):', errorData);
@@ -107,9 +118,12 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
       }
       const data = await res.json();
       
+      console.log('📥 Comments fetched:', data.data?.length || 0, 'comments');
+      console.log('📥 Raw data:', data);
+      
       // Get total count
       const totalRes = await fetch(
-        `${API_URL}/items/comments?filter[post_id][_eq]=${postId}&filter[status][_eq]=approved&aggregate[count]=*`,
+        `${API_URL}/items/comments?${filterQuery}&aggregate[count]=*`,
         { cache: 'no-store' }
       );
       const totalData = await totalRes.json();
@@ -123,19 +137,22 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
         setPage(1);
         setHasMore(newComments.length < total);
         setAllCommentsLoaded(newComments.length >= total);
+        setDebugInfo(`Showing ${newComments.length} of ${total} comments for post ${numericPostId}`);
       } else {
-        // Append new comments
         setComments(prev => [...prev, ...newComments]);
-        setHasMore(comments.length + newComments.length < total);
-        setAllCommentsLoaded(comments.length + newComments.length >= total);
+        const newTotal = comments.length + newComments.length;
+        setHasMore(newTotal < total);
+        setAllCommentsLoaded(newTotal >= total);
+        setDebugInfo(`Showing ${newTotal} of ${total} comments`);
       }
     } catch (error) {
       console.error('Error fetching comments:', error);
+      setDebugInfo(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [postId, sortOrder, page]);
+  }, [postId, sortOrder, page, comments.length]);
 
   // ✅ Load more comments
   const loadMoreComments = async () => {
@@ -149,6 +166,7 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
   // ✅ Initial load and sort changes
   useEffect(() => {
     if (postId) {
+      console.log('🔄 Refreshing comments for post:', postId);
       setLoading(true);
       setPage(1);
       setComments([]);
@@ -177,14 +195,18 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
     setErrorMessage('');
 
     try {
+      const numericPostId = Number(postId);
       const payload = {
         name: formData.name.trim(),
         email: formData.email.trim() || null,
         content: formData.content.trim(),
-        post_id: Number(postId),
+        post_id: numericPostId,
         post_slug: postSlug,
         status: 'pending',
       };
+
+      console.log('📤 Submitting comment with post_id:', numericPostId);
+      console.log('📤 Payload:', payload);
 
       const res = await fetch(`${API_URL}/items/comments`, {
         method: 'POST',
@@ -207,6 +229,7 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
         return;
       }
 
+      console.log('✅ Comment submitted successfully:', responseData);
       setFormStatus('success');
       setFormData({ name: '', email: '', content: '' });
       setShowForm(false);
@@ -235,6 +258,11 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
 
   return (
     <div className="space-y-8">
+      {/* ===== DEBUG INFO (Remove after testing) ===== */}
+      <div className="text-xs text-gray-400 bg-gray-50 p-2 rounded">
+        Debug: {debugInfo} | Post ID: {postId} | Total: {totalComments}
+      </div>
+
       {/* ===== HEADER ===== */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -251,7 +279,6 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          {/* Sort toggle */}
           <button
             onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105"
@@ -385,12 +412,35 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
       {comments.length === 0 ? (
         <div className="text-center py-12" style={{ color: MUTE_ON_LIGHT }}>
           <div className="text-4xl mb-3 opacity-30">💬</div>
-          <p className="text-sm">No comments yet. Be the first to share your thoughts!</p>
+          <p className="text-sm">No approved comments yet for this post.</p>
+          <p className="text-xs mt-2 opacity-50">Debug: {debugInfo}</p>
         </div>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => (
-            <CommentItem key={comment.id} comment={comment} />
+            <div key={comment.id} className="p-5 rounded-2xl border transition-all hover:shadow-sm" style={{ borderColor: BORDER_LIGHT, background: CARD_BG }}>
+              <div className="flex items-start gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm shrink-0"
+                  style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
+                >
+                  {comment.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium text-sm" style={{ color: TEXT_PRIMARY }}>
+                      {comment.name}
+                    </span>
+                    <span className="text-[10px]" style={{ color: MUTE_ON_LIGHT }}>
+                      {formatDate(comment.created_at)}
+                    </span>
+                  </div>
+                  <p className="text-sm leading-relaxed mt-1" style={{ color: TEXT_SECONDARY }}>
+                    {comment.content}
+                  </p>
+                </div>
+              </div>
+            </div>
           ))}
           
           {/* ===== LOAD MORE ===== */}
@@ -432,64 +482,5 @@ export function Comments({ postId, postSlug }: { postId: string | number; postSl
         </div>
       )}
     </div>
-  );
-}
-
-// ============================================================
-// COMMENT ITEM COMPONENT
-// ============================================================
-function CommentItem({ comment }: { comment: Comment }) {
-  const [liked, setLiked] = useState(false);
-  const [showReply, setShowReply] = useState(false);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="p-5 rounded-2xl border transition-all hover:shadow-sm"
-      style={{ borderColor: BORDER_LIGHT, background: CARD_BG }}
-    >
-      <div className="flex items-start gap-3">
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm shrink-0"
-          style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
-        >
-          {comment.name.charAt(0).toUpperCase()}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-medium text-sm" style={{ color: TEXT_PRIMARY }}>
-              {comment.name}
-            </span>
-            <span className="text-[10px]" style={{ color: MUTE_ON_LIGHT }}>
-              {formatDate(comment.created_at)}
-            </span>
-          </div>
-          <p className="text-sm leading-relaxed mt-1" style={{ color: TEXT_SECONDARY }}>
-            {comment.content}
-          </p>
-          
-          {/* ===== COMMENT ACTIONS ===== */}
-          <div className="flex items-center gap-4 mt-3 pt-3 border-t" style={{ borderColor: BORDER_LIGHT }}>
-            <button
-              onClick={() => setLiked(!liked)}
-              className="inline-flex items-center gap-1 text-xs transition-all hover:scale-105"
-              style={{ color: liked ? YPA_BLUE : MUTE_ON_LIGHT }}
-            >
-              <ThumbsUp className="w-3.5 h-3.5" fill={liked ? YPA_BLUE : 'none'} />
-              {liked ? 'Liked' : 'Like'}
-            </button>
-            <button
-              onClick={() => setShowReply(!showReply)}
-              className="inline-flex items-center gap-1 text-xs transition-all hover:scale-105"
-              style={{ color: MUTE_ON_LIGHT }}
-            >
-              <Reply className="w-3.5 h-3.5" />
-              Reply
-            </button>
-          </div>
-        </div>
-      </div>
-    </motion.div>
   );
 }
