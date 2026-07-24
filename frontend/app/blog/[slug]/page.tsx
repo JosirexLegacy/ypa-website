@@ -391,6 +391,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               } as React.CSSProperties
             }
           >
+            {/* ✅ This renders the HTML content with proper formatting */}
             <div
               className="[&_blockquote]:bg-[#E6F8FD] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
               dangerouslySetInnerHTML={{ __html: post.content }}
