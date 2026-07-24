@@ -51,7 +51,7 @@ interface Post {
 }
 
 // ============================================================
-// FONTS - Added Poppins
+// FONTS
 // ============================================================
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -327,10 +327,10 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* ===== CATEGORY FILTER - HORIZONTAL SCROLL ON MOBILE ===== */}
+      {/* ===== CATEGORY FILTER - CENTERED & SYMMETRICAL ===== */}
       <div className="sticky top-20 z-30 flex justify-center px-3 md:px-4 -mt-4">
         <div
-          className="flex items-center gap-2 px-3 md:px-4 py-2 rounded-2xl md:rounded-full transition-all duration-300 w-full max-w-full overflow-hidden"
+          className="inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-2xl md:rounded-full transition-all duration-300 max-w-full"
           style={{
             background: "rgba(255,255,255,0.85)",
             backdropFilter: "blur(20px) saturate(1.3)",
@@ -343,13 +343,8 @@ export default function BlogPage() {
             Filter:
           </span>
           
-          {/* ✅ HORIZONTAL SCROLL ON MOBILE */}
-          <div className="flex items-center gap-1 md:gap-1.5 overflow-x-auto scrollbar-hide pb-1 pt-1 px-0.5 -mr-1 pr-1 w-full" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <style jsx>{`
-              .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
+          {/* ✅ CENTERED & SYMMETRICAL - Same on mobile & desktop */}
+          <div className="flex items-center justify-center gap-1 md:gap-1.5 flex-wrap">
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
               const isActive = searchParams.category === cat.value;
@@ -357,7 +352,7 @@ export default function BlogPage() {
                 <button
                   key={cat.value}
                   onClick={() => updateParams(cat.value, 1)}
-                  className={`px-2.5 md:px-3.5 py-1 rounded-full text-[9px] md:text-xs font-medium transition-all duration-200 flex items-center gap-1 md:gap-1.5 whitespace-nowrap flex-shrink-0 ${
+                  className={`px-2.5 md:px-3.5 py-1 rounded-full text-[9px] md:text-xs font-medium transition-all duration-200 flex items-center gap-1 md:gap-1.5 whitespace-nowrap ${
                     isActive
                       ? "bg-[#2196F3] text-white shadow-md shadow-[#2196F3]/25"
                       : "hover:bg-[#F5F9FF] border border-transparent hover:border-[#E8ECF0]"

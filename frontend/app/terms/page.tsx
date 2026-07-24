@@ -84,13 +84,13 @@ const TermsSection = ({
   delay?: number; 
 }) => (
   <ScrollReveal delay={delay}>
-    <div className="bg-white/80 backdrop-blur-sm rounded-3xl border p-8 md:p-10 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ borderColor: "#E8ECF0", background: "rgba(255,255,255,0.8)" }}>
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl md:rounded-3xl border p-6 md:p-10 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ borderColor: "#E8ECF0", background: "rgba(255,255,255,0.8)" }}>
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: `${BLUE}12` }}>
-          <Icon className="w-5 h-5" style={{ color: BLUE }} />
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: `${BLUE}12` }}>
+          <Icon className="w-4 h-4 md:w-5 md:h-5" style={{ color: BLUE }} />
         </div>
-        <div className="flex-1">
-          <h3 className={`${display.className} text-xl md:text-2xl font-medium mb-3 text-[#0E2540]`}>
+        <div className="flex-1 min-w-0">
+          <h3 className={`${display.className} text-lg md:text-2xl font-medium mb-3 text-[#0E2540]`}>
             {title}
           </h3>
           <div className="text-[#1A2A3A] text-sm md:text-base leading-relaxed space-y-3 [&_p]:text-[#1A2A3A] [&_li]:text-[#1A2A3A] [&_strong]:text-[#0E2540] [&_strong]:font-semibold">
@@ -136,57 +136,57 @@ export default function TermsPage() {
       <Navigation />
 
       {/* ===== HERO ===== */}
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden" style={{ background: INK }}>
+      <section className="relative pt-32 pb-20 px-4 md:px-6 overflow-hidden" style={{ background: INK }}>
         <div className="absolute inset-0 opacity-30 pointer-events-none">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-3xl" style={{ background: BLUE }} />
           <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-3xl" style={{ background: SKY }} />
         </div>
         <div className="relative container mx-auto max-w-4xl text-center z-10">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full mb-6" style={{
+            <div className="inline-flex items-center gap-3 px-4 md:px-5 py-2 md:py-2.5 rounded-full mb-6" style={{
               background: "rgba(255,255,255,0.08)",
               backdropFilter: "blur(16px)",
               border: "1px solid rgba(255,255,255,0.12)",
               boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
             }}>
-              <Scale className="w-4 h-4" style={{ color: SKY }} />
-              <span className={`${mono.className} text-[10px] tracking-[0.15em] uppercase text-white/70`}>
+              <Scale className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: SKY }} />
+              <span className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.15em] uppercase text-white/70`}>
                 Legal Agreement
               </span>
             </div>
-            <h1 className={`${display.className} text-4xl md:text-5xl lg:text-6xl font-medium text-white tracking-tight leading-[1.05]`}>
+            <h1 className={`${display.className} text-3xl md:text-5xl lg:text-6xl font-medium text-white tracking-tight leading-[1.05]`}>
               Terms of Service
             </h1>
-            <p className="text-base md:text-lg max-w-2xl mx-auto mt-4 text-white/50">
+            <p className="text-sm md:text-lg max-w-2xl mx-auto mt-3 md:mt-4 text-white/50 px-2">
               Welcome to Youth Platform Africa. By using our services, you agree to the following terms and conditions.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-sm">
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mt-4 md:mt-6 text-xs md:text-sm">
               <div className="flex items-center gap-2 text-white/40">
-                <Clock className="w-4 h-4" />
-                <span className={`${mono.className} text-[11px] tracking-[0.05em]`}>
+                <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className={`${mono.className} text-[10px] md:text-[11px] tracking-[0.05em]`}>
                   Last Updated: {lastUpdated}
                 </span>
               </div>
-              <span className="w-px h-6 bg-white/10" />
+              <span className="w-px h-5 md:h-6 bg-white/10" />
               <div className="flex items-center gap-2 text-white/40">
-                <Building className="w-4 h-4" />
-                <span className={`${mono.className} text-[11px] tracking-[0.05em]`}>
+                <Building className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className={`${mono.className} text-[10px] md:text-[11px] tracking-[0.05em]`}>
                   Kampala, Uganda
                 </span>
               </div>
             </div>
-            <div className="flex flex-wrap justify-center gap-3 mt-10">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
-                <Check className="w-3.5 h-3.5 text-sky-400" />
-                <span className={`${mono.className} text-[10px] tracking-[0.08em] uppercase text-white/60`}>URSB Registered</span>
+            <div className="flex flex-wrap justify-center gap-2 md:gap-3 mt-6 md:mt-10">
+              <div className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
+                <Check className="w-3 h-3 md:w-3.5 md:h-3.5 text-sky-400" />
+                <span className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.08em] uppercase text-white/60`}>URSB Registered</span>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
-                <Award className="w-3.5 h-3.5 text-amber-400" />
-                <span className={`${mono.className} text-[10px] tracking-[0.08em] uppercase text-white/60`}>Since 2014</span>
+              <div className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
+                <Award className="w-3 h-3 md:w-3.5 md:h-3.5 text-amber-400" />
+                <span className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.08em] uppercase text-white/60`}>Since 2014</span>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
-                <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                <span className={`${mono.className} text-[10px] tracking-[0.08em] uppercase text-white/60`}>Trusted Platform</span>
+              <div className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
+                <Shield className="w-3 h-3 md:w-3.5 md:h-3.5 text-emerald-400" />
+                <span className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.08em] uppercase text-white/60`}>Trusted Platform</span>
               </div>
             </div>
           </motion.div>
@@ -201,15 +201,15 @@ export default function TermsPage() {
       </section>
 
       {/* ===== INTRODUCTION ===== */}
-      <section className="py-16 px-6 border-b" style={{ borderColor: "#E8ECF0", background: MIST }}>
+      <section className="py-12 md:py-16 px-4 md:px-6 border-b" style={{ borderColor: "#E8ECF0", background: MIST }}>
         <div className="container mx-auto max-w-3xl">
           <ScrollReveal>
             <div className="text-center">
-              <p className={`${mono.className} text-[11px] tracking-[0.22em] uppercase mb-3 text-[#5B6B7A]`}>Our Agreement</p>
-              <h2 className={`${display.className} text-2xl md:text-3xl font-medium tracking-tight mb-4 text-[#0E2540]`}>
+              <p className={`${mono.className} text-[10px] md:text-[11px] tracking-[0.22em] uppercase mb-3 text-[#5B6B7A]`}>Our Agreement</p>
+              <h2 className={`${display.className} text-2xl md:text-3xl font-medium tracking-tight mb-3 md:mb-4 text-[#0E2540]`}>
                 Clear, Fair, and Transparent
               </h2>
-              <div className="text-[#1A2A3A] text-sm md:text-base leading-relaxed space-y-4">
+              <div className="text-[#1A2A3A] text-sm md:text-base leading-relaxed space-y-3 md:space-y-4 text-left md:text-center">
                 <p>
                   These Terms of Service govern your use of the Youth Platform Africa (YPA) website, projects, and services. 
                   By accessing or using our platform, you agree to be bound by these terms. If you do not agree, please do not use our services.
@@ -224,36 +224,38 @@ export default function TermsPage() {
         </div>
       </section>
 
-      {/* ===== ULTRA GLASSY FLOATING NAV ===== */}
-      <div className="sticky top-24 z-30 flex justify-center px-4 -mt-6">
+      {/* ===== FLOATING NAV - FIXED MOBILE ===== */}
+      <div className="sticky top-24 z-30 flex justify-center px-3 md:px-4 -mt-6">
         <div
-          className="inline-flex flex-wrap items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 overflow-x-auto"
+          className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-3 rounded-2xl md:rounded-full transition-all duration-300 max-w-full"
           style={{
-            background: "rgba(255,255,255,0.35)",
+            background: "rgba(255,255,255,0.85)",
             backdropFilter: "blur(32px) saturate(1.6)",
             boxShadow: "0 8px 50px rgba(33,150,243,0.15), 0 0 0 1px rgba(255,255,255,0.2) inset",
             border: "1px solid rgba(255,255,255,0.2)",
           }}
         >
-          <span className={`${mono.className} text-[10px] tracking-[0.1em] uppercase text-[#5B6B7A] shrink-0`}>
+          <span className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.1em] uppercase text-[#5B6B7A] shrink-0`}>
             Jump to:
           </span>
-          {sections.map((s) => (
-            <a
-              key={s.id}
-              href={`#${s.id}`}
-              className={`${mono.className} text-[10px] tracking-[0.05em] px-3 py-1 rounded-full transition-all whitespace-nowrap hover:bg-white/30 hover:text-[#2196F3]`}
-              style={{ color: "#5B6B7A" }}
-            >
-              {s.label}
-            </a>
-          ))}
+          <div className="flex flex-wrap items-center justify-center gap-1 md:gap-1.5 max-w-full">
+            {sections.map((s) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.05em] px-2 md:px-3 py-0.5 md:py-1 rounded-full transition-all whitespace-nowrap hover:bg-white/30 hover:text-[#2196F3]`}
+                style={{ color: "#5B6B7A" }}
+              >
+                {s.label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* ===== TERMS SECTIONS ===== */}
-      <section className="py-16 px-6">
-        <div className="container mx-auto max-w-3xl space-y-6">
+      <section className="py-12 md:py-16 px-4 md:px-6">
+        <div className="container mx-auto max-w-3xl space-y-4 md:space-y-6">
           <TermsSection title="Acceptance of Terms" icon={FileText} delay={0}>
             <p>
               By accessing or using the YPA website, mobile applications, or any of our services (collectively, the "Services"), 
@@ -418,24 +420,24 @@ export default function TermsPage() {
             <p>
               If you have any questions, concerns, or requests regarding these Terms of Service, please contact us:
             </p>
-            <div className="mt-4 p-6 rounded-2xl border" style={{ borderColor: "#E8ECF0", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)" }}>
+            <div className="mt-4 p-4 md:p-6 rounded-2xl border" style={{ borderColor: "#E8ECF0", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)" }}>
               <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-[#2196F3]" />
-                  <span className={`${mono.className} text-sm text-[#0E2540]`}>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Mail className="w-4 h-4 text-[#2196F3] shrink-0" />
+                  <span className={`${mono.className} text-sm text-[#0E2540] break-all`}>
                     <a href="mailto:legal@youthplatformafrica.com" className="hover:underline text-[#2196F3]">legal@youthplatformafrica.com</a>
                   </span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-[#2196F3]" />
+                <div className="flex flex-wrap items-center gap-3">
+                  <Phone className="w-4 h-4 text-[#2196F3] shrink-0" />
                   <span className={`${mono.className} text-sm text-[#0E2540]`}>+256 774 313 551</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-[#2196F3]" />
+                <div className="flex flex-wrap items-center gap-3">
+                  <MapPin className="w-4 h-4 text-[#2196F3] shrink-0" />
                   <span className={`${mono.className} text-sm text-[#0E2540]`}>Kampala, Uganda</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Building className="w-4 h-4 text-[#2196F3]" />
+                <div className="flex flex-wrap items-center gap-3">
+                  <Building className="w-4 h-4 text-[#2196F3] shrink-0" />
                   <span className={`${mono.className} text-sm text-[#0E2540]`}>URSB Registration: Since 2014</span>
                 </div>
               </div>
@@ -445,24 +447,24 @@ export default function TermsPage() {
       </section>
 
       {/* ===== TRUST BADGES ===== */}
-      <section className="py-16 px-6 border-t" style={{ borderColor: "#E8ECF0", background: MIST }}>
+      <section className="py-12 md:py-16 px-4 md:px-6 border-t" style={{ borderColor: "#E8ECF0", background: MIST }}>
         <div className="container mx-auto max-w-4xl">
           <ScrollReveal>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center p-6 rounded-2xl bg-white border shadow-sm" style={{ borderColor: "#E8ECF0" }}>
-                <Shield className="w-10 h-10 mx-auto mb-3 text-[#2196F3]" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+              <div className="text-center p-5 md:p-6 rounded-2xl bg-white border shadow-sm" style={{ borderColor: "#E8ECF0" }}>
+                <Shield className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-[#2196F3]" />
                 <h4 className={`${display.className} text-sm font-medium text-[#0E2540]`}>URSB Registered</h4>
-                <p className={`${mono.className} text-[10px] tracking-[0.05em] mt-1 text-[#5B6B7A]`}>Operating since 2014</p>
+                <p className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.05em] mt-1 text-[#5B6B7A]`}>Operating since 2014</p>
               </div>
-              <div className="text-center p-6 rounded-2xl bg-white border shadow-sm" style={{ borderColor: "#E8ECF0" }}>
-                <Gavel className="w-10 h-10 mx-auto mb-3 text-[#2196F3]" />
+              <div className="text-center p-5 md:p-6 rounded-2xl bg-white border shadow-sm" style={{ borderColor: "#E8ECF0" }}>
+                <Gavel className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-[#2196F3]" />
                 <h4 className={`${display.className} text-sm font-medium text-[#0E2540]`}>Legally Compliant</h4>
-                <p className={`${mono.className} text-[10px] tracking-[0.05em] mt-1 text-[#5B6B7A]`}>Ugandan Law &amp; Regulations</p>
+                <p className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.05em] mt-1 text-[#5B6B7A]`}>Ugandan Law & Regulations</p>
               </div>
-              <div className="text-center p-6 rounded-2xl bg-white border shadow-sm" style={{ borderColor: "#E8ECF0" }}>
-                <Heart className="w-10 h-10 mx-auto mb-3 text-[#F0B429]" />
+              <div className="text-center p-5 md:p-6 rounded-2xl bg-white border shadow-sm" style={{ borderColor: "#E8ECF0" }}>
+                <Heart className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-[#F0B429]" />
                 <h4 className={`${display.className} text-sm font-medium text-[#0E2540]`}>Community Trust</h4>
-                <p className={`${mono.className} text-[10px] tracking-[0.05em] mt-1 text-[#5B6B7A]`}>1,000+ Members &amp; Growing</p>
+                <p className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.05em] mt-1 text-[#5B6B7A]`}>1,000+ Members & Growing</p>
               </div>
             </div>
           </ScrollReveal>
@@ -479,11 +481,11 @@ export default function TermsPage() {
         }}
         transition={{ duration: 0.3 }}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-8 right-8 z-50 w-12 h-12 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform duration-300"
+        className="fixed bottom-6 md:bottom-8 right-6 md:right-8 z-50 w-10 h-10 md:w-12 md:h-12 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform duration-300"
         style={{ background: BLUE, boxShadow: `0 8px 30px ${BLUE}66` }}
         aria-label="Back to top"
       >
-        <ChevronDown className="w-5 h-5 rotate-180" />
+        <ChevronDown className="w-4 h-4 md:w-5 md:h-5 rotate-180" />
       </motion.button>
 
       <Footer />
