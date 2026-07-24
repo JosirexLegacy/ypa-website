@@ -19,15 +19,19 @@ const mono = IBM_Plex_Mono({
 });
 
 // ============================================================
-// DESIGN TOKENS
+// DESIGN TOKENS - YPA Brand Colors
 // ============================================================
-const INK = "#060B14";
-const BLUE = "#2196F3";
-const SKY = "#7EC8FF";
+const YPA_BLUE = "#00AEEF";
+const YPA_BLUE_LIGHT = "#33C1F5";
+const YPA_BLUE_SOFT = "#E6F8FD";
+const YPA_GOLD = "#F0B429";
+const NAVY = "#0E2540";
+const NAVY_SOFT = "#153455";
+const INK = "#0A1628";
 const MUTE_ON_LIGHT = "#5B6B7A";
 
 // ============================================================
-// CUSTOM SVG ICONS (no external dependencies)
+// CUSTOM SVG ICONS
 // ============================================================
 const FacebookIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -43,7 +47,7 @@ const TwitterIcon = ({ className = "w-4 h-4" }) => (
 
 const InstagramIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z" />
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z" />
   </svg>
 );
 
@@ -59,7 +63,6 @@ const YouTubeIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-// ===== TIKTOK CUSTOM ICON =====
 const TikTokIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
     <path d="M12.525.02c1.223-.043 2.438.05 3.65.26v3.55c-.59-.086-1.18-.126-1.77-.116-1.16.02-2.31.25-3.39.68v9.44c0 1.44-.78 2.69-1.96 3.38-1.18.69-2.64.77-3.89.22-1.25-.55-2.1-1.75-2.17-3.11-.07-1.36.67-2.65 1.87-3.27 1.2-.62 2.69-.56 3.84.17v-3.83c-1.41-.22-2.85.02-4.12.74-1.27.72-2.24 1.86-2.68 3.21-.44 1.35-.31 2.82.37 4.07.68 1.25 1.85 2.16 3.24 2.54 1.39.38 2.89.25 4.18-.38 1.29-.63 2.22-1.75 2.58-3.08.11-.39.18-.79.21-1.2V0h.01z" />
@@ -75,6 +78,13 @@ const MailIcon = ({ className = "w-4 h-4" }) => (
 const PhoneIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+  </svg>
+);
+
+const MapPinIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
   </svg>
 );
 
@@ -112,17 +122,17 @@ export const Footer = () => {
   ];
 
   const projectLinks = [
-    { name: "Goats Project", href: "/projects/goats" },
-    { name: "Maize Project", href: "/projects/maize" },
-    { name: "Beekeeping", href: "/projects/beekeeping" },
-    { name: "Planned Kids", href: "/projects/planned-kids" },
+    { name: "Goats Programme", href: "/projects/goats" },
+    { name: "Maize Programme", href: "/projects/maize" },
+    { name: "YPA SACCO", href: "/sacco" },
   ];
 
   const resourceLinks = [
-    { name: "YPA SACCO", href: "/sacco" },
-    { name: "Media", href: "/media" },
-    { name: "FAQ", href: "/about#faq" },
-    { name: "Careers", href: "/careers" },
+    { name: "Gallery", href: "/gallery" },
+    { name: "Team", href: "/team" },
+    { name: "Press", href: "/press" },
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms of Service", href: "/terms" },
   ];
 
   return (
@@ -130,50 +140,59 @@ export const Footer = () => {
       className={`${display.variable} ${mono.variable} relative bg-[#0A1628] text-white overflow-hidden font-sans antialiased`}
       style={{ background: INK }}
     >
-      {/* Decorative gradient blobs */}
-      <div
-        className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl opacity-30 pointer-events-none"
-        style={{ background: `${BLUE}30` }}
-      />
-      <div
-        className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none"
-        style={{ background: `${SKY}20` }}
-      />
+      {/* ===== ANIMATED GRADIENT BLOBS ===== */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl opacity-30"
+          style={{ background: `${YPA_BLUE}30` }}
+        />
+        <div
+          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl opacity-20"
+          style={{ background: `${YPA_BLUE_LIGHT}20` }}
+        />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl opacity-10"
+          style={{ background: `${YPA_GOLD}15` }}
+        />
+      </div>
 
       <div className="relative container mx-auto px-6 max-w-7xl pt-20 pb-8">
         {/* ===== MAIN FOOTER CONTENT ===== */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
-          {/* Brand Column */}
-          <div className="col-span-2 md:col-span-1 lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 md:gap-12 mb-16">
+          {/* Brand Column - Apple Style */}
+          <div className="col-span-2 md:col-span-1 lg:col-span-2 space-y-5">
+            {/* Logo - Clean, Box-Free */}
             <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12">
+              <div className="relative w-11 h-11 flex items-center justify-center">
                 <Image
                   src="/images/ypa-logo.webp"
                   alt="YPA Logo"
-                  width={48}
-                  height={48}
-                  className="object-contain"
+                  width={44}
+                  height={44}
+                  className="object-contain drop-shadow-lg"
+                  style={{ filter: "brightness(1.1) contrast(1.1)" }}
                 />
               </div>
-              <div>
-                <span className={`${display.className} text-xl font-medium tracking-tight text-white`}>
+              <div className="flex flex-col">
+                <span className={`${display.className} text-2xl font-medium tracking-tight text-white leading-none`}>
                   YPA
                 </span>
                 <span
-                  className={`${mono.className} block text-[10px] tracking-[0.15em] uppercase`}
-                  style={{ color: SKY }}
+                  className={`${mono.className} text-[9px] tracking-[0.15em] uppercase font-medium`}
+                  style={{ color: YPA_BLUE }}
                 >
                   Youth Platform Africa
                 </span>
               </div>
             </div>
 
-            <p className="text-sm leading-relaxed max-w-xs" style={{ color: "#90CAF9" }}>
-              Empowering Africa's youth through sustainable agribusiness practices and community development.
+            {/* Tagline */}
+            <p className="text-sm leading-relaxed max-w-xs font-light" style={{ color: "#94A3B8" }}>
+              Empowering Africa's youth through sustainable agribusiness and financial inclusion.
             </p>
 
-            {/* Social Links – glass pill style */}
-            <div className="flex flex-wrap gap-3">
+            {/* Social Links – Apple-style pill */}
+            <div className="flex flex-wrap gap-2.5">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
                 return (
@@ -181,15 +200,15 @@ export const Footer = () => {
                     key={social.label}
                     href={social.href}
                     aria-label={social.label}
-                    className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-1 group"
+                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 group"
                     style={{
-                      background: "rgba(255,255,255,0.05)",
+                      background: "rgba(255,255,255,0.06)",
                       backdropFilter: "blur(8px)",
                       border: "1px solid rgba(255,255,255,0.06)",
-                      color: "#90CAF9",
+                      color: "#94A3B8",
                     }}
                   >
-                    <Icon className="w-4 h-4 transition-colors duration-300 group-hover:text-white" />
+                    <Icon className="w-3.5 h-3.5 transition-colors duration-300 group-hover:text-white" />
                   </a>
                 );
               })}
@@ -199,18 +218,18 @@ export const Footer = () => {
           {/* Quick Links */}
           <div>
             <h4
-              className={`${mono.className} text-[11px] tracking-[0.2em] uppercase font-semibold mb-5`}
-              style={{ color: `${MUTE_ON_LIGHT}cc` }}
+              className={`${mono.className} text-[10px] tracking-[0.2em] uppercase font-semibold mb-5`}
+              style={{ color: "#64748B" }}
             >
               Quick Links
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
                     className={`${mono.className} text-sm transition-all duration-300 hover:translate-x-1 inline-flex items-center gap-1 group`}
-                    style={{ color: "#90CAF9" }}
+                    style={{ color: "#94A3B8" }}
                   >
                     <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 -ml-4 group-hover:ml-0">
                       <ArrowRightIcon className="w-3 h-3" />
@@ -225,18 +244,18 @@ export const Footer = () => {
           {/* Projects */}
           <div>
             <h4
-              className={`${mono.className} text-[11px] tracking-[0.2em] uppercase font-semibold mb-5`}
-              style={{ color: `${MUTE_ON_LIGHT}cc` }}
+              className={`${mono.className} text-[10px] tracking-[0.2em] uppercase font-semibold mb-5`}
+              style={{ color: "#64748B" }}
             >
-              Projects
+              Programmes
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {projectLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
                     className={`${mono.className} text-sm transition-all duration-300 hover:translate-x-1 inline-flex items-center gap-1 group`}
-                    style={{ color: "#90CAF9" }}
+                    style={{ color: "#94A3B8" }}
                   >
                     <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 -ml-4 group-hover:ml-0">
                       <ArrowRightIcon className="w-3 h-3" />
@@ -251,18 +270,18 @@ export const Footer = () => {
           {/* Resources & Contact */}
           <div>
             <h4
-              className={`${mono.className} text-[11px] tracking-[0.2em] uppercase font-semibold mb-5`}
-              style={{ color: `${MUTE_ON_LIGHT}cc` }}
+              className={`${mono.className} text-[10px] tracking-[0.2em] uppercase font-semibold mb-5`}
+              style={{ color: "#64748B" }}
             >
               Resources
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {resourceLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
                     className={`${mono.className} text-sm transition-all duration-300 hover:translate-x-1 inline-flex items-center gap-1 group`}
-                    style={{ color: "#90CAF9" }}
+                    style={{ color: "#94A3B8" }}
                   >
                     <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 -ml-4 group-hover:ml-0">
                       <ArrowRightIcon className="w-3 h-3" />
@@ -273,12 +292,12 @@ export const Footer = () => {
               ))}
             </ul>
 
-            {/* Contact info – glass chip style */}
-            <div className="mt-6 space-y-2">
+            {/* Contact Info - Apple-style */}
+            <div className="mt-6 space-y-2.5">
               <a
                 href="mailto:info@youthplatformafrica.com"
                 className={`${mono.className} flex items-center gap-3 text-sm transition-all duration-300 hover:text-white group`}
-                style={{ color: "#90CAF9" }}
+                style={{ color: "#94A3B8" }}
               >
                 <MailIcon className="w-4 h-4" />
                 <span>info@youthplatformafrica.com</span>
@@ -286,56 +305,63 @@ export const Footer = () => {
               <a
                 href="tel:+256774313551"
                 className={`${mono.className} flex items-center gap-3 text-sm transition-all duration-300 hover:text-white group`}
-                style={{ color: "#90CAF9" }}
+                style={{ color: "#94A3B8" }}
               >
                 <PhoneIcon className="w-4 h-4" />
                 <span>+256 774 313 551</span>
               </a>
+              <div
+                className={`${mono.className} flex items-center gap-3 text-sm`}
+                style={{ color: "#94A3B8" }}
+              >
+                <MapPinIcon className="w-4 h-4" />
+                <span>Kampala, Uganda</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* ===== DIVIDER WITH GLOW ===== */}
+        {/* ===== DIVIDER WITH SPARKLE ===== */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
+            <div className="w-full border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }} />
           </div>
           <div className="relative flex justify-center">
-            <div className="px-4 rounded-full" style={{ background: INK }}>
-              <SparklesIcon className="w-5 h-5 text-[#2196F3]/60" />
+            <div className="px-4 bg-[#0A1628]">
+              <SparklesIcon className="w-5 h-5 text-[#00AEEF]/40" />
             </div>
           </div>
         </div>
 
-        {/* ===== BOTTOM BAR – updated with JLX logo ===== */}
+        {/* ===== BOTTOM BAR – Apple-style ===== */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8">
-          <p className={`${mono.className} text-[11px] tracking-[0.05em]`} style={{ color: "#90CAF9" }}>
+          <p className={`${mono.className} text-[10px] tracking-[0.05em]`} style={{ color: "#64748B" }}>
             © {new Date().getFullYear()} Youth Platform Africa. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 text-xs flex-wrap justify-center">
+          <div className="flex items-center gap-4 text-xs flex-wrap justify-center">
             <Link
               href="/privacy"
-              className={`${mono.className} text-[11px] tracking-[0.05em] transition-colors duration-300`}
-              style={{ color: "#90CAF9" }}
+              className={`${mono.className} text-[10px] tracking-[0.05em] transition-colors duration-300 hover:text-white`}
+              style={{ color: "#64748B" }}
             >
               Privacy Policy
             </Link>
-            <span className="w-px h-3" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <span className="w-px h-3" style={{ background: "rgba(255,255,255,0.08)" }} />
             <Link
               href="/terms"
-              className={`${mono.className} text-[11px] tracking-[0.05em] transition-colors duration-300`}
-              style={{ color: "#90CAF9" }}
+              className={`${mono.className} text-[10px] tracking-[0.05em] transition-colors duration-300 hover:text-white`}
+              style={{ color: "#64748B" }}
             >
               Terms of Service
             </Link>
-            <span className="w-px h-3" style={{ background: "rgba(255,255,255,0.1)" }} />
+            <span className="w-px h-3" style={{ background: "rgba(255,255,255,0.08)" }} />
             <Link
-              href="https://your-agency-website.com" // ← replace with your JLX website URL
+              href="https://jlx-branding.com"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <span className={`${mono.className} text-[11px] tracking-[0.05em]`} style={{ color: "#90CAF9" }}>
+              <span className={`${mono.className} text-[10px] tracking-[0.05em]`} style={{ color: "#64748B" }}>
                 Crafted by
               </span>
               <Image
@@ -344,6 +370,7 @@ export const Footer = () => {
                 width={60}
                 height={24}
                 className="object-contain"
+                style={{ filter: "brightness(1.2) contrast(1.1)" }}
               />
             </Link>
           </div>
