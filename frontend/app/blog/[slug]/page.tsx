@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -14,7 +14,6 @@ import {
   Clock,
   Tag,
   ChevronRight,
-  ArrowRight,
   MessageCircle,
   Heart,
   Share2,
@@ -27,7 +26,9 @@ import {
   AlertCircle,
   X,
   Send,
-  Mail
+  Mail,
+  Award,
+  Sparkles
 } from "lucide-react";
 import { ShareButtons } from "./ShareButtons";
 import { SaveButton } from "./SaveButton";
@@ -35,7 +36,7 @@ import { Comments } from "./Comments";
 import { Metadata } from "next";
 
 // ============================================================
-// FONTS
+// FONTS - Professional & Clean
 // ============================================================
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -47,29 +48,28 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
   variable: "--font-mono",
 });
-const serif = Source_Serif_4({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-serif",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
 });
 
 // ============================================================
-// YPA BRAND COLORS - Fully Defined
+// YPA BRAND COLORS
 // ============================================================
 const YPA_BLUE = "#00AEEF";
 const YPA_BLUE_LIGHT = "#33C1F5";
 const YPA_BLUE_SOFT = "#E6F8FD";
 const YPA_GOLD = "#F0B429";
-const YPA_GOLD_LIGHT = "#FFE08A";
-const INK = "#111111";
 const NAVY = "#0E2540";
 const NAVY_SOFT = "#153455";
-const LINE = "#1F3B57";
+const INK = "#0A1628";
 const MIST = "#F6F8FA";
 const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
-const POSITIVE = "#34D399";
-const BODY_TEXT = "#1E2A3A";
+const TEXT_PRIMARY = "#0A1628";
+const TEXT_SECONDARY = "#2D3748";
+const BORDER_LIGHT = "#E8ECF0";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
@@ -204,7 +204,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${serif.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
+      className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
     >
       <Navigation />
 
@@ -224,7 +224,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             className="inline-flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-white/80 hover:text-white transition-all group"
           >
             <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Back to blog</span>
+            <span className={`${inter.className} font-light`}>Back to blog</span>
           </Link>
           <div className="flex items-center gap-3 md:gap-4">
             <span className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.15em] uppercase text-white/50 hidden sm:block`}>
@@ -266,6 +266,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 <Clock className="w-2.5 h-2.5 md:w-3 md:h-3" />
                 {readingTime} min read
               </span>
+              {post.featured && (
+                <span className={`${mono.className} inline-flex items-center gap-1 px-2.5 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-semibold tracking-[0.08em] uppercase bg-[#F0B429]/30 backdrop-blur-sm text-[#F0B429] border border-white/10`}>
+                  <Sparkles className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                  Featured
+                </span>
+              )}
             </div>
             <h1
               className={`${display.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-medium text-white tracking-tight leading-[1.05] max-w-4xl drop-shadow-xl`}
@@ -280,7 +286,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 {post.author ? post.author.charAt(0).toUpperCase() : "Y"}
               </div>
               <div>
-                <div className="text-sm md:text-base font-medium text-white">{post.author || "YPA Team"}</div>
+                <div className={`${inter.className} text-sm md:text-base font-medium text-white`}>
+                  {post.author || "YPA Team"}
+                </div>
                 <div className={`${mono.className} flex items-center gap-2 text-[10px] md:text-xs text-white/50`}>
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5" />
@@ -347,38 +355,38 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          {/* ===== CONTENT ===== */}
+          {/* ===== CONTENT with Professional Typography ===== */}
           <div
-            className={`${serif.className} prose prose-base md:prose-lg max-w-none
-              prose-headings:font-sans prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-[#111111]
+            className={`${inter.className} prose prose-base md:prose-lg max-w-none
+              prose-headings:font-display prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-[#0A1628]
               prose-h1:text-4xl md:prose-h1:text-5xl prose-h1:mt-12 prose-h1:mb-6
               prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-10 prose-h2:mb-5 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-100
               prose-h3:text-2xl md:prose-h3:text-3xl prose-h3:mt-8 prose-h3:mb-4
               prose-h4:text-xl md:prose-h4:text-2xl prose-h4:mt-6 prose-h4:mb-3
               prose-p:text-[17px] md:prose-p:text-[19px] prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-[#1E2A3A] prose-p:font-light
-              prose-strong:font-semibold prose-strong:text-[#111111]
-              prose-a:text-[#00AEEF] hover:prose-a:underline
+              prose-strong:font-semibold prose-strong:text-[#0A1628]
+              prose-a:text-[#00AEEF] hover:prose-a:underline prose-a:font-medium
               prose-ul:text-[17px] md:prose-ul:text-[19px] prose-ul:leading-[1.8] prose-ul:mb-6 prose-ul:pl-6 prose-ul:text-[#1E2A3A]
               prose-li:text-[17px] md:prose-li:text-[19px] prose-li:leading-[1.8] prose-li:text-[#1E2A3A] prose-li:marker:text-[#00AEEF]
-              prose-blockquote:border-l-4 prose-blockquote:border-l-[#00AEEF] prose-blockquote:bg-[#E6F8FD] prose-blockquote:px-5 md:prose-blockquote:px-8 prose-blockquote:py-4 md:prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[18px] md:prose-blockquote:text-[20px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#111111] prose-blockquote:shadow-sm
+              prose-blockquote:border-l-4 prose-blockquote:border-l-[#00AEEF] prose-blockquote:bg-[#E6F8FD] prose-blockquote:px-5 md:prose-blockquote:px-8 prose-blockquote:py-4 md:prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[18px] md:prose-blockquote:text-[20px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#0A1628] prose-blockquote:shadow-sm
               prose-blockquote:mx-0 prose-blockquote:my-8
               prose-blockquote:before:content-none prose-blockquote:after:content-none
               prose-img:rounded-2xl md:prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-8
               prose-hr:my-12 prose-hr:border-gray-200
               [&_*]:text-[#1E2A3A]
-              [&_h1]:!text-[#111111] [&_h2]:!text-[#111111] [&_h3]:!text-[#111111] [&_h4]:!text-[#111111]
-              [&_strong]:!text-[#111111]
+              [&_h1]:!text-[#0A1628] [&_h2]:!text-[#0A1628] [&_h3]:!text-[#0A1628] [&_h4]:!text-[#0A1628]
+              [&_strong]:!text-[#0A1628]
               [&_p]:!text-[#1E2A3A]
               [&_li]:!text-[#1E2A3A]
-              [&_blockquote]:!text-[#111111]`}
+              [&_blockquote]:!text-[#0A1628]`}
             style={
               {
                 "--tw-prose-body": "#1E2A3A",
-                "--tw-prose-bold": "#111111",
-                "--tw-prose-headings": "#111111",
+                "--tw-prose-bold": "#0A1628",
+                "--tw-prose-headings": "#0A1628",
                 "--tw-prose-links": YPA_BLUE,
                 "--tw-prose-bullets": YPA_BLUE,
-                "--tw-prose-quotes": "#111111",
+                "--tw-prose-quotes": "#0A1628",
                 "--tw-prose-quote-borders": YPA_BLUE,
               } as React.CSSProperties
             }
@@ -399,7 +407,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 <Link
                   key={tag}
                   href={`/blog?tag=${tag}`}
-                  className="px-3 py-1 rounded-full text-xs font-medium transition-all hover:bg-[#00AEEF]/10 hover:text-[#00AEEF]"
+                  className={`${inter.className} px-3 py-1 rounded-full text-xs font-medium transition-all hover:bg-[#00AEEF]/10 hover:text-[#00AEEF]`}
                   style={{ background: "#F6F8FA", color: "#5B6B7A" }}
                 >
                   #{tag}
@@ -412,6 +420,26 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4 mt-8 md:mt-10 pt-6 md:pt-8 border-t" style={{ borderColor: "#E8ECF0" }}>
             <ShareButtons slug={post.slug} title={post.title} />
             <SaveButton slug={post.slug} />
+          </div>
+
+          {/* ===== AUTHOR BIO ===== */}
+          <div className="mt-10 p-6 md:p-8 rounded-2xl border" style={{ borderColor: "#E8ECF0", background: MIST }}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div
+                className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-medium text-base md:text-lg shrink-0"
+                style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
+              >
+                {post.author ? post.author.charAt(0).toUpperCase() : "Y"}
+              </div>
+              <div>
+                <div className={`${inter.className} text-base md:text-lg font-semibold`} style={{ color: TEXT_PRIMARY }}>
+                  {post.author || "YPA Team"}
+                </div>
+                <p className={`${inter.className} text-sm font-light`} style={{ color: MUTE_ON_LIGHT }}>
+                  Writing about agribusiness, sustainable farming, and community development in Africa.
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* ===== RELATED POSTS ===== */}
@@ -442,10 +470,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                       )}
                     </div>
                     <div className="p-3 md:p-4">
-                      <h4 className="text-sm md:text-base font-medium line-clamp-2 group-hover:text-[#00AEEF] transition-colors" style={{ color: INK_ON_LIGHT }}>
+                      <h4 className={`${inter.className} text-sm md:text-base font-medium line-clamp-2 group-hover:text-[#00AEEF] transition-colors`} style={{ color: INK_ON_LIGHT }}>
                         {related.title}
                       </h4>
-                      <p className="text-xs text-[#5B6B7A] mt-1 line-clamp-1">{related.excerpt}</p>
+                      <p className={`${inter.className} text-xs text-[#5B6B7A] mt-1 line-clamp-1 font-light`}>
+                        {related.excerpt}
+                      </p>
                     </div>
                   </Link>
                 ))}
