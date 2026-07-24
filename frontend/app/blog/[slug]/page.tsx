@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, IBM_Plex_Mono, Inter, Source_Sans_3 } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -28,8 +28,7 @@ import {
   Send,
   Mail,
   Award,
-  Sparkles,
-  Link2
+  Sparkles
 } from "lucide-react";
 import { ShareButtons } from "./ShareButtons";
 import { SaveButton } from "./SaveButton";
@@ -37,7 +36,7 @@ import { Comments } from "./Comments";
 import { Metadata } from "next";
 
 // ============================================================
-// FONTS - Premium Apple-style
+// FONTS - Professional & Clean
 // ============================================================
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -54,11 +53,6 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-inter",
 });
-const sourceSans = Source_Sans_3({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-source-sans",
-});
 
 // ============================================================
 // YPA BRAND COLORS
@@ -67,7 +61,6 @@ const YPA_BLUE = "#00AEEF";
 const YPA_BLUE_LIGHT = "#33C1F5";
 const YPA_BLUE_SOFT = "#E6F8FD";
 const YPA_GOLD = "#F0B429";
-const YPA_GREEN = "#34D399";
 const NAVY = "#0E2540";
 const NAVY_SOFT = "#153455";
 const INK = "#0A1628";
@@ -194,55 +187,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 // ============================================================
-// READING PROGRESS COMPONENT
-// ============================================================
-function ReadingProgress() {
-  return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-gray-100">
-      <div 
-        className="h-full bg-gradient-to-r from-[#00AEEF] to-[#33C1F5] transition-all duration-200"
-        style={{ width: '0%' }}
-        id="reading-progress"
-      />
-    </div>
-  );
-}
-
-// ============================================================
-// TABLE OF CONTENTS
-// ============================================================
-function TableOfContents({ content }: { content: string }) {
-  // Extract headings from content
-  const headings = content?.match(/<h2[^>]*>(.*?)<\/h2>/g) || [];
-  if (headings.length === 0) return null;
-
-  return (
-    <div className="my-12 p-8 rounded-2xl border bg-[#F8FAFB]" style={{ borderColor: BORDER_LIGHT }}>
-      <h4 className={`${display.className} text-sm font-semibold uppercase tracking-wider mb-4`} style={{ color: MUTE_ON_LIGHT }}>
-        In This Article
-      </h4>
-      <ul className="space-y-2">
-        {headings.slice(0, 6).map((heading, index) => {
-          const text = heading.replace(/<h2[^>]*>|<\/h2>/g, '').trim();
-          const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          return (
-            <li key={index}>
-              <a
-                href={`#${id}`}
-                className={`${inter.className} text-sm transition-colors hover:text-[#00AEEF]`}
-                style={{ color: TEXT_SECONDARY }}
-              >
-                {text}
-              </a>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
-
-// ============================================================
 // MAIN PAGE COMPONENT
 // ============================================================
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
@@ -260,15 +204,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${inter.variable} ${sourceSans.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
+      className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
     >
-      <ReadingProgress />
       <Navigation />
 
       {/* ===== FLOATING GLASS NAV ===== */}
       <div className="sticky top-20 z-30 flex justify-center px-4 py-3">
         <div
-          className="inline-flex items-center justify-between w-full max-w-4xl px-4 md:px-6 py-2.5 md:py-3 rounded-full transition-all duration-300"
+          className="inline-flex items-center justify-between w-full max-w-3xl px-4 md:px-6 py-2.5 md:py-3 rounded-full transition-all duration-300"
           style={{
             background: "rgba(14,37,64,0.85)",
             backdropFilter: "blur(20px) saturate(1.3)",
@@ -292,9 +235,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         </div>
       </div>
 
-      {/* ===== HERO - Massive Image ===== */}
+      {/* ===== HERO ===== */}
       <div className="relative w-full px-5 md:px-14">
-        <div className="relative w-full max-w-5xl mx-auto aspect-[21/9] max-h-[70vh] min-h-[350px] md:min-h-[450px] overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl">
+        <div className="relative w-full aspect-[21/9] max-h-[70vh] min-h-[300px] md:min-h-[400px] overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl">
           {post.featured_image ? (
             <img
               src={`${API_URL}/assets/${post.featured_image}`}
@@ -302,7 +245,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#0E2540] to-[#153455] flex items-center justify-center text-white/20">
+            <div className="w-full h-full bg-[#0E2540] flex items-center justify-center text-white/20">
               <span className={`${display.className} text-4xl`}>📖</span>
             </div>
           )}
@@ -331,7 +274,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               )}
             </div>
             <h1
-              className={`${display.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium text-white tracking-tight leading-[1.05] max-w-4xl drop-shadow-xl`}
+              className={`${display.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-medium text-white tracking-tight leading-[1.05] max-w-4xl drop-shadow-xl`}
             >
               {post.title}
             </h1>
@@ -363,7 +306,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         </div>
       </div>
 
-      {/* ===== ARTICLE CONTENT - Premium Reading Experience ===== */}
+      {/* ===== ARTICLE CONTENT ===== */}
       <article className="px-5 md:px-14 py-10 md:py-16">
         <div className="container mx-auto max-w-3xl">
           {/* ===== VIDEO EMBED ===== */}
@@ -383,11 +326,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 <span className={`${mono.className} text-white/60 text-[8px] md:text-[10px] font-medium`}>Video</span>
               </div>
             </div>
-          )}
-
-          {/* ===== TABLE OF CONTENTS ===== */}
-          {post.content && post.content.length > 1500 && (
-            <TableOfContents content={post.content} />
           )}
 
           {/* ===== GALLERY IMAGES ===== */}
@@ -411,44 +349,36 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                       alt={`${post.title} - Image ${index + 1}`}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    {index === 2 && post.gallery_images.length > 3 && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className={`${display.className} text-white text-2xl font-medium`}>
-                          +{post.gallery_images.length - 3}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* ===== CONTENT - Premium Reading Experience ===== */}
+          {/* ===== CONTENT with Professional Typography ===== */}
           <div
-            className={`${sourceSans.className} prose prose-base md:prose-lg max-w-none
-              prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-[#0A1628]
+            className={`${inter.className} prose prose-base md:prose-lg max-w-none
+              prose-headings:font-display prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-[#0A1628]
               prose-h1:text-4xl md:prose-h1:text-5xl prose-h1:mt-12 prose-h1:mb-6
-              prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-100
-              prose-h3:text-2xl md:prose-h3:text-3xl prose-h3:mt-10 prose-h3:mb-5
-              prose-h4:text-xl md:prose-h4:text-2xl prose-h4:mt-8 prose-h4:mb-4
-              prose-p:text-[17px] md:prose-p:text-[19px] prose-p:leading-[1.8] prose-p:mb-8 prose-p:text-[#1E2A3A] prose-p:font-light
+              prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-10 prose-h2:mb-5 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-100
+              prose-h3:text-2xl md:prose-h3:text-3xl prose-h3:mt-8 prose-h3:mb-4
+              prose-h4:text-xl md:prose-h4:text-2xl prose-h4:mt-6 prose-h4:mb-3
+              prose-p:text-[17px] md:prose-p:text-[19px] prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-[#1E2A3A] prose-p:font-light
               prose-strong:font-semibold prose-strong:text-[#0A1628]
               prose-a:text-[#00AEEF] hover:prose-a:underline prose-a:font-medium
-              prose-ul:text-[17px] md:prose-ul:text-[19px] prose-ul:leading-[1.8] prose-ul:mb-8 prose-ul:pl-6 prose-ul:text-[#1E2A3A]
+              prose-ul:text-[17px] md:prose-ul:text-[19px] prose-ul:leading-[1.8] prose-ul:mb-6 prose-ul:pl-6 prose-ul:text-[#1E2A3A]
               prose-li:text-[17px] md:prose-li:text-[19px] prose-li:leading-[1.8] prose-li:text-[#1E2A3A] prose-li:marker:text-[#00AEEF]
-              prose-blockquote:border-l-4 prose-blockquote:border-l-[#00AEEF] prose-blockquote:bg-[#E6F8FD] prose-blockquote:px-6 md:prose-blockquote:px-8 prose-blockquote:py-5 md:prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[20px] md:prose-blockquote:text-[22px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#0A1628] prose-blockquote:shadow-sm prose-blockquote:leading-[1.8]
-              prose-blockquote:mx-0 prose-blockquote:my-10
+              prose-blockquote:border-l-4 prose-blockquote:border-l-[#00AEEF] prose-blockquote:bg-[#E6F8FD] prose-blockquote:px-5 md:prose-blockquote:px-8 prose-blockquote:py-4 md:prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[18px] md:prose-blockquote:text-[20px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#0A1628] prose-blockquote:shadow-sm
+              prose-blockquote:mx-0 prose-blockquote:my-8
               prose-blockquote:before:content-none prose-blockquote:after:content-none
-              prose-img:rounded-2xl md:prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-10
-              prose-hr:my-16 prose-hr:border-gray-200
+              prose-img:rounded-2xl md:prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-8
+              prose-hr:my-12 prose-hr:border-gray-200
               [&_*]:text-[#1E2A3A]
               [&_h1]:!text-[#0A1628] [&_h2]:!text-[#0A1628] [&_h3]:!text-[#0A1628] [&_h4]:!text-[#0A1628]
               [&_strong]:!text-[#0A1628]
               [&_p]:!text-[#1E2A3A]
               [&_li]:!text-[#1E2A3A]
-              [&_blockquote]:!text-[#0A1628]
-              [&_p:first-of-type]:text-[20px] md:[&_p:first-of-type]:text-[22px] [&_p:first-of-type]:leading-[1.9] [&_p:first-of-type]:font-light`}
+              [&_blockquote]:!text-[#0A1628]`}
             style={
               {
                 "--tw-prose-body": "#1E2A3A",
@@ -461,6 +391,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               } as React.CSSProperties
             }
           >
+            {/* ✅ This renders the HTML content with proper formatting */}
             <div
               className="[&_blockquote]:bg-[#E6F8FD] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
               dangerouslySetInnerHTML={{ __html: post.content }}
@@ -469,7 +400,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
           {/* ===== TAGS ===== */}
           {post.tags && post.tags.length > 0 && (
-            <div className="mt-10 md:mt-12 flex flex-wrap items-center gap-2 border-t pt-8 md:pt-10" style={{ borderColor: "#E8ECF0" }}>
+            <div className="mt-8 md:mt-10 flex flex-wrap items-center gap-2 border-t pt-6 md:pt-8" style={{ borderColor: "#E8ECF0" }}>
               <span className={`${mono.className} text-[10px] tracking-[0.15em] uppercase text-[#5B6B7A] mr-2`}>
                 Tags:
               </span>
@@ -492,53 +423,24 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             <SaveButton slug={post.slug} />
           </div>
 
-          {/* ===== AUTHOR BIO - Premium ===== */}
-          <div className="mt-12 overflow-hidden rounded-2xl border" style={{ borderColor: "#E8ECF0" }}>
-            <div className="relative">
-              <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT}, ${YPA_GOLD})` }} />
-              
-              <div className="p-6 md:p-8" style={{ background: MIST }}>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                  <div
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center text-white text-xl md:text-2xl font-medium shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
-                  >
-                    {post.author ? post.author.charAt(0).toUpperCase() : "Y"}
-                  </div>
-                  <div>
-                    <div className={`${inter.className} text-base md:text-lg font-semibold`} style={{ color: TEXT_PRIMARY }}>
-                      Written by {post.author || "YPA Team"}
-                    </div>
-                    <p className={`${sourceSans.className} text-sm font-light leading-relaxed`} style={{ color: MUTE_ON_LIGHT }}>
-                      Empowering young people through agriculture, innovation and entrepreneurship.
-                    </p>
-                  </div>
+          {/* ===== AUTHOR BIO ===== */}
+          <div className="mt-10 p-6 md:p-8 rounded-2xl border" style={{ borderColor: "#E8ECF0", background: MIST }}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div
+                className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-medium text-base md:text-lg shrink-0"
+                style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
+              >
+                {post.author ? post.author.charAt(0).toUpperCase() : "Y"}
+              </div>
+              <div>
+                <div className={`${inter.className} text-base md:text-lg font-semibold`} style={{ color: TEXT_PRIMARY }}>
+                  {post.author || "YPA Team"}
                 </div>
+                <p className={`${inter.className} text-sm font-light`} style={{ color: MUTE_ON_LIGHT }}>
+                  Writing about agribusiness, sustainable farming, and community development in Africa.
+                </p>
               </div>
             </div>
-          </div>
-
-          {/* ===== WHISPERED PICKS REFLECTION ===== */}
-          <div className="mt-12 p-6 md:p-8 rounded-2xl border" style={{ borderColor: "#E8ECF0", background: "#F8FAFB" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-[#F0B429]" />
-              <span className={`${display.className} text-sm font-semibold uppercase tracking-wider`} style={{ color: MUTE_ON_LIGHT }}>
-                Before you leave...
-              </span>
-            </div>
-            <p className={`${sourceSans.className} text-base md:text-lg font-light leading-relaxed italic`} style={{ color: TEXT_SECONDARY }}>
-              Every harvest begins with a seed, but every successful farming business begins with a market. As you prepare for your next season, ask yourself one simple question: Who am I growing for? Sometimes the answer to that question matters more than the size of the field itself.
-            </p>
-          </div>
-
-          {/* ===== WHAT DO YOU THINK? ===== */}
-          <div className="mt-12 text-center p-8 rounded-2xl border" style={{ borderColor: "#E8ECF0", background: MIST }}>
-            <h3 className={`${display.className} text-xl font-medium mb-2`} style={{ color: TEXT_PRIMARY }}>
-              What do you think?
-            </h3>
-            <p className={`${inter.className} text-sm font-light`} style={{ color: MUTE_ON_LIGHT }}>
-              Have you experienced contract farming? Share your thoughts below.
-            </p>
           </div>
 
           {/* ===== RELATED POSTS ===== */}
@@ -581,16 +483,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               </div>
             </div>
           )}
-
-          {/* ===== ESTIMATED READ COMPLETION ===== */}
-          <div className="mt-12 pt-8 border-t text-center" style={{ borderColor: "#E8ECF0" }}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: MIST }}>
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              <span className={`${inter.className} text-sm font-light`} style={{ color: MUTE_ON_LIGHT }}>
-                You just finished a {readingTime} minute read.
-              </span>
-            </div>
-          </div>
 
           {/* ===== COMMENTS SECTION ===== */}
           <div className="mt-12 md:mt-16 pt-8 md:pt-10 border-t" style={{ borderColor: "#E8ECF0" }}>
