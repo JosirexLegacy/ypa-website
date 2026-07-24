@@ -3,6 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 
 // ============================================================
 // FONTS
@@ -19,16 +21,14 @@ const mono = IBM_Plex_Mono({
 });
 
 // ============================================================
-// DESIGN TOKENS - YPA Brand Colors
+// YPA BRAND COLORS
 // ============================================================
 const YPA_BLUE = "#00AEEF";
+const YPA_BLUE_DARK = "#0099D6";
 const YPA_BLUE_LIGHT = "#33C1F5";
 const YPA_BLUE_SOFT = "#E6F8FD";
 const YPA_GOLD = "#F0B429";
-const NAVY = "#0E2540";
-const NAVY_SOFT = "#153455";
-const INK = "#0A1628";
-const MUTE_ON_LIGHT = "#5B6B7A";
+const YPA_RED = "#E74C3C";
 
 // ============================================================
 // CUSTOM SVG ICONS
@@ -94,13 +94,13 @@ const ArrowRightIcon = ({ className = "w-3 h-3" }) => (
   </svg>
 );
 
-const SparklesIcon = ({ className = "w-5 h-5" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-  </svg>
-);
-
 export const Footer = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const socialLinks = [
     { icon: FacebookIcon, href: "#", label: "Facebook" },
     { icon: TwitterIcon, href: "#", label: "Twitter" },
@@ -117,7 +117,6 @@ export const Footer = () => {
     { name: "Sister Companies", href: "/sister-companies" },
     { name: "Blog", href: "/blog" },
     { name: "Events", href: "/events" },
-    { name: "FAQ", href: "/about#faq" },
     { name: "Contact", href: "/contact" },
   ];
 
@@ -137,44 +136,152 @@ export const Footer = () => {
 
   return (
     <footer
-      className={`${display.variable} ${mono.variable} relative bg-[#0A1628] text-white overflow-hidden font-sans antialiased`}
-      style={{ background: INK }}
+      className={`${display.variable} ${mono.variable} relative overflow-hidden font-sans antialiased`}
+      style={{
+        background: "rgba(255,255,255,0.3)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderTop: "1px solid rgba(255,255,255,0.4)",
+        boxShadow: "0 -20px 60px rgba(0,0,0,0.05)",
+      }}
     >
-      {/* ===== ANIMATED GRADIENT BLOBS ===== */}
+      {/* ===== ANIMATED GLASSY STRIPES ===== */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div
-          className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl opacity-30"
-          style={{ background: `${YPA_BLUE}30` }}
+        {/* Diagonal stripe 1 - Blue */}
+        <motion.div
+          className="absolute -top-1/2 left-1/3 w-[200%] h-[200%] origin-center"
+          style={{
+            background: `linear-gradient(45deg, transparent 40%, ${YPA_BLUE}08 45%, ${YPA_BLUE}15 48%, ${YPA_BLUE}08 51%, transparent 55%)`,
+            transform: "rotate(-15deg)",
+          }}
+          animate={mounted ? {
+            x: ["0%", "10%", "-5%", "0%"],
+            y: ["0%", "-5%", "10%", "0%"],
+          } : {}}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
         />
-        <div
-          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl opacity-20"
-          style={{ background: `${YPA_BLUE_LIGHT}20` }}
+
+        {/* Diagonal stripe 2 - Gold */}
+        <motion.div
+          className="absolute -top-1/2 right-1/3 w-[200%] h-[200%] origin-center"
+          style={{
+            background: `linear-gradient(-35deg, transparent 35%, ${YPA_GOLD}06 40%, ${YPA_GOLD}12 43%, ${YPA_GOLD}06 46%, transparent 50%)`,
+            transform: "rotate(10deg)",
+          }}
+          animate={mounted ? {
+            x: ["0%", "-8%", "12%", "0%"],
+            y: ["0%", "8%", "-10%", "0%"],
+          } : {}}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
         />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl opacity-10"
-          style={{ background: `${YPA_GOLD}15` }}
+
+        {/* Diagonal stripe 3 - Blue Light */}
+        <motion.div
+          className="absolute -bottom-1/2 left-1/2 w-[200%] h-[200%] origin-center"
+          style={{
+            background: `linear-gradient(60deg, transparent 30%, ${YPA_BLUE_LIGHT}05 35%, ${YPA_BLUE_LIGHT}10 38%, ${YPA_BLUE_LIGHT}05 41%, transparent 45%)`,
+            transform: "rotate(25deg)",
+          }}
+          animate={mounted ? {
+            x: ["0%", "15%", "-10%", "0%"],
+            y: ["0%", "-8%", "12%", "0%"],
+          } : {}}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 4,
+          }}
+        />
+
+        {/* Glowing orb - Blue */}
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-64 h-64 rounded-full blur-3xl"
+          style={{ background: `${YPA_BLUE}15` }}
+          animate={mounted ? {
+            scale: [1, 1.3, 0.8, 1],
+            x: [0, 30, -20, 0],
+            y: [0, -20, 30, 0],
+          } : {}}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Glowing orb - Gold */}
+        <motion.div
+          className="absolute bottom-1/4 left-1/4 w-48 h-48 rounded-full blur-3xl"
+          style={{ background: `${YPA_GOLD}10` }}
+          animate={mounted ? {
+            scale: [1, 0.7, 1.2, 1],
+            x: [0, -30, 20, 0],
+            y: [0, 30, -20, 0],
+          } : {}}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 3,
+          }}
+        />
+
+        {/* Glowing orb - Blue Light */}
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl"
+          style={{ background: `${YPA_BLUE_LIGHT}08` }}
+          animate={mounted ? {
+            scale: [1, 1.2, 0.9, 1],
+          } : {}}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
         />
       </div>
 
-      <div className="relative container mx-auto px-6 max-w-7xl pt-20 pb-8">
+      <div className="relative container mx-auto px-6 max-w-7xl pt-16 pb-8">
         {/* ===== MAIN FOOTER CONTENT ===== */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 md:gap-12 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 md:gap-12 mb-14">
           {/* Brand Column - Apple Style */}
-          <div className="col-span-2 md:col-span-1 lg:col-span-2 space-y-5">
-            {/* Logo - Clean, Box-Free */}
-            <div className="flex items-center gap-3">
-              <div className="relative w-11 h-11 flex items-center justify-center">
+          <div className="col-span-2 md:col-span-1 lg:col-span-2 space-y-4">
+            {/* Logo - Rounded, Premium */}
+            <motion.div
+              className="flex items-center gap-3"
+              initial={{ opacity: 0, y: 10 }}
+              animate={mounted ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6 }}
+            >
+              <div
+                className="relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_DARK})`,
+                  boxShadow: `0 8px 32px ${YPA_BLUE}30`,
+                }}
+              >
                 <Image
                   src="/images/ypa-logo.webp"
                   alt="YPA Logo"
-                  width={44}
-                  height={44}
-                  className="object-contain drop-shadow-lg"
-                  style={{ filter: "brightness(1.1) contrast(1.1)" }}
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                  style={{ filter: "brightness(0) invert(1)" }}
                 />
               </div>
               <div className="flex flex-col">
-                <span className={`${display.className} text-2xl font-medium tracking-tight text-white leading-none`}>
+                <span className={`${display.className} text-2xl font-medium tracking-tight text-[#0A1628] leading-none`}>
                   YPA
                 </span>
                 <span
@@ -184,42 +291,61 @@ export const Footer = () => {
                   Youth Platform Africa
                 </span>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Tagline */}
-            <p className="text-sm leading-relaxed max-w-xs font-light" style={{ color: "#94A3B8" }}>
+            <motion.p
+              className="text-sm leading-relaxed max-w-xs font-light text-[#4A5A68]"
+              initial={{ opacity: 0 }}
+              animate={mounted ? { opacity: 1 } : {}}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
               Empowering Africa's youth through sustainable agribusiness and financial inclusion.
-            </p>
+            </motion.p>
 
-            {/* Social Links – Apple-style pill */}
-            <div className="flex flex-wrap gap-2.5">
-              {socialLinks.map((social) => {
+            {/* Social Links – Glass Pills */}
+            <motion.div
+              className="flex flex-wrap gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={mounted ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              {socialLinks.map((social, index) => {
                 const Icon = social.icon;
                 return (
-                  <a
+                  <motion.a
                     key={social.label}
                     href={social.href}
                     aria-label={social.label}
                     className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 group"
                     style={{
-                      background: "rgba(255,255,255,0.06)",
+                      background: "rgba(255,255,255,0.4)",
                       backdropFilter: "blur(8px)",
-                      border: "1px solid rgba(255,255,255,0.06)",
-                      color: "#94A3B8",
+                      border: "1px solid rgba(255,255,255,0.3)",
+                      color: "#5B6B7A",
                     }}
+                    whileHover={{
+                      background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})`,
+                      color: "#FFFFFF",
+                      boxShadow: `0 8px 24px ${YPA_BLUE}30`,
+                    }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <Icon className="w-3.5 h-3.5 transition-colors duration-300 group-hover:text-white" />
-                  </a>
+                    <Icon className="w-3.5 h-3.5 transition-colors duration-300" />
+                  </motion.a>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
 
           {/* Quick Links */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={mounted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             <h4
               className={`${mono.className} text-[10px] tracking-[0.2em] uppercase font-semibold mb-5`}
-              style={{ color: "#64748B" }}
+              style={{ color: "#5B6B7A" }}
             >
               Quick Links
             </h4>
@@ -229,7 +355,7 @@ export const Footer = () => {
                   <Link
                     href={link.href}
                     className={`${mono.className} text-sm transition-all duration-300 hover:translate-x-1 inline-flex items-center gap-1 group`}
-                    style={{ color: "#94A3B8" }}
+                    style={{ color: "#4A5A68" }}
                   >
                     <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 -ml-4 group-hover:ml-0">
                       <ArrowRightIcon className="w-3 h-3" />
@@ -239,13 +365,17 @@ export const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Projects */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={mounted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             <h4
               className={`${mono.className} text-[10px] tracking-[0.2em] uppercase font-semibold mb-5`}
-              style={{ color: "#64748B" }}
+              style={{ color: "#5B6B7A" }}
             >
               Programmes
             </h4>
@@ -255,7 +385,7 @@ export const Footer = () => {
                   <Link
                     href={link.href}
                     className={`${mono.className} text-sm transition-all duration-300 hover:translate-x-1 inline-flex items-center gap-1 group`}
-                    style={{ color: "#94A3B8" }}
+                    style={{ color: "#4A5A68" }}
                   >
                     <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 -ml-4 group-hover:ml-0">
                       <ArrowRightIcon className="w-3 h-3" />
@@ -265,13 +395,17 @@ export const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Resources & Contact */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={mounted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
             <h4
               className={`${mono.className} text-[10px] tracking-[0.2em] uppercase font-semibold mb-5`}
-              style={{ color: "#64748B" }}
+              style={{ color: "#5B6B7A" }}
             >
               Resources
             </h4>
@@ -281,7 +415,7 @@ export const Footer = () => {
                   <Link
                     href={link.href}
                     className={`${mono.className} text-sm transition-all duration-300 hover:translate-x-1 inline-flex items-center gap-1 group`}
-                    style={{ color: "#94A3B8" }}
+                    style={{ color: "#4A5A68" }}
                   >
                     <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 -ml-4 group-hover:ml-0">
                       <ArrowRightIcon className="w-3 h-3" />
@@ -292,76 +426,104 @@ export const Footer = () => {
               ))}
             </ul>
 
-            {/* Contact Info - Apple-style */}
+            {/* Contact Info - Glass */}
             <div className="mt-6 space-y-2.5">
               <a
                 href="mailto:info@youthplatformafrica.com"
-                className={`${mono.className} flex items-center gap-3 text-sm transition-all duration-300 hover:text-white group`}
-                style={{ color: "#94A3B8" }}
+                className={`${mono.className} flex items-center gap-3 text-sm transition-all duration-300 hover:text-[#00AEEF] group`}
+                style={{ color: "#4A5A68" }}
               >
-                <MailIcon className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-full flex items-center justify-center bg-white/40 backdrop-blur-sm border border-white/30">
+                  <MailIcon className="w-3.5 h-3.5" />
+                </div>
                 <span>info@youthplatformafrica.com</span>
               </a>
               <a
                 href="tel:+256774313551"
-                className={`${mono.className} flex items-center gap-3 text-sm transition-all duration-300 hover:text-white group`}
-                style={{ color: "#94A3B8" }}
+                className={`${mono.className} flex items-center gap-3 text-sm transition-all duration-300 hover:text-[#00AEEF] group`}
+                style={{ color: "#4A5A68" }}
               >
-                <PhoneIcon className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-full flex items-center justify-center bg-white/40 backdrop-blur-sm border border-white/30">
+                  <PhoneIcon className="w-3.5 h-3.5" />
+                </div>
                 <span>+256 774 313 551</span>
               </a>
               <div
                 className={`${mono.className} flex items-center gap-3 text-sm`}
-                style={{ color: "#94A3B8" }}
+                style={{ color: "#4A5A68" }}
               >
-                <MapPinIcon className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-full flex items-center justify-center bg-white/40 backdrop-blur-sm border border-white/30">
+                  <MapPinIcon className="w-3.5 h-3.5" />
+                </div>
                 <span>Kampala, Uganda</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* ===== DIVIDER WITH SPARKLE ===== */}
+        {/* ===== DIVIDER ===== */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }} />
+            <div className="w-full border-t" style={{ borderColor: "rgba(0,0,0,0.06)" }} />
           </div>
           <div className="relative flex justify-center">
-            <div className="px-4 bg-[#0A1628]">
-              <SparklesIcon className="w-5 h-5 text-[#00AEEF]/40" />
+            <div
+              className="px-4 rounded-full"
+              style={{
+                background: "rgba(255,255,255,0.5)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <motion.div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: YPA_BLUE }}
+                animate={mounted ? {
+                  scale: [1, 1.5, 1],
+                  boxShadow: [
+                    `0 0 0 0 ${YPA_BLUE}00`,
+                    `0 0 20px ${YPA_BLUE}40`,
+                    `0 0 0 0 ${YPA_BLUE}00`,
+                  ],
+                } : {}}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
             </div>
           </div>
         </div>
 
-        {/* ===== BOTTOM BAR – Apple-style ===== */}
+        {/* ===== BOTTOM BAR ===== */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8">
-          <p className={`${mono.className} text-[10px] tracking-[0.05em]`} style={{ color: "#64748B" }}>
+          <p className={`${mono.className} text-[10px] tracking-[0.05em]`} style={{ color: "#5B6B7A" }}>
             © {new Date().getFullYear()} Youth Platform Africa. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-xs flex-wrap justify-center">
             <Link
               href="/privacy"
-              className={`${mono.className} text-[10px] tracking-[0.05em] transition-colors duration-300 hover:text-white`}
-              style={{ color: "#64748B" }}
+              className={`${mono.className} text-[10px] tracking-[0.05em] transition-colors duration-300 hover:text-[#00AEEF]`}
+              style={{ color: "#5B6B7A" }}
             >
               Privacy Policy
             </Link>
-            <span className="w-px h-3" style={{ background: "rgba(255,255,255,0.08)" }} />
+            <span className="w-px h-3" style={{ background: "rgba(0,0,0,0.08)" }} />
             <Link
               href="/terms"
-              className={`${mono.className} text-[10px] tracking-[0.05em] transition-colors duration-300 hover:text-white`}
-              style={{ color: "#64748B" }}
+              className={`${mono.className} text-[10px] tracking-[0.05em] transition-colors duration-300 hover:text-[#00AEEF]`}
+              style={{ color: "#5B6B7A" }}
             >
               Terms of Service
             </Link>
-            <span className="w-px h-3" style={{ background: "rgba(255,255,255,0.08)" }} />
+            <span className="w-px h-3" style={{ background: "rgba(0,0,0,0.08)" }} />
             <Link
               href="https://jlx-branding.com"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <span className={`${mono.className} text-[10px] tracking-[0.05em]`} style={{ color: "#64748B" }}>
+              <span className={`${mono.className} text-[10px] tracking-[0.05em]`} style={{ color: "#5B6B7A" }}>
                 Crafted by
               </span>
               <Image
@@ -370,7 +532,6 @@ export const Footer = () => {
                 width={60}
                 height={24}
                 className="object-contain"
-                style={{ filter: "brightness(1.2) contrast(1.1)" }}
               />
             </Link>
           </div>
