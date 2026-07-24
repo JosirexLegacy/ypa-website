@@ -224,26 +224,34 @@ export default function TermsPage() {
         </div>
       </section>
 
-      {/* ===== FLOATING NAV - FIXED MOBILE ===== */}
+      {/* ===== STICKY NAV - GLASSY + HORIZONTAL SCROLL ON MOBILE ===== */}
       <div className="sticky top-24 z-30 flex justify-center px-3 md:px-4 -mt-6">
         <div
-          className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-3 rounded-2xl md:rounded-full transition-all duration-300 max-w-full"
+          className="flex items-center gap-2 md:gap-3 px-3 md:px-5 py-2 md:py-3 rounded-2xl md:rounded-full transition-all duration-300 w-full max-w-full overflow-hidden"
           style={{
-            background: "rgba(255,255,255,0.85)",
+            background: "rgba(255,255,255,0.75)",
             backdropFilter: "blur(32px) saturate(1.6)",
-            boxShadow: "0 8px 50px rgba(33,150,243,0.15), 0 0 0 1px rgba(255,255,255,0.2) inset",
-            border: "1px solid rgba(255,255,255,0.2)",
+            WebkitBackdropFilter: "blur(32px) saturate(1.6)",
+            boxShadow: "0 8px 50px rgba(33,150,243,0.12), 0 0 0 1px rgba(255,255,255,0.2) inset",
+            border: "1px solid rgba(255,255,255,0.15)",
           }}
         >
           <span className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.1em] uppercase text-[#5B6B7A] shrink-0`}>
             Jump to:
           </span>
-          <div className="flex flex-wrap items-center justify-center gap-1 md:gap-1.5 max-w-full">
+          
+          {/* ✅ HORIZONTAL SCROLL ON MOBILE */}
+          <div className="flex items-center gap-1 md:gap-1.5 overflow-x-auto scrollbar-hide pb-1 pt-1 px-0.5 w-full" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <style jsx>{`
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
             {sections.map((s) => (
               <a
                 key={s.id}
                 href={`#${s.id}`}
-                className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.05em] px-2 md:px-3 py-0.5 md:py-1 rounded-full transition-all whitespace-nowrap hover:bg-white/30 hover:text-[#2196F3]`}
+                className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.05em] px-2 md:px-3 py-0.5 md:py-1 rounded-full transition-all whitespace-nowrap hover:bg-white/50 hover:text-[#2196F3] flex-shrink-0`}
                 style={{ color: "#5B6B7A" }}
               >
                 {s.label}
