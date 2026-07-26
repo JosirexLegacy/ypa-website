@@ -82,7 +82,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 // TYPES
 // ============================================================
 interface Author {
-  id: number;
+  id: string;
   name: string;
   bio?: string;
   avatar?: string;
@@ -93,7 +93,7 @@ interface Author {
 }
 
 interface Post {
-  id: number;
+  id: string;
   title: string;
   slug: string;
   content?: string;
@@ -101,7 +101,7 @@ interface Post {
   featured_image?: string;
   category?: string;
   author?: string;
-  author_id?: number;
+  author_id?: Author | string;
   published_at?: string;
   featured?: boolean;
   tags?: string[] | null;
@@ -140,54 +140,39 @@ function getVideoEmbedUrl(url: string) {
 }
 
 // ============================================================
-// HELPERS
+// HELPER: Get image URL
 // ============================================================
 function getImageUrl(image: string | undefined): string | null {
   if (!image) return null;
-  if (image.startsWith('http')) return image;
   return `${API_URL}/assets/${image}`;
 }
 
-function getAvatarUrl(avatar: string | undefined): string | null {
-  if (!avatar) return null;
-  return `${API_URL}/assets/${avatar}`;
-}
-
 // ============================================================
-// DATA FETCHING
+// DATA FETCHING - FIXED ✅
 // ============================================================
 async function getPost(slug: string): Promise<Post | null> {
   try {
+    // ✅ Fetch post with author relation fields explicitly
     const res = await fetch(
-      `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published`,
+      `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published&fields=*,author_id.id,author_id.name,author_id.bio,author_id.role,author_id.avatar`,
       { cache: "no-store" }
     );
     if (!res.ok) return null;
     const data = await res.json();
-    return data.data?.[0] || null;
+    const post = data.data?.[0] || null;
+    
+    // ✅ Debug log to check author data
+    console.log('📝 Post data:', post);
+    console.log('👤 Author data:', post?.author_id);
+    
+    return post;
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
   }
 }
 
-async function getAuthor(authorId: number): Promise<Author | null> {
-  if (!authorId) return null;
-  try {
-    const res = await fetch(
-      `${API_URL}/items/authors/${authorId}`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.data || null;
-  } catch (error) {
-    console.error('Error fetching author:', error);
-    return null;
-  }
-}
-
-async function getRelatedPosts(category: string | undefined, currentId: number) {
+async function getRelatedPosts(category: string | undefined, currentId: string) {
   if (!category) return [];
   try {
     const res = await fetch(
@@ -218,7 +203,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   const imageUrl = getImageUrl(post.featured_image) || `${API_URL}/assets/default-og-image.jpg`;
-  const authorName = post.author || "YPA Team";
+  
+  // ✅ Safely get author name
+  const authorName = post.author_id && typeof post.author_id === 'object' 
+    ? post.author_id.name 
+    : post.author || "YPA Team";
+  
   const tags = Array.isArray(post.tags) ? post.tags.join(", ") : post.category || "YPA, Youth Platform Africa, agribusiness";
 
   return {
@@ -271,16 +261,13 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const category = CATEGORIES.find((c) => c.value === post.category);
   const relatedPosts = await getRelatedPosts(post.category, post.id);
 
-  // ✅ Fetch author separately using the author_id (which is a number)
-  const author = post.author_id ? await getAuthor(post.author_id) : null;
+  // ✅ Get author data - check if it's an object or string
+  const author = post.author_id && typeof post.author_id === 'object' ? post.author_id : null;
   const authorName = author?.name || post.author || "YPA Team";
   const authorInitial = authorName.charAt(0).toUpperCase();
 
   // ✅ Get featured image URL
   const featuredImageUrl = getImageUrl(post.featured_image);
-
-  // ✅ Get avatar URL
-  const avatarUrl = getAvatarUrl(author?.avatar);
 
   return (
     <main
@@ -510,36 +497,19 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             <SaveButton slug={post.slug} />
           </div>
 
-          {/* ===== AUTHOR BIO WITH AVATAR ===== */}
-          {author && (
+          {/* ===== AUTHOR BIO ===== */}
+          {author && author.name && (
             <div className="mt-10 overflow-hidden rounded-2xl border" style={{ borderColor: "#E8ECF0" }}>
               <div className="relative">
                 <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT}, ${YPA_GOLD})` }} />
                 
                 <div className="p-6 md:p-8" style={{ background: MIST }}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    {/* ✅ Avatar with image support */}
-                    <div className="relative shrink-0">
-                      {avatarUrl ? (
-                        <img
-                          src={avatarUrl}
-                          alt={author.name}
-                          className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover border-2 border-white shadow-lg"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const fallback = e.currentTarget.nextElementSibling;
-                            if (fallback) fallback.classList.remove('hidden');
-                          }}
-                        />
-                      ) : null}
-                      <div
-                        className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center text-white text-xl md:text-2xl font-medium shrink-0 ${
-                          avatarUrl ? 'hidden' : ''
-                        }`}
-                        style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
-                      >
-                        {authorInitial}
-                      </div>
+                    <div
+                      className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center text-white text-xl md:text-2xl font-medium shrink-0"
+                      style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
+                    >
+                      {authorInitial}
                     </div>
                     <div>
                       <div className={`${inter.className} text-base md:text-lg font-semibold`} style={{ color: TEXT_PRIMARY }}>
