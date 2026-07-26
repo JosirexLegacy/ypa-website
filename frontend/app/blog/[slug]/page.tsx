@@ -79,34 +79,6 @@ const BORDER_LIGHT = "#E8ECF0";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
-// TYPES
-// ============================================================
-interface Author {
-  id: number;
-  name: string;
-  bio?: string;
-  avatar?: string;
-  role?: string;
-}
-
-interface Post {
-  id: number;
-  title: string;
-  slug: string;
-  content?: string;
-  excerpt?: string;
-  featured_image?: string;
-  category?: string;
-  author?: string;
-  author_id?: number;
-  published_at?: string;
-  featured?: boolean;
-  tags?: string[] | null;
-  video_url?: string;
-  gallery_images?: any[];
-}
-
-// ============================================================
 // CATEGORIES
 // ============================================================
 const CATEGORIES = [
@@ -148,9 +120,8 @@ function getImageUrl(image: string | undefined): string | null {
 // ============================================================
 // DATA FETCHING
 // ============================================================
-async function getPost(slug: string): Promise<Post | null> {
+async function getPost(slug: string): Promise<any> {
   try {
-    // Fetch post
     const res = await fetch(
       `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published`,
       { cache: "no-store" }
@@ -164,7 +135,7 @@ async function getPost(slug: string): Promise<Post | null> {
   }
 }
 
-async function getAuthor(authorId: number): Promise<Author | null> {
+async function getAuthor(authorId: number): Promise<any> {
   if (!authorId) return null;
   try {
     const res = await fetch(
@@ -308,9 +279,11 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       <div className="relative w-full px-5 md:px-14">
         <div className="relative w-full aspect-[21/9] max-h-[70vh] min-h-[300px] md:min-h-[400px] overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl">
           {featuredImageUrl ? (
+            // ✅ Use regular img with crossOrigin to avoid preload issues
             <img
               src={featuredImageUrl}
               alt={post.title}
+              crossOrigin="anonymous"
               className="w-full h-full object-cover"
               onError={(e) => {
                 console.error('❌ Image failed to load:', featuredImageUrl);
@@ -426,6 +399,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                         <img
                           src={imageUrl}
                           alt={`${post.title} - Image ${index + 1}`}
+                          crossOrigin="anonymous"
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           onError={(e) => {
                             e.currentTarget.src = 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80';
@@ -560,6 +534,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                         <img
                           src={getImageUrl(related.featured_image) || ''}
                           alt={related.title}
+                          crossOrigin="anonymous"
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           onError={(e) => {
                             e.currentTarget.src = 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80';
