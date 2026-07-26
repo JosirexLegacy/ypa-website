@@ -132,14 +132,14 @@ export const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-x-6 sm:gap-x-8 gap-y-10 sm:gap-y-12 pb-12 sm:pb-16">
           {/* Brand */}
           <div className="col-span-2 md:col-span-4 lg:col-span-4">
-            {/* ✅ Updated Logo Section - Larger with Tagline */}
+            {/* ✅ Logo with Tagline */}
             <div className="flex items-center gap-3 mb-5">
               <div 
                 className="relative w-12 h-12 rounded-lg flex items-center justify-center shrink-0 overflow-hidden"
                 style={{ background: "rgba(0,174,239,0.14)" }}
               >
                 <Image
-                  src="/favicon.ico"
+                  src="/favicon.ico.png"
                   alt="YPA"
                   width={32}
                   height={32}
