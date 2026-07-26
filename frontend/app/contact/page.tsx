@@ -24,6 +24,11 @@ import {
   Briefcase,
   CreditCard,
   MessageCircle,
+  Sparkles,
+  Award,
+  Star,
+  Globe,
+  Heart,
 } from "lucide-react";
 
 // ============================================================
@@ -113,7 +118,7 @@ const WHATSAPP_GREEN = "#25D366";
 // API BASE
 // ============================================================
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
-const WHATSAPP_NUMBER = "256700000000"; // Replace with YPA's WhatsApp number
+const WHATSAPP_NUMBER = "256700000000";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 // ============================================================
@@ -144,20 +149,6 @@ async function getContactContent() {
   }
 }
 
-async function getSupportArticles() {
-  try {
-    const res = await fetch(`${API_URL}/items/support_articles?filter[status][_eq]=published&sort[]=-featured&sort[]=-created_at&limit=6`, { 
-      cache: "no-store" 
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.data || [];
-  } catch (error) {
-    console.error("Error fetching support articles:", error);
-    return [];
-  }
-}
-
 // ============================================================
 // GOAT MARK
 // ============================================================
@@ -178,54 +169,6 @@ const GoatMark = () => (
     <path d="M195 125 C197 140 202 155 205 165 C200 160 195 150 192 140" fill={BLUE} />
   </svg>
 );
-
-// ============================================================
-// SUPPORT CATEGORIES
-// ============================================================
-const SUPPORT_CATEGORIES = [
-  { 
-    icon: HelpCircle, 
-    label: "General Help", 
-    description: "Common questions and answers",
-    color: BLUE,
-    href: "/support/general"
-  },
-  { 
-    icon: Users, 
-    label: "Membership", 
-    description: "Join, renew, or manage your membership",
-    color: BLUE_LIGHT,
-    href: "/support/membership"
-  },
-  { 
-    icon: Briefcase, 
-    label: "Programmes", 
-    description: "Goats, Maize, SACCO & more",
-    color: GOLD,
-    href: "/support/programmes"
-  },
-  { 
-    icon: CreditCard, 
-    label: "Payments & Fees", 
-    description: "Billing, payments, and refunds",
-    color: POSITIVE,
-    href: "/support/payments"
-  },
-  { 
-    icon: Shield, 
-    label: "Security & Privacy", 
-    description: "Account security and data privacy",
-    color: WARNING,
-    href: "/support/security"
-  },
-  { 
-    icon: Headphones, 
-    label: "Technical Support", 
-    description: "Website, app, and technical issues",
-    color: NEGATIVE,
-    href: "/support/technical"
-  },
-];
 
 // ============================================================
 // FAQ ITEMS
@@ -273,7 +216,6 @@ type FormStatus = "idle" | "sending" | "success" | "error";
 // ============================================================
 export default function ContactPage() {
   const [content, setContent] = useState<any>(null);
-  const [supportArticles, setSupportArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -296,12 +238,8 @@ export default function ContactPage() {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const [contactData, supportData] = await Promise.all([
-          getContactContent(),
-          getSupportArticles(),
-        ]);
+        const contactData = await getContactContent();
         setContent(contactData);
-        setSupportArticles(supportData);
       } catch (error) {
         console.error("Error fetching content:", error);
       } finally {
@@ -409,9 +347,10 @@ export default function ContactPage() {
       <Navigation />
 
       {/* ============================================================
-          HERO SECTION
+          HERO SECTION - Enhanced with more YPA colors and animations
       ============================================================ */}
-      <section id="hero" ref={heroRef} className="relative pt-32 pb-20 px-6 md:px-14 overflow-hidden min-h-[52vh] flex items-center" style={{ background: NAVY }}>
+      <section id="hero" ref={heroRef} className="relative pt-32 pb-20 px-6 md:px-14 overflow-hidden min-h-[60vh] flex items-center" style={{ background: NAVY }}>
+        {/* Grid pattern overlay */}
         <div
           className="absolute inset-0 opacity-[0.05] pointer-events-none"
           style={{
@@ -420,56 +359,143 @@ export default function ContactPage() {
             backgroundSize: "64px 64px",
           }}
         />
+        
+        {/* Animated gradient blobs */}
         <motion.div
-          className="absolute top-[-25%] right-[-8%] w-[560px] h-[560px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${BLUE}1c` }}
-          animate={reduce ? {} : { x: [0, 50, -30, 0], y: [0, -30, 50, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-30%] right-[-10%] w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: `${BLUE}15` }}
+          animate={reduce ? {} : { x: [0, 60, -40, 0], y: [0, -40, 50, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-[-25%] left-[-8%] w-[440px] h-[440px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${BLUE_LIGHT}14` }}
-          animate={reduce ? {} : { x: [0, -40, 30, 0], y: [0, 30, -40, 0] }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-30%] left-[-10%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: `${BLUE_LIGHT}12` }}
+          animate={reduce ? {} : { x: [0, -50, 30, 0], y: [0, 40, -30, 0] }}
+          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+        <motion.div
+          className="absolute top-[20%] left-[40%] w-[300px] h-[300px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: `${GOLD}08` }}
+          animate={reduce ? {} : { scale: [1, 1.2, 1], x: [0, 30, -20, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
 
+        {/* Goat mark */}
         <div className="absolute right-0 bottom-0 w-[420px] h-[420px] pointer-events-none">
           <div className="absolute inset-0 flex items-end justify-end">
             <GoatMark />
           </div>
         </div>
 
+        {/* Decorative floating elements */}
+        <motion.div
+          className="absolute top-[15%] left-[5%] pointer-events-none hidden lg:block"
+          animate={reduce ? {} : { y: [0, -15, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Sparkles className="w-8 h-8" style={{ color: BLUE_LIGHT, opacity: 0.3 }} />
+        </motion.div>
+        <motion.div
+          className="absolute bottom-[20%] right-[15%] pointer-events-none hidden lg:block"
+          animate={reduce ? {} : { y: [0, 15, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        >
+          <Award className="w-10 h-10" style={{ color: GOLD, opacity: 0.15 }} />
+        </motion.div>
+
         <div className="relative container mx-auto max-w-6xl z-10">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="max-w-2xl">
-            <div className={`${mono.className} inline-flex items-center gap-3 text-[11px] tracking-[0.25em] uppercase text-white/45 mb-4`}>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8 }}
+            className="max-w-2xl"
+          >
+            {/* Status badge with shimmer */}
+            <motion.div 
+              className={`${mono.className} inline-flex items-center gap-3 text-[11px] tracking-[0.25em] uppercase text-white/45 mb-4 relative overflow-hidden px-4 py-2 rounded-full border border-white/10`}
+              style={{ background: "rgba(255,255,255,0.05)" }}
+            >
+              {!reduce && (
+                <motion.span
+                  aria-hidden="true"
+                  className="absolute inset-0 w-1/3 pointer-events-none"
+                  style={{ background: `linear-gradient(120deg, transparent, ${BLUE}30, transparent)` }}
+                  animate={{ x: ["-150%", "250%"] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", repeatDelay: 2 }}
+                />
+              )}
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34D399] opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34D399]" />
               </span>
               Live Support — 24/7
-            </div>
+            </motion.div>
             
-            <h1 className={`${display.className} text-4xl md:text-5xl lg:text-6xl font-medium text-white leading-[1.05] tracking-tight`}>
+            <motion.h1 
+              className={`${display.className} text-4xl md:text-5xl lg:text-6xl font-medium text-white leading-[1.05] tracking-tight`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               {content?.title || "We're here to help"}
-              <span
-                className="block text-transparent bg-clip-text mt-1"
-                style={{ backgroundImage: `linear-gradient(90deg, ${BLUE_LIGHT}, ${BLUE}, ${GOLD})` }}
+              <motion.span
+                className="block mt-1"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
               >
-                Every question answered
-              </span>
-            </h1>
-            <p className="text-base md:text-lg text-white/50 mt-5 max-w-lg font-light leading-relaxed">
+                <span
+                  className="text-transparent bg-clip-text"
+                  style={{ backgroundImage: `linear-gradient(135deg, ${BLUE_LIGHT}, ${BLUE}, ${BLUE_DARK}, ${GOLD})` }}
+                >
+                  Every question answered
+                </span>
+              </motion.span>
+            </motion.h1>
+
+            <motion.p 
+              className="text-base md:text-lg text-white/50 mt-5 max-w-lg font-light leading-relaxed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
               {content?.subtitle || "Reach out to us anytime. Our team is ready to help with anything you need."}
-            </p>
+            </motion.p>
             
-            <div className="flex flex-wrap gap-3 mt-8">
+            {/* Trust indicators */}
+            <motion.div 
+              className="flex flex-wrap items-center gap-6 mt-6"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <div className="flex items-center gap-2 text-white/30 text-xs">
+                <Heart className="w-3.5 h-3.5" style={{ color: BLUE_LIGHT }} />
+                <span>1,000+ members</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/30 text-xs">
+                <Star className="w-3.5 h-3.5" style={{ color: GOLD }} />
+                <span>4.9/5 rating</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/30 text-xs">
+                <Globe className="w-3.5 h-3.5" style={{ color: BLUE }} />
+                <span>12 branches</span>
+              </div>
+            </motion.div>
+            
+            <motion.div 
+              className="flex flex-wrap gap-3 mt-8"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+            >
               <motion.a
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-white transition-all"
+                whileHover={{ scale: 1.05, y: -3 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-white transition-all shadow-lg"
                 style={{ 
                   background: WHATSAPP_GREEN,
                   boxShadow: `0 20px 40px -12px ${WHATSAPP_GREEN}66`
@@ -480,14 +506,14 @@ export default function ContactPage() {
               </motion.a>
               <motion.a
                 href="#contact-form"
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20"
+                whileHover={{ scale: 1.05, y: -3 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40"
               >
-                <Mail className="w-4 h-4" />
+                <Mail className="w-4 h-4" style={{ color: BLUE_LIGHT }} />
                 Send Email
               </motion.a>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -539,9 +565,9 @@ export default function ContactPage() {
       </section>
 
       {/* ============================================================
-          SUPPORT SECTION
+          FAQ SECTION - Dropdown
       ============================================================ */}
-      <section id="support" className="px-6 md:px-14 py-20" style={{ background: MIST }}>
+      <section className="px-6 md:px-14 py-20" style={{ background: MIST }}>
         <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -554,10 +580,10 @@ export default function ContactPage() {
               Help Center
             </span>
             <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
-              How can we support you?
+              Frequently Asked Questions
             </h2>
             <p className="text-base text-[#5B6B7A] mt-3 max-w-2xl mx-auto">
-              Find answers to common questions, browse support articles, or get in touch with our team.
+              Quick answers to common questions about YPA programmes and services.
             </p>
           </motion.div>
 
@@ -609,45 +635,7 @@ export default function ContactPage() {
             </div>
           </motion.div>
 
-          {/* Support Categories */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-            {SUPPORT_CATEGORIES.map((category, index) => {
-              const Icon = category.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  viewport={{ once: true }}
-                >
-                  <Link href={category.href}>
-                    <div
-                      className="group p-6 rounded-2xl bg-white border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                      style={{ borderColor: "#E8ECF0" }}
-                    >
-                      <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110"
-                        style={{ background: `${category.color}15` }}
-                      >
-                        <Icon className="w-6 h-6" style={{ color: category.color }} />
-                      </div>
-                      <h3 className="text-base font-medium" style={{ color: INK_ON_LIGHT }}>
-                        {category.label}
-                      </h3>
-                      <p className="text-sm text-[#5B6B7A] mt-1">{category.description}</p>
-                      <div className="flex items-center gap-1 mt-3 text-sm font-medium" style={{ color: BLUE }}>
-                        Learn more
-                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* FAQ Section */}
+          {/* FAQ Accordion */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -659,9 +647,9 @@ export default function ContactPage() {
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
               <div>
                 <h3 className={`${display.className} text-xl font-medium`} style={{ color: INK_ON_LIGHT }}>
-                  Frequently Asked Questions
+                  Popular Questions
                 </h3>
-                <p className="text-sm text-[#5B6B7A] mt-1">Quick answers to common questions</p>
+                <p className="text-sm text-[#5B6B7A] mt-1">Click to expand and find answers</p>
               </div>
               
               <div className="flex gap-2 flex-wrap">
@@ -748,50 +736,6 @@ export default function ContactPage() {
               </p>
             </div>
           </motion.div>
-
-          {/* Support Articles Preview */}
-          {supportArticles.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
-              className="mt-8"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className={`${display.className} text-lg font-medium`} style={{ color: INK_ON_LIGHT }}>
-                  Latest Support Articles
-                </h3>
-                <Link href="/support" className="text-sm font-medium" style={{ color: BLUE }}>
-                  View all
-                  <ArrowRight className="inline-block w-4 h-4 ml-1" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {supportArticles.slice(0, 3).map((article, index) => (
-                  <motion.div
-                    key={article.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                  >
-                    <Link href={`/support/${article.slug}`}>
-                      <div className="p-4 bg-white rounded-xl border hover:shadow-md transition-all hover:-translate-y-1" style={{ borderColor: "#E8ECF0" }}>
-                        <h4 className="text-sm font-medium text-[#111111] line-clamp-2">{article.title}</h4>
-                        <p className="text-xs text-[#5B6B7A] mt-1 line-clamp-2">{article.excerpt}</p>
-                        <div className="flex items-center gap-2 mt-3 text-[10px] text-[#5B6B7A]">
-                          <Clock className="w-3 h-3" />
-                          <span>{article.read_time || "3 min read"}</span>
-                          <span className="w-1 h-1 rounded-full bg-[#5B6B7A]" />
-                          <span style={{ color: BLUE }}>{article.category || "General"}</span>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
         </div>
       </section>
 
