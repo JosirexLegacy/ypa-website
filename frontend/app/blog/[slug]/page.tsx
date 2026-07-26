@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Inter, Source_Sans_3 } from "next/font/google";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -53,6 +53,11 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-inter",
 });
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-source-sans",
+});
 
 // ============================================================
 // YPA BRAND COLORS
@@ -72,6 +77,37 @@ const TEXT_SECONDARY = "#2D3748";
 const BORDER_LIGHT = "#E8ECF0";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
+
+// ============================================================
+// TYPES
+// ============================================================
+interface Author {
+  id: string;
+  name: string;
+  bio?: string;
+  avatar?: string;
+  role?: string;
+  email?: string;
+  social_linkedin?: string;
+  social_twitter?: string;
+}
+
+interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  content?: string;
+  excerpt?: string;
+  featured_image?: string;
+  category?: string;
+  author?: string;
+  author_id?: Author | string;
+  published_at?: string;
+  featured?: boolean;
+  tags?: string[] | null;
+  video_url?: string;
+  gallery_images?: any[];
+}
 
 // ============================================================
 // CATEGORIES
@@ -106,21 +142,23 @@ function getVideoEmbedUrl(url: string) {
 // ============================================================
 // DATA FETCHING
 // ============================================================
-async function getPost(slug: string) {
+async function getPost(slug: string): Promise<Post | null> {
   try {
     const res = await fetch(
-      `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published`,
+      `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published&fields=*,author_id.*`,
       { cache: "no-store" }
     );
     if (!res.ok) return null;
     const data = await res.json();
     return data.data?.[0] || null;
   } catch (error) {
+    console.error('Error fetching post:', error);
     return null;
   }
 }
 
-async function getRelatedPosts(category: string, currentId: string) {
+async function getRelatedPosts(category: string | undefined, currentId: string) {
+  if (!category) return [];
   try {
     const res = await fetch(
       `${API_URL}/items/posts?filter[status][_eq]=published&filter[category][_eq]=${category}&filter[id][_neq]=${currentId}&sort[]=-published_at&limit=3`,
@@ -130,12 +168,13 @@ async function getRelatedPosts(category: string, currentId: string) {
     const data = await res.json();
     return data.data || [];
   } catch (error) {
+    console.error('Error fetching related posts:', error);
     return [];
   }
 }
 
 // ============================================================
-// METADATA FOR SEO
+// METADATA FOR SEO - FIXED
 // ============================================================
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -152,10 +191,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     ? `${API_URL}/assets/${post.featured_image}`
     : `${API_URL}/assets/default-og-image.jpg`;
 
+  const authorName = post.author_id && typeof post.author_id === 'object' 
+    ? post.author_id.name 
+    : post.author || "YPA Team";
+
+  // ✅ FIXED: Safely handle tags
+  const tags = Array.isArray(post.tags) ? post.tags.join(", ") : post.category || "YPA, Youth Platform Africa, agribusiness";
+
   return {
     title: post.title,
     description: post.excerpt || post.title,
-    keywords: post.tags?.join(", ") || post.category || "YPA, Youth Platform Africa, agribusiness",
+    keywords: tags,
     openGraph: {
       title: post.title,
       description: post.excerpt || post.title,
@@ -171,8 +217,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       ],
       type: "article",
       publishedTime: post.published_at,
-      authors: post.author ? [post.author] : ["YPA Team"],
-      tags: post.tags || [post.category],
+      authors: [authorName],
+      tags: Array.isArray(post.tags) ? post.tags : [post.category || "YPA"],
     },
     twitter: {
       card: "summary_large_image",
@@ -202,9 +248,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const category = CATEGORIES.find((c) => c.value === post.category);
   const relatedPosts = await getRelatedPosts(post.category, post.id);
 
+  // ✅ Get author data from relation
+  const author = post.author_id && typeof post.author_id === 'object' ? post.author_id : null;
+  const authorName = author?.name || post.author || "YPA Team";
+  const authorInitial = authorName.charAt(0).toUpperCase();
+
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
+      className={`${display.variable} ${mono.variable} ${inter.variable} ${sourceSans.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
     >
       <Navigation />
 
@@ -283,11 +334,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-medium text-xs md:text-sm shrink-0 border-2 border-white/20"
                 style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
               >
-                {post.author ? post.author.charAt(0).toUpperCase() : "Y"}
+                {authorInitial}
               </div>
               <div>
                 <div className={`${inter.className} text-sm md:text-base font-medium text-white`}>
-                  {post.author || "YPA Team"}
+                  {authorName}
+                  {author?.role && (
+                    <span className="ml-2 text-xs font-light text-white/50">· {author.role}</span>
+                  )}
                 </div>
                 <div className={`${mono.className} flex items-center gap-2 text-[10px] md:text-xs text-white/50`}>
                   <span className="flex items-center gap-1">
@@ -355,9 +409,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          {/* ===== CONTENT with Professional Typography ===== */}
+          {/* ===== CONTENT ===== */}
           <div
-            className={`${inter.className} prose prose-base md:prose-lg max-w-none
+            className={`${sourceSans.className} prose prose-base md:prose-lg max-w-none
               prose-headings:font-display prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-[#0A1628]
               prose-h1:text-4xl md:prose-h1:text-5xl prose-h1:mt-12 prose-h1:mb-6
               prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-10 prose-h2:mb-5 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-100
@@ -394,12 +448,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             {/* ✅ This renders the HTML content with proper formatting */}
             <div
               className="[&_blockquote]:bg-[#E6F8FD] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: post.content || '' }}
             />
           </div>
 
           {/* ===== TAGS ===== */}
-          {post.tags && post.tags.length > 0 && (
+          {post.tags && Array.isArray(post.tags) && post.tags.length > 0 && (
             <div className="mt-8 md:mt-10 flex flex-wrap items-center gap-2 border-t pt-6 md:pt-8" style={{ borderColor: "#E8ECF0" }}>
               <span className={`${mono.className} text-[10px] tracking-[0.15em] uppercase text-[#5B6B7A] mr-2`}>
                 Tags:
@@ -424,24 +478,39 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           </div>
 
           {/* ===== AUTHOR BIO ===== */}
-          <div className="mt-10 p-6 md:p-8 rounded-2xl border" style={{ borderColor: "#E8ECF0", background: MIST }}>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div
-                className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-medium text-base md:text-lg shrink-0"
-                style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
-              >
-                {post.author ? post.author.charAt(0).toUpperCase() : "Y"}
-              </div>
-              <div>
-                <div className={`${inter.className} text-base md:text-lg font-semibold`} style={{ color: TEXT_PRIMARY }}>
-                  {post.author || "YPA Team"}
+          {author && (
+            <div className="mt-10 overflow-hidden rounded-2xl border" style={{ borderColor: "#E8ECF0" }}>
+              <div className="relative">
+                <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT}, ${YPA_GOLD})` }} />
+                
+                <div className="p-6 md:p-8" style={{ background: MIST }}>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div
+                      className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center text-white text-xl md:text-2xl font-medium shrink-0"
+                      style={{ background: `linear-gradient(135deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT})` }}
+                    >
+                      {authorInitial}
+                    </div>
+                    <div>
+                      <div className={`${inter.className} text-base md:text-lg font-semibold`} style={{ color: TEXT_PRIMARY }}>
+                        Written by {author.name}
+                      </div>
+                      {author.bio && (
+                        <p className={`${sourceSans.className} text-sm font-light leading-relaxed`} style={{ color: MUTE_ON_LIGHT }}>
+                          {author.bio}
+                        </p>
+                      )}
+                      {author.role && (
+                        <p className={`${mono.className} text-xs font-medium mt-1`} style={{ color: YPA_BLUE }}>
+                          {author.role}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <p className={`${inter.className} text-sm font-light`} style={{ color: MUTE_ON_LIGHT }}>
-                  Writing about agribusiness, sustainable farming, and community development in Africa.
-                </p>
               </div>
             </div>
-          </div>
+          )}
 
           {/* ===== RELATED POSTS ===== */}
           {relatedPosts.length > 0 && (
