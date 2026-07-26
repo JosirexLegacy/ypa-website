@@ -110,8 +110,6 @@ const MIST = "#F6F8FA";
 const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
 const POSITIVE = "#34D399";
-const NEGATIVE = "#EF4444";
-const WARNING = "#F59E0B";
 const WHATSAPP_GREEN = "#25D366";
 
 // ============================================================
@@ -153,7 +151,7 @@ async function getContactContent() {
 // GOAT MARK
 // ============================================================
 const GoatMark = () => (
-  <svg viewBox="0 0 400 400" className="w-full h-full opacity-[0.08]" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 400 400" className="w-full h-full opacity-[0.06] sm:opacity-[0.08]" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M200 50 C180 50 160 60 150 80 C140 60 120 55 110 70 C100 85 110 100 120 110 C100 115 80 130 70 150 C60 170 55 195 60 220 C65 245 75 265 90 280 C105 295 125 305 145 310 C165 315 185 315 200 310 C215 305 235 295 250 280 C265 265 275 245 280 220 C285 195 280 170 270 150 C260 130 240 115 220 110 C230 100 240 85 230 70 C220 55 200 60 190 80 C180 60 160 50 200 50Z"
       fill={BLUE}
@@ -343,51 +341,51 @@ export default function ContactPage() {
   const faqCategories = ["All", ...new Set(FAQ_ITEMS.map(item => item.category))];
 
   return (
-    <main className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white overflow-x-hidden font-sans`}>
+    <main className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white overflow-x-hidden font-sans antialiased`}>
       <Navigation />
 
       {/* ============================================================
-          HERO SECTION - Enhanced with more YPA colors and animations
+          HERO SECTION - Mobile Optimized
       ============================================================ */}
-      <section id="hero" ref={heroRef} className="relative pt-32 pb-20 px-6 md:px-14 overflow-hidden min-h-[60vh] flex items-center" style={{ background: NAVY }}>
-        {/* Grid pattern overlay */}
+      <section id="hero" ref={heroRef} className="relative pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 md:px-14 overflow-hidden min-h-[80vh] sm:min-h-[70vh] md:min-h-[60vh] flex items-center" style={{ background: NAVY }}>
+        {/* Grid pattern overlay - lighter on mobile */}
         <div
-          className="absolute inset-0 opacity-[0.05] pointer-events-none"
+          className="absolute inset-0 opacity-[0.03] sm:opacity-[0.05] pointer-events-none"
           style={{
             backgroundImage:
               "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
+            backgroundSize: "48px 48px",
           }}
         />
         
-        {/* Animated gradient blobs */}
+        {/* Animated gradient blobs - scaled down on mobile */}
         <motion.div
-          className="absolute top-[-30%] right-[-10%] w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${BLUE}15` }}
-          animate={reduce ? {} : { x: [0, 60, -40, 0], y: [0, -40, 50, 0] }}
+          className="absolute top-[-20%] right-[-20%] w-[300px] sm:w-[400px] md:w-[600px] h-[300px] sm:h-[400px] md:h-[600px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: `${BLUE}12` }}
+          animate={reduce ? {} : { x: [0, 40, -30, 0], y: [0, -30, 40, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-[-30%] left-[-10%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${BLUE_LIGHT}12` }}
-          animate={reduce ? {} : { x: [0, -50, 30, 0], y: [0, 40, -30, 0] }}
+          className="absolute bottom-[-20%] left-[-20%] w-[250px] sm:w-[350px] md:w-[500px] h-[250px] sm:h-[350px] md:h-[500px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: `${BLUE_LIGHT}10` }}
+          animate={reduce ? {} : { x: [0, -30, 20, 0], y: [0, 30, -20, 0] }}
           transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
         <motion.div
-          className="absolute top-[20%] left-[40%] w-[300px] h-[300px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${GOLD}08` }}
-          animate={reduce ? {} : { scale: [1, 1.2, 1], x: [0, 30, -20, 0] }}
+          className="absolute top-[30%] left-[30%] w-[150px] sm:w-[200px] md:w-[300px] h-[150px] sm:h-[200px] md:h-[300px] rounded-full blur-3xl pointer-events-none hidden sm:block"
+          style={{ background: `${GOLD}06` }}
+          animate={reduce ? {} : { scale: [1, 1.15, 1], x: [0, 20, -15, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
 
-        {/* Goat mark */}
-        <div className="absolute right-0 bottom-0 w-[420px] h-[420px] pointer-events-none">
+        {/* Goat mark - hidden on small mobile */}
+        <div className="absolute right-0 bottom-0 w-[200px] sm:w-[300px] md:w-[420px] h-[200px] sm:h-[300px] md:h-[420px] pointer-events-none hidden sm:block">
           <div className="absolute inset-0 flex items-end justify-end">
             <GoatMark />
           </div>
         </div>
 
-        {/* Decorative floating elements */}
+        {/* Decorative floating elements - hidden on mobile */}
         <motion.div
           className="absolute top-[15%] left-[5%] pointer-events-none hidden lg:block"
           animate={reduce ? {} : { y: [0, -15, 0] }}
@@ -405,21 +403,21 @@ export default function ContactPage() {
 
         <div className="relative container mx-auto max-w-6xl z-10">
           <motion.div 
-            initial={{ opacity: 0, y: 30 }} 
+            initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             className="max-w-2xl"
           >
-            {/* Status badge with shimmer */}
+            {/* Status badge - mobile friendly */}
             <motion.div 
-              className={`${mono.className} inline-flex items-center gap-3 text-[11px] tracking-[0.25em] uppercase text-white/45 mb-4 relative overflow-hidden px-4 py-2 rounded-full border border-white/10`}
+              className={`${mono.className} inline-flex items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/45 mb-3 sm:mb-4 relative overflow-hidden px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10`}
               style={{ background: "rgba(255,255,255,0.05)" }}
             >
               {!reduce && (
                 <motion.span
                   aria-hidden="true"
                   className="absolute inset-0 w-1/3 pointer-events-none"
-                  style={{ background: `linear-gradient(120deg, transparent, ${BLUE}30, transparent)` }}
+                  style={{ background: `linear-gradient(120deg, transparent, ${BLUE}25, transparent)` }}
                   animate={{ x: ["-150%", "250%"] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", repeatDelay: 2 }}
                 />
@@ -428,21 +426,22 @@ export default function ContactPage() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34D399] opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34D399]" />
               </span>
-              Live Support — 24/7
+              <span className="hidden xs:inline">Live Support — 24/7</span>
+              <span className="xs:hidden">24/7 Live</span>
             </motion.div>
             
             <motion.h1 
-              className={`${display.className} text-4xl md:text-5xl lg:text-6xl font-medium text-white leading-[1.05] tracking-tight`}
-              initial={{ opacity: 0, y: 20 }}
+              className={`${display.className} text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-white leading-[1.08] sm:leading-[1.05] tracking-tight`}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
             >
               {content?.title || "We're here to help"}
               <motion.span
                 className="block mt-1"
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
               >
                 <span
                   className="text-transparent bg-clip-text"
@@ -454,64 +453,67 @@ export default function ContactPage() {
             </motion.h1>
 
             <motion.p 
-              className="text-base md:text-lg text-white/50 mt-5 max-w-lg font-light leading-relaxed"
+              className="text-sm sm:text-base md:text-lg text-white/50 mt-3 sm:mt-5 max-w-lg font-light leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
               {content?.subtitle || "Reach out to us anytime. Our team is ready to help with anything you need."}
             </motion.p>
             
-            {/* Trust indicators */}
+            {/* Trust indicators - scrollable on mobile if needed */}
             <motion.div 
-              className="flex flex-wrap items-center gap-6 mt-6"
-              initial={{ opacity: 0, y: 10 }}
+              className="flex flex-wrap items-center gap-3 sm:gap-6 mt-4 sm:mt-6"
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
             >
-              <div className="flex items-center gap-2 text-white/30 text-xs">
-                <Heart className="w-3.5 h-3.5" style={{ color: BLUE_LIGHT }} />
+              <div className="flex items-center gap-1.5 text-white/30 text-[10px] sm:text-xs">
+                <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5" style={{ color: BLUE_LIGHT }} />
                 <span>1,000+ members</span>
               </div>
-              <div className="flex items-center gap-2 text-white/30 text-xs">
-                <Star className="w-3.5 h-3.5" style={{ color: GOLD }} />
+              <div className="flex items-center gap-1.5 text-white/30 text-[10px] sm:text-xs">
+                <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5" style={{ color: GOLD }} />
                 <span>4.9/5 rating</span>
               </div>
-              <div className="flex items-center gap-2 text-white/30 text-xs">
-                <Globe className="w-3.5 h-3.5" style={{ color: BLUE }} />
+              <div className="flex items-center gap-1.5 text-white/30 text-[10px] sm:text-xs">
+                <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5" style={{ color: BLUE }} />
                 <span>12 branches</span>
               </div>
             </motion.div>
             
+            {/* Buttons - mobile optimized */}
             <motion.div 
-              className="flex flex-wrap gap-3 mt-8"
-              initial={{ opacity: 0, y: 10 }}
+              className="flex flex-wrap gap-2 sm:gap-3 mt-5 sm:mt-8"
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
             >
               <motion.a
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.05, y: -3 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-white transition-all shadow-lg"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium text-white transition-all shadow-lg flex-1 sm:flex-none justify-center"
                 style={{ 
                   background: WHATSAPP_GREEN,
-                  boxShadow: `0 20px 40px -12px ${WHATSAPP_GREEN}66`
+                  boxShadow: `0 12px 24px -10px ${WHATSAPP_GREEN}55`
                 }}
               >
                 <WhatsAppIcon />
-                Chat on WhatsApp
+                <span className="hidden xs:inline">Chat on WhatsApp</span>
+                <span className="xs:hidden">WhatsApp</span>
               </motion.a>
               <motion.a
                 href="#contact-form"
-                whileHover={{ scale: 1.05, y: -3 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium transition-all bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40 flex-1 sm:flex-none justify-center"
               >
                 <Mail className="w-4 h-4" style={{ color: BLUE_LIGHT }} />
-                Send Email
+                <span className="hidden xs:inline">Send Email</span>
+                <span className="xs:hidden">Email</span>
               </motion.a>
             </motion.div>
           </motion.div>
@@ -519,26 +521,26 @@ export default function ContactPage() {
       </section>
 
       {/* ============================================================
-          DIRECT LINES
+          DIRECT LINES - Mobile Optimized
       ============================================================ */}
       <section className="border-y" style={{ background: NAVY, borderColor: LINE }}>
-        <div className="flex items-center gap-3 px-6 md:px-14 pt-4">
-          <Zap className="h-3.5 w-3.5" style={{ color: GOLD }} />
-          <span className={`${mono.className} text-[10px] tracking-[0.22em] uppercase text-white/40`}>
+        <div className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-14 pt-3 sm:pt-4">
+          <Zap className="h-3 w-3 sm:h-3.5 sm:w-3.5" style={{ color: GOLD }} />
+          <span className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-white/40`}>
             Direct lines — no contact form required
           </span>
         </div>
-        <div className="max-w-6xl mx-auto px-6 md:px-14 py-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-14 py-4 sm:py-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
           {directLines.map((d, i) => {
             const Icon = d.icon;
             const isClickable = d.href && d.value;
             const content = (
               <div key={i} className={mono.className}>
-                <div className="flex items-center gap-2 text-[10px] tracking-[0.12em] uppercase text-white/35">
-                  <Icon className="h-3 w-3" />
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] tracking-[0.12em] uppercase text-white/35">
+                  <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   {d.label}
                 </div>
-                <div className="text-sm md:text-base mt-1.5 break-words" style={{ color: d.value ? "#fff" : GOLD }}>
+                <div className="text-xs sm:text-sm md:text-base mt-1 break-words" style={{ color: d.value ? "#fff" : GOLD }}>
                   {d.value || "—"}
                 </div>
               </div>
@@ -565,53 +567,53 @@ export default function ContactPage() {
       </section>
 
       {/* ============================================================
-          FAQ SECTION - Dropdown
+          FAQ SECTION - Mobile Optimized
       ============================================================ */}
-      <section className="px-6 md:px-14 py-20" style={{ background: MIST }}>
+      <section className="px-4 sm:px-6 md:px-14 py-12 sm:py-20" style={{ background: MIST }}>
         <div className="container mx-auto max-w-6xl">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true, margin: "-50px" }}
+            className="text-center mb-8 sm:mb-12"
           >
-            <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+            <span className={`${mono.className} text-[10px] sm:text-[11px] font-medium tracking-[0.2em] uppercase`} style={{ color: BLUE }}>
               Help Center
             </span>
-            <h2 className={`${display.className} text-3xl md:text-4xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
+            <h2 className={`${display.className} text-2xl sm:text-3xl md:text-4xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
               Frequently Asked Questions
             </h2>
-            <p className="text-base text-[#5B6B7A] mt-3 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-[#5B6B7A] mt-2 sm:mt-3 max-w-2xl mx-auto">
               Quick answers to common questions about YPA programmes and services.
             </p>
           </motion.div>
 
-          {/* WhatsApp Floating Card */}
+          {/* WhatsApp Floating Card - Mobile Optimized */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.97 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="mb-12"
+            transition={{ duration: 0.4 }}
+            viewport={{ once: true, margin: "-50px" }}
+            className="mb-8 sm:mb-12"
           >
             <div 
-              className="relative rounded-2xl p-6 md:p-8 overflow-hidden border"
+              className="relative rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 overflow-hidden border"
               style={{ 
                 background: `linear-gradient(135deg, ${WHATSAPP_GREEN}12, #128C7E12)`,
                 borderColor: `${WHATSAPP_GREEN}33`
               }}
             >
-              <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl" style={{ background: `${WHATSAPP_GREEN}18` }} />
-              <div className="relative flex flex-col md:flex-row items-center gap-6">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center shrink-0" style={{ background: WHATSAPP_GREEN }}>
+              <div className="absolute top-0 right-0 w-32 sm:w-48 h-32 sm:h-48 rounded-full blur-3xl" style={{ background: `${WHATSAPP_GREEN}18` }} />
+              <div className="relative flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shrink-0" style={{ background: WHATSAPP_GREEN }}>
                   <WhatsAppIcon />
                 </div>
-                <div className="flex-1 text-center md:text-left">
-                  <h3 className={`${display.className} text-xl font-medium`} style={{ color: INK_ON_LIGHT }}>
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className={`${display.className} text-base sm:text-xl font-medium`} style={{ color: INK_ON_LIGHT }}>
                     Get instant help on WhatsApp
                   </h3>
-                  <p className="text-sm text-[#5B6B7A] mt-1">
+                  <p className="text-xs sm:text-sm text-[#5B6B7A] mt-0.5 sm:mt-1">
                     Chat directly with our support team. We usually respond within 5 minutes.
                   </p>
                 </div>
@@ -619,12 +621,12 @@ export default function ContactPage() {
                   href={WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-white transition-all shrink-0"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-medium text-white transition-all shrink-0 w-full sm:w-auto justify-center"
                   style={{ 
                     background: WHATSAPP_GREEN,
-                    boxShadow: `0 8px 24px -8px ${WHATSAPP_GREEN}66`
+                    boxShadow: `0 8px 20px -8px ${WHATSAPP_GREEN}55`
                   }}
                 >
                   <WhatsAppIcon />
@@ -635,29 +637,29 @@ export default function ContactPage() {
             </div>
           </motion.div>
 
-          {/* FAQ Accordion */}
+          {/* FAQ Accordion - Mobile Optimized */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="bg-white rounded-2xl border p-6 md:p-8"
+            transition={{ duration: 0.5, delay: 0.1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            className="bg-white rounded-xl sm:rounded-2xl border p-4 sm:p-6 md:p-8"
             style={{ borderColor: "#E8ECF0" }}
           >
-            <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
               <div>
-                <h3 className={`${display.className} text-xl font-medium`} style={{ color: INK_ON_LIGHT }}>
+                <h3 className={`${display.className} text-lg sm:text-xl font-medium`} style={{ color: INK_ON_LIGHT }}>
                   Popular Questions
                 </h3>
-                <p className="text-sm text-[#5B6B7A] mt-1">Click to expand and find answers</p>
+                <p className="text-xs sm:text-sm text-[#5B6B7A] mt-0.5">Click to expand and find answers</p>
               </div>
               
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                 {faqCategories.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    className={`px-2 sm:px-3 py-1 rounded-full text-[9px] sm:text-xs font-medium transition-all touch-manipulation ${
                       activeCategory === cat
                         ? "text-white"
                         : "text-[#5B6B7A] hover:text-[#111111]"
@@ -676,26 +678,26 @@ export default function ContactPage() {
               {filteredFaqs.map((faq, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                  transition={{ duration: 0.25, delay: index * 0.02 }}
                   className="border rounded-xl overflow-hidden transition-all"
                   style={{ borderColor: expandedFaq === index ? BLUE : "#E8ECF0" }}
                 >
                   <button
                     onClick={() => toggleFaq(index)}
-                    className="w-full px-5 py-4 flex items-center justify-between text-left transition-colors hover:bg-[#F6F8FA]"
+                    className="w-full px-3 sm:px-5 py-3 sm:py-4 flex items-center justify-between text-left transition-colors hover:bg-[#F6F8FA] touch-manipulation"
                   >
-                    <span className={`text-sm font-medium ${expandedFaq === index ? '' : ''}`} style={{ color: INK_ON_LIGHT }}>
+                    <span className={`text-xs sm:text-sm font-medium ${expandedFaq === index ? '' : ''}`} style={{ color: INK_ON_LIGHT }}>
                       {faq.question}
                     </span>
                     <motion.div
                       animate={{ rotate: expandedFaq === index ? 180 : 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="shrink-0 ml-4"
+                      transition={{ duration: 0.25 }}
+                      className="shrink-0 ml-2 sm:ml-4"
                       style={{ color: BLUE }}
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                     </motion.div>
                   </button>
                   <motion.div
@@ -703,16 +705,15 @@ export default function ContactPage() {
                     animate={{ 
                       height: expandedFaq === index ? "auto" : 0,
                       opacity: expandedFaq === index ? 1 : 0,
-                      marginTop: expandedFaq === index ? 0 : 0,
                     }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
-                    <div className="px-5 pb-4">
-                      <p className="text-sm text-[#5B6B7A] leading-relaxed">
+                    <div className="px-3 sm:px-5 pb-3 sm:pb-4">
+                      <p className="text-xs sm:text-sm text-[#5B6B7A] leading-relaxed">
                         {faq.answer}
                       </p>
-                      <span className="inline-block mt-2 text-[10px] font-medium tracking-wide uppercase px-2 py-0.5 rounded-full" style={{ background: `${BLUE}12`, color: BLUE }}>
+                      <span className="inline-block mt-1.5 sm:mt-2 text-[8px] sm:text-[10px] font-medium tracking-wide uppercase px-1.5 sm:px-2 py-0.5 rounded-full" style={{ background: `${BLUE}12`, color: BLUE }}>
                         {faq.category}
                       </span>
                     </div>
@@ -722,13 +723,13 @@ export default function ContactPage() {
             </div>
 
             {filteredFaqs.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-[#5B6B7A]">No FAQs found in this category.</p>
+              <div className="text-center py-6 sm:py-8">
+                <p className="text-sm text-[#5B6B7A]">No FAQs found in this category.</p>
               </div>
             )}
 
-            <div className="mt-6 pt-6 border-t text-center" style={{ borderColor: "#E8ECF0" }}>
-              <p className="text-sm text-[#5B6B7A]">
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t text-center" style={{ borderColor: "#E8ECF0" }}>
+              <p className="text-xs sm:text-sm text-[#5B6B7A]">
                 Can't find what you're looking for?{" "}
                 <a href="#contact-form" className="font-medium" style={{ color: BLUE }}>
                   Contact our support team
@@ -740,28 +741,28 @@ export default function ContactPage() {
       </section>
 
       {/* ============================================================
-          CONTACT FORM
+          CONTACT FORM - Mobile Optimized
       ============================================================ */}
-      <section id="contact-form" className="px-6 md:px-14 py-20">
+      <section id="contact-form" className="px-4 sm:px-6 md:px-14 py-12 sm:py-20">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-8 sm:gap-12">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true, margin: "-50px" }}
             >
-              <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+              <span className={`${mono.className} text-[10px] sm:text-[11px] font-medium tracking-[0.2em] uppercase`} style={{ color: BLUE }}>
                 Reach out
               </span>
-              <h2 className={`${display.className} text-2xl md:text-3xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
+              <h2 className={`${display.className} text-xl sm:text-2xl md:text-3xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
                 Every channel, one team
               </h2>
-              <p className="text-sm text-[#5B6B7A] mt-3 max-w-sm">
+              <p className="text-sm text-[#5B6B7A] mt-2 sm:mt-3 max-w-sm">
                 Choose the channel that works best for you. We're here to help.
               </p>
 
-              <div className="space-y-3 mt-6">
+              <div className="space-y-3 mt-4 sm:mt-6">
                 {[
                   { icon: Mail, label: "Email", value: content?.email, href: `mailto:${content?.email || ""}` },
                   { icon: Phone, label: "Phone", value: content?.phone, href: `tel:${content?.phone || ""}` },
@@ -775,18 +776,19 @@ export default function ContactPage() {
                       href={row.href || "#"}
                       target={row.label === "Address" ? "_blank" : undefined}
                       rel={row.label === "Address" ? "noopener noreferrer" : undefined}
-                      whileHover={{ scale: 1.01, x: 4 }}
-                      className="flex items-start gap-4 p-4 bg-white rounded-xl border transition-all duration-300 hover:shadow-md cursor-pointer"
+                      whileHover={{ x: 3 }}
+                      whileTap={{ scale: 0.99 }}
+                      className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl border transition-all duration-300 hover:shadow-md cursor-pointer"
                       style={{ borderColor: "#E8ECF0" }}
                     >
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${BLUE}12` }}>
-                        <Icon className="w-5 h-5" style={{ color: BLUE }} />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${BLUE}12` }}>
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: BLUE }} />
                       </div>
                       <div>
-                        <p className={`${mono.className} text-[10px] tracking-[0.1em] uppercase`} style={{ color: MUTE_ON_LIGHT }}>
+                        <p className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.1em] uppercase`} style={{ color: MUTE_ON_LIGHT }}>
                           {row.label}
                         </p>
-                        <p className="text-sm font-medium mt-0.5" style={{ color: INK_ON_LIGHT }}>{row.value}</p>
+                        <p className="text-xs sm:text-sm font-medium mt-0.5" style={{ color: INK_ON_LIGHT }}>{row.value}</p>
                       </div>
                     </motion.a>
                   );
@@ -796,25 +798,26 @@ export default function ContactPage() {
                   href={WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  whileHover={{ scale: 1.01, x: 4 }}
-                  className="flex items-start gap-4 p-4 bg-white rounded-xl border transition-all duration-300 hover:shadow-md"
+                  whileHover={{ x: 3 }}
+                  whileTap={{ scale: 0.99 }}
+                  className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl border transition-all duration-300 hover:shadow-md"
                   style={{ borderColor: `${WHATSAPP_GREEN}44` }}
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${WHATSAPP_GREEN}18` }}>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${WHATSAPP_GREEN}18` }}>
                     <WhatsAppIcon />
                   </div>
                   <div>
-                    <p className={`${mono.className} text-[10px] tracking-[0.1em] uppercase`} style={{ color: WHATSAPP_GREEN }}>
+                    <p className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.1em] uppercase`} style={{ color: WHATSAPP_GREEN }}>
                       WhatsApp
                     </p>
-                    <p className="text-sm font-medium mt-0.5" style={{ color: INK_ON_LIGHT }}>
+                    <p className="text-xs sm:text-sm font-medium mt-0.5" style={{ color: INK_ON_LIGHT }}>
                       Chat with us instantly
                     </p>
                   </div>
                 </motion.a>
 
                 {!content?.email && !content?.phone && !content?.address && (
-                  <div className="p-4 rounded-xl border border-dashed" style={{ borderColor: `${GOLD}66`, background: `${GOLD}0d` }}>
+                  <div className="p-3 sm:p-4 rounded-xl border border-dashed" style={{ borderColor: `${GOLD}66`, background: `${GOLD}0d` }}>
                     <p className="text-xs font-medium" style={{ color: GOLD }}>
                       No contact details published yet
                       <NeedsInfo>Add email, phone & address in Directus</NeedsInfo>
@@ -824,16 +827,16 @@ export default function ContactPage() {
               </div>
 
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                viewport={{ once: true }}
-                className="mt-10"
+                transition={{ duration: 0.4, delay: 0.15 }}
+                viewport={{ once: true, margin: "-50px" }}
+                className="mt-8 sm:mt-10"
               >
-                <h3 className={`${mono.className} text-[10px] font-semibold tracking-[0.15em] uppercase mb-4`} style={{ color: MUTE_ON_LIGHT }}>
+                <h3 className={`${mono.className} text-[9px] sm:text-[10px] font-semibold tracking-[0.15em] uppercase mb-3 sm:mb-4`} style={{ color: MUTE_ON_LIGHT }}>
                   Follow us
                 </h3>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                   {socialLinks.map((social, index) => {
                     const Icon = social.icon;
                     return (
@@ -842,9 +845,9 @@ export default function ContactPage() {
                         href={social.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        whileHover={{ y: -4, scale: 1.08 }}
+                        whileHover={{ y: -3, scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-300"
                         style={{ background: "#fff", border: "1px solid #E8ECF0", color: MUTE_ON_LIGHT }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.background = BLUE;
@@ -864,21 +867,21 @@ export default function ContactPage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true, margin: "-50px" }}
             >
-              <span className={`${mono.className} text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: BLUE }}>
+              <span className={`${mono.className} text-[10px] sm:text-[11px] font-medium tracking-[0.2em] uppercase`} style={{ color: BLUE }}>
                 Send a message
               </span>
-              <h2 className={`${display.className} text-2xl md:text-3xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
+              <h2 className={`${display.className} text-xl sm:text-2xl md:text-3xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
                 Tell us what you need
               </h2>
 
-              <form onSubmit={handleSubmit} className="space-y-4 mt-6 bg-white rounded-2xl border p-6" style={{ borderColor: "#E8ECF0" }}>
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 mt-4 sm:mt-6 bg-white rounded-xl sm:rounded-2xl border p-4 sm:p-6" style={{ borderColor: "#E8ECF0" }}>
                 <div>
-                  <label htmlFor="name" className={`${mono.className} block text-[10px] font-semibold tracking-[0.1em] uppercase mb-1.5`} style={{ color: MUTE_ON_LIGHT }}>
+                  <label htmlFor="name" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
                     Full Name <span style={{ color: BLUE }}>*</span>
                   </label>
                   <input
@@ -889,7 +892,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     placeholder="John Doe"
-                    className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 transition"
                     style={{ borderColor: "#E3E7EB" }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = BLUE)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "#E3E7EB")}
@@ -897,7 +900,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className={`${mono.className} block text-[10px] font-semibold tracking-[0.1em] uppercase mb-1.5`} style={{ color: MUTE_ON_LIGHT }}>
+                  <label htmlFor="email" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
                     Email Address <span style={{ color: BLUE }}>*</span>
                   </label>
                   <input
@@ -908,7 +911,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     placeholder="you@example.com"
-                    className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 transition"
                     style={{ borderColor: "#E3E7EB" }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = BLUE)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "#E3E7EB")}
@@ -916,7 +919,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className={`${mono.className} block text-[10px] font-semibold tracking-[0.1em] uppercase mb-1.5`} style={{ color: MUTE_ON_LIGHT }}>
+                  <label htmlFor="phone" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
                     Phone Number
                   </label>
                   <input
@@ -926,7 +929,7 @@ export default function ContactPage() {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="+256 700 000 000"
-                    className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 transition"
                     style={{ borderColor: "#E3E7EB" }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = BLUE)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "#E3E7EB")}
@@ -934,7 +937,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="category" className={`${mono.className} block text-[10px] font-semibold tracking-[0.1em] uppercase mb-1.5`} style={{ color: MUTE_ON_LIGHT }}>
+                  <label htmlFor="category" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
                     Inquiry Category
                   </label>
                   <select
@@ -942,7 +945,7 @@ export default function ContactPage() {
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition bg-white"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white"
                     style={{ borderColor: "#E3E7EB" }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = BLUE)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "#E3E7EB")}
@@ -959,7 +962,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className={`${mono.className} block text-[10px] font-semibold tracking-[0.1em] uppercase mb-1.5`} style={{ color: MUTE_ON_LIGHT }}>
+                  <label htmlFor="subject" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
                     Subject <span style={{ color: BLUE }}>*</span>
                   </label>
                   <input
@@ -970,7 +973,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     placeholder="How can we help?"
-                    className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 transition"
                     style={{ borderColor: "#E3E7EB" }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = BLUE)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "#E3E7EB")}
@@ -978,7 +981,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className={`${mono.className} block text-[10px] font-semibold tracking-[0.1em] uppercase mb-1.5`} style={{ color: MUTE_ON_LIGHT }}>
+                  <label htmlFor="message" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
                     Message <span style={{ color: BLUE }}>*</span>
                   </label>
                   <textarea
@@ -987,9 +990,9 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    rows={5}
+                    rows={4}
                     placeholder="Tell us how we can help..."
-                    className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition resize-none"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border rounded-xl focus:outline-none focus:ring-2 transition resize-none"
                     style={{ borderColor: "#E3E7EB" }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = BLUE)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "#E3E7EB")}
@@ -997,7 +1000,7 @@ export default function ContactPage() {
                 </div>
 
                 {errorMessage && (
-                  <div className="p-3 rounded-xl text-sm" style={{ background: "#FEF2F2", border: "1px solid #FECACA", color: "#DC2626" }}>
+                  <div className="p-2.5 sm:p-3 rounded-xl text-xs sm:text-sm" style={{ background: "#FEF2F2", border: "1px solid #FECACA", color: "#DC2626" }}>
                     {errorMessage}
                   </div>
                 )}
@@ -1007,7 +1010,7 @@ export default function ContactPage() {
                   disabled={formStatus === "sending"}
                   whileHover={formStatus === "sending" ? {} : { scale: 1.01 }}
                   whileTap={formStatus === "sending" ? {} : { scale: 0.98 }}
-                  className="w-full py-3.5 rounded-xl font-medium text-white transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full py-3 sm:py-3.5 rounded-xl font-medium text-white transition-all duration-300 flex items-center justify-center gap-2 text-sm"
                   style={{
                     background: formStatus === "sending" ? "#9CA3AF" : INK_ON_LIGHT,
                     cursor: formStatus === "sending" ? "not-allowed" : "pointer",
@@ -1021,12 +1024,12 @@ export default function ContactPage() {
                 >
                   {formStatus === "sending" ? (
                     <>
-                      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Sending...
                     </>
                   ) : formStatus === "success" ? (
                     <>
-                      <CheckCircle className="w-5 h-5" />
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                       Message Sent!
                     </>
                   ) : (
@@ -1039,9 +1042,9 @@ export default function ContactPage() {
 
                 {formStatus === "success" && (
                   <motion.p
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-center"
+                    className="text-xs sm:text-sm text-center"
                     style={{ color: POSITIVE }}
                   >
                     Your message has been sent. We'll get back to you soon.
@@ -1054,31 +1057,31 @@ export default function ContactPage() {
       </section>
 
       {/* ============================================================
-          BRANCHES CTA
+          BRANCHES CTA - Mobile Optimized
       ============================================================ */}
-      <section className="px-6 md:px-14 py-24 relative overflow-hidden" style={{ background: NAVY }}>
-        <div className="absolute top-[-40%] right-[-10%] w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none" style={{ background: `${BLUE}14` }} />
-        <div className="absolute bottom-[-30%] left-[-10%] w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none" style={{ background: `${GOLD}10` }} />
+      <section className="px-4 sm:px-6 md:px-14 py-16 sm:py-20 md:py-24 relative overflow-hidden" style={{ background: NAVY }}>
+        <div className="absolute top-[-40%] right-[-10%] w-[300px] sm:w-[400px] md:w-[600px] h-[300px] sm:h-[400px] md:h-[600px] rounded-full blur-3xl pointer-events-none" style={{ background: `${BLUE}14` }} />
+        <div className="absolute bottom-[-30%] left-[-10%] w-[200px] sm:w-[300px] md:w-[400px] h-[200px] sm:h-[300px] md:h-[400px] rounded-full blur-3xl pointer-events-none" style={{ background: `${GOLD}10` }} />
         
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true, margin: "-50px" }}
           className="relative container mx-auto max-w-2xl text-center"
         >
-          <div className="w-14 h-14 mx-auto mb-5 rounded-2xl border flex items-center justify-center" style={{ borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}>
-            <Building className="w-6 h-6" style={{ color: BLUE_LIGHT }} />
+          <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-4 sm:mb-5 rounded-2xl border flex items-center justify-center" style={{ borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}>
+            <Building className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: BLUE_LIGHT }} />
           </div>
-          <h3 className={`${display.className} text-2xl md:text-3xl font-medium text-white`}>Prefer to visit us in person?</h3>
-          <p className="text-white/40 text-sm mt-2 max-w-md mx-auto font-light">
+          <h3 className={`${display.className} text-xl sm:text-2xl md:text-3xl font-medium text-white`}>Prefer to visit us in person?</h3>
+          <p className="text-white/40 text-xs sm:text-sm mt-2 max-w-md mx-auto font-light">
             Find a YPA branch near you and start your agribusiness journey face-to-face.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center mt-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-5 sm:mt-6">
             <Link
               href="/branches"
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-medium text-white transition-all hover:-translate-y-0.5"
-              style={{ background: BLUE, boxShadow: `0 20px 40px -12px ${BLUE}66` }}
+              className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium text-white transition-all hover:-translate-y-0.5"
+              style={{ background: BLUE, boxShadow: `0 16px 32px -12px ${BLUE}55` }}
             >
               <MapPin className="w-4 h-4" />
               View Branches
@@ -1088,7 +1091,7 @@ export default function ContactPage() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-medium transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium transition-all hover:-translate-y-0.5"
               style={{ 
                 background: "rgba(255,255,255,0.08)", 
                 backdropFilter: "blur(10px)",
