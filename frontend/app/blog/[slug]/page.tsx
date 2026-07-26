@@ -82,18 +82,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 // TYPES
 // ============================================================
 interface Author {
-  id: string;
+  id: number;
   name: string;
   bio?: string;
   avatar?: string;
   role?: string;
-  email?: string;
-  social_linkedin?: string;
-  social_twitter?: string;
 }
 
 interface Post {
-  id: string;
+  id: number;
   title: string;
   slug: string;
   content?: string;
@@ -101,7 +98,7 @@ interface Post {
   featured_image?: string;
   category?: string;
   author?: string;
-  author_id?: Author | string;
+  author_id?: number;
   published_at?: string;
   featured?: boolean;
   tags?: string[] | null;
@@ -140,39 +137,49 @@ function getVideoEmbedUrl(url: string) {
 }
 
 // ============================================================
-// HELPER: Get image URL
+// HELPERS
 // ============================================================
 function getImageUrl(image: string | undefined): string | null {
   if (!image) return null;
+  if (image.startsWith('http')) return image;
   return `${API_URL}/assets/${image}`;
 }
 
 // ============================================================
-// DATA FETCHING - FIXED ✅
+// DATA FETCHING
 // ============================================================
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    // ✅ Fetch post with author relation fields explicitly
+    // Fetch post
     const res = await fetch(
-      `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published&fields=*,author_id.id,author_id.name,author_id.bio,author_id.role,author_id.avatar`,
+      `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published`,
       { cache: "no-store" }
     );
     if (!res.ok) return null;
     const data = await res.json();
-    const post = data.data?.[0] || null;
-    
-    // ✅ Debug log to check author data
-    console.log('📝 Post data:', post);
-    console.log('👤 Author data:', post?.author_id);
-    
-    return post;
+    return data.data?.[0] || null;
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
   }
 }
 
-async function getRelatedPosts(category: string | undefined, currentId: string) {
+async function getAuthor(authorId: number): Promise<Author | null> {
+  if (!authorId) return null;
+  try {
+    const res = await fetch(
+      `${API_URL}/items/authors/${authorId}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching author:', error);
+    return null;
+  }
+}
+
+async function getRelatedPosts(category: string | undefined, currentId: number) {
   if (!category) return [];
   try {
     const res = await fetch(
@@ -203,12 +210,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   const imageUrl = getImageUrl(post.featured_image) || `${API_URL}/assets/default-og-image.jpg`;
-  
-  // ✅ Safely get author name
-  const authorName = post.author_id && typeof post.author_id === 'object' 
-    ? post.author_id.name 
-    : post.author || "YPA Team";
-  
+  const authorName = post.author || "YPA Team";
   const tags = Array.isArray(post.tags) ? post.tags.join(", ") : post.category || "YPA, Youth Platform Africa, agribusiness";
 
   return {
@@ -261,8 +263,8 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const category = CATEGORIES.find((c) => c.value === post.category);
   const relatedPosts = await getRelatedPosts(post.category, post.id);
 
-  // ✅ Get author data - check if it's an object or string
-  const author = post.author_id && typeof post.author_id === 'object' ? post.author_id : null;
+  // ✅ Fetch author separately using author_id
+  const author = post.author_id ? await getAuthor(post.author_id) : null;
   const authorName = author?.name || post.author || "YPA Team";
   const authorInitial = authorName.charAt(0).toUpperCase();
 
@@ -310,6 +312,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               src={featuredImageUrl}
               alt={post.title}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                console.error('❌ Image failed to load:', featuredImageUrl);
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=1200&q=80';
+              }}
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#0E2540] to-[#153455] flex items-center justify-center text-white/20">
@@ -421,6 +427,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                           src={imageUrl}
                           alt={`${post.title} - Image ${index + 1}`}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80';
+                          }}
                         />
                       )}
                     </div>
@@ -498,7 +507,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           </div>
 
           {/* ===== AUTHOR BIO ===== */}
-          {author && author.name && (
+          {author && (
             <div className="mt-10 overflow-hidden rounded-2xl border" style={{ borderColor: "#E8ECF0" }}>
               <div className="relative">
                 <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT}, ${YPA_GOLD})` }} />
@@ -552,6 +561,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                           src={getImageUrl(related.featured_image) || ''}
                           alt={related.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80';
+                          }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[#5B6B7A]/30">
