@@ -66,7 +66,7 @@ const WARNING = "#F59E0B";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
-// SUPPORT CATEGORIES
+// SUPPORT CATEGORIES - ✅ UPDATED LINKS
 // ============================================================
 const SUPPORT_CATEGORIES = [
   {
@@ -74,7 +74,7 @@ const SUPPORT_CATEGORIES = [
     label: "General Help",
     description: "Common questions and answers about YPA",
     color: BLUE,
-    href: "/support/general",
+    href: "/support/category/general",
     count: 12,
   },
   {
@@ -82,7 +82,7 @@ const SUPPORT_CATEGORIES = [
     label: "Membership",
     description: "Join, renew, or manage your membership",
     color: BLUE_LIGHT,
-    href: "/support/membership",
+    href: "/support/category/membership",
     count: 8,
   },
   {
@@ -90,7 +90,7 @@ const SUPPORT_CATEGORIES = [
     label: "Programmes",
     description: "Goats, Maize, SACCO & more",
     color: GOLD,
-    href: "/support/programmes",
+    href: "/support/category/programmes",
     count: 15,
   },
   {
@@ -98,7 +98,7 @@ const SUPPORT_CATEGORIES = [
     label: "Payments & Fees",
     description: "Billing, payments, and refunds",
     color: POSITIVE,
-    href: "/support/payments",
+    href: "/support/category/payments",
     count: 6,
   },
   {
@@ -106,7 +106,7 @@ const SUPPORT_CATEGORIES = [
     label: "Security & Privacy",
     description: "Account security and data privacy",
     color: WARNING,
-    href: "/support/security",
+    href: "/support/category/security",
     count: 4,
   },
   {
@@ -114,7 +114,7 @@ const SUPPORT_CATEGORIES = [
     label: "Technical Support",
     description: "Website, app, and technical issues",
     color: NEGATIVE,
-    href: "/support/technical",
+    href: "/support/category/technical",
     count: 9,
   },
 ];
@@ -380,7 +380,7 @@ export default function SupportPage() {
       </section>
 
       {/* ============================================================
-          FEATURED ARTICLES
+          FEATURED ARTICLES - ✅ UPDATED LINKS
       ============================================================ */}
       {featuredArticles.length > 0 && (
         <section className="px-6 md:px-14 py-20">
@@ -417,7 +417,8 @@ export default function SupportPage() {
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                   viewport={{ once: true }}
                 >
-                  <Link href={`/support/${article.slug}`}>
+                  {/* ✅ FIXED: /support/article/${article.slug} */}
+                  <Link href={`/support/article/${article.slug}`}>
                     <div
                       className="group p-6 rounded-2xl bg-white border transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                       style={{ borderColor: "#E8ECF0" }}
@@ -450,7 +451,7 @@ export default function SupportPage() {
       )}
 
       {/* ============================================================
-          RECENT ARTICLES
+          RECENT ARTICLES - ✅ UPDATED LINKS
       ============================================================ */}
       {filteredArticles.length > 0 && (
         <section className="px-6 md:px-14 pb-20" style={{ background: MIST }}>
@@ -475,7 +476,8 @@ export default function SupportPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.02 }}
                   >
-                    <Link href={`/support/${article.slug}`}>
+                    {/* ✅ FIXED: /support/article/${article.slug} */}
+                    <Link href={`/support/article/${article.slug}`}>
                       <div
                         className="group flex items-center gap-4 p-4 bg-white rounded-xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
                         style={{ borderColor: "#E8ECF0" }}
