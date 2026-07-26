@@ -98,7 +98,7 @@ interface Post {
   slug: string;
   content?: string;
   excerpt?: string;
-  featured_image?: string | { id: string; filename_download?: string };
+  featured_image?: string;
   category?: string;
   author?: string;
   author_id?: Author | string;
@@ -142,30 +142,30 @@ function getVideoEmbedUrl(url: string) {
 // ============================================================
 // HELPER: Get image URL
 // ============================================================
-function getImageUrl(image: string | { id: string; filename_download?: string } | undefined): string | null {
+function getImageUrl(image: string | undefined): string | null {
   if (!image) return null;
-  if (typeof image === 'string') {
-    return `${API_URL}/assets/${image}`;
-  }
-  if (image.id) {
-    return `${API_URL}/assets/${image.id}`;
-  }
-  return null;
+  return `${API_URL}/assets/${image}`;
 }
 
 // ============================================================
-// DATA FETCHING
+// DATA FETCHING - FIXED ✅
 // ============================================================
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    // ✅ Fetch post with author relation
+    // ✅ Fetch post with author relation fields explicitly
     const res = await fetch(
-      `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published&fields=*,author_id.*`,
+      `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published&fields=*,author_id.id,author_id.name,author_id.bio,author_id.role,author_id.avatar`,
       { cache: "no-store" }
     );
     if (!res.ok) return null;
     const data = await res.json();
-    return data.data?.[0] || null;
+    const post = data.data?.[0] || null;
+    
+    // ✅ Debug log to check author data
+    console.log('📝 Post data:', post);
+    console.log('👤 Author data:', post?.author_id);
+    
+    return post;
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
@@ -203,9 +203,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   const imageUrl = getImageUrl(post.featured_image) || `${API_URL}/assets/default-og-image.jpg`;
+  
+  // ✅ Safely get author name
   const authorName = post.author_id && typeof post.author_id === 'object' 
     ? post.author_id.name 
     : post.author || "YPA Team";
+  
   const tags = Array.isArray(post.tags) ? post.tags.join(", ") : post.category || "YPA, Youth Platform Africa, agribusiness";
 
   return {
@@ -258,7 +261,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const category = CATEGORIES.find((c) => c.value === post.category);
   const relatedPosts = await getRelatedPosts(post.category, post.id);
 
-  // ✅ Get author data from relation
+  // ✅ Get author data - check if it's an object or string
   const author = post.author_id && typeof post.author_id === 'object' ? post.author_id : null;
   const authorName = author?.name || post.author || "YPA Team";
   const authorInitial = authorName.charAt(0).toUpperCase();
@@ -407,7 +410,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {post.gallery_images.map((image: any, index: number) => {
-                  const imageUrl = typeof image === 'string' ? `${API_URL}/assets/${image}` : null;
+                  const imageUrl = typeof image === 'string' ? getImageUrl(image) : null;
                   return (
                     <div
                       key={index}
@@ -495,7 +498,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           </div>
 
           {/* ===== AUTHOR BIO ===== */}
-          {author && (
+          {author && author.name && (
             <div className="mt-10 overflow-hidden rounded-2xl border" style={{ borderColor: "#E8ECF0" }}>
               <div className="relative">
                 <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT}, ${YPA_GOLD})` }} />
@@ -546,7 +549,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                     <div className="relative aspect-[16/9] overflow-hidden bg-[#F6F8FA]">
                       {related.featured_image ? (
                         <img
-                          src={`${API_URL}/assets/${related.featured_image}`}
+                          src={getImageUrl(related.featured_image) || ''}
                           alt={related.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
