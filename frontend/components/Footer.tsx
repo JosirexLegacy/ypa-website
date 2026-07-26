@@ -132,20 +132,29 @@ export const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-x-6 sm:gap-x-8 gap-y-10 sm:gap-y-12 pb-12 sm:pb-16">
           {/* Brand */}
           <div className="col-span-2 md:col-span-4 lg:col-span-4">
-            <div className="flex items-center gap-2.5 mb-5">
-              <div className="relative w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(0,174,239,0.14)" }}>
+            {/* ✅ Updated Logo Section - Larger with Tagline */}
+            <div className="flex items-center gap-3 mb-5">
+              <div 
+                className="relative w-12 h-12 rounded-lg flex items-center justify-center shrink-0 overflow-hidden"
+                style={{ background: "rgba(0,174,239,0.14)" }}
+              >
                 <Image
-                  src="/images/ypa-logo.webp"
+                  src="/favicon.ico"
                   alt="YPA"
-                  width={20}
-                  height={20}
+                  width={32}
+                  height={32}
                   className="object-contain"
-                  style={{ filter: "brightness(0) invert(1)", opacity: 0.9 }}
+                  style={{ filter: "brightness(0) invert(1)", opacity: 0.95 }}
                 />
               </div>
-              <span className={`${display.className} text-lg font-medium tracking-tight text-white`}>
-                Youth Platform Africa
-              </span>
+              <div>
+                <span className={`${display.className} text-xl font-medium tracking-tight text-white block`}>
+                  Youth Platform Africa
+                </span>
+                <span className="text-[10px] tracking-[0.15em] uppercase font-light" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  discovering the genius in you
+                </span>
+              </div>
             </div>
 
             <p className="text-[13px] leading-relaxed max-w-[19rem] font-light" style={{ color: "rgba(255,255,255,0.45)" }}>
