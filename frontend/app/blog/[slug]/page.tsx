@@ -36,7 +36,7 @@ import { Comments } from "./Comments";
 import { Metadata } from "next";
 
 // ============================================================
-// FONTS - Professional & Clean
+// FONTS
 // ============================================================
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -98,7 +98,7 @@ interface Post {
   slug: string;
   content?: string;
   excerpt?: string;
-  featured_image?: string;
+  featured_image?: string | { id: string; filename_download?: string };
   category?: string;
   author?: string;
   author_id?: Author | string;
@@ -140,10 +140,25 @@ function getVideoEmbedUrl(url: string) {
 }
 
 // ============================================================
+// HELPER: Get image URL
+// ============================================================
+function getImageUrl(image: string | { id: string; filename_download?: string } | undefined): string | null {
+  if (!image) return null;
+  if (typeof image === 'string') {
+    return `${API_URL}/assets/${image}`;
+  }
+  if (image.id) {
+    return `${API_URL}/assets/${image.id}`;
+  }
+  return null;
+}
+
+// ============================================================
 // DATA FETCHING
 // ============================================================
 async function getPost(slug: string): Promise<Post | null> {
   try {
+    // ✅ Fetch post with author relation
     const res = await fetch(
       `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published&fields=*,author_id.*`,
       { cache: "no-store" }
@@ -174,7 +189,7 @@ async function getRelatedPosts(category: string | undefined, currentId: string) 
 }
 
 // ============================================================
-// METADATA FOR SEO - FIXED
+// METADATA FOR SEO
 // ============================================================
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -187,15 +202,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  const imageUrl = post.featured_image 
-    ? `${API_URL}/assets/${post.featured_image}`
-    : `${API_URL}/assets/default-og-image.jpg`;
-
+  const imageUrl = getImageUrl(post.featured_image) || `${API_URL}/assets/default-og-image.jpg`;
   const authorName = post.author_id && typeof post.author_id === 'object' 
     ? post.author_id.name 
     : post.author || "YPA Team";
-
-  // ✅ FIXED: Safely handle tags
   const tags = Array.isArray(post.tags) ? post.tags.join(", ") : post.category || "YPA, Youth Platform Africa, agribusiness";
 
   return {
@@ -253,6 +263,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const authorName = author?.name || post.author || "YPA Team";
   const authorInitial = authorName.charAt(0).toUpperCase();
 
+  // ✅ Get featured image URL
+  const featuredImageUrl = getImageUrl(post.featured_image);
+
   return (
     <main
       className={`${display.variable} ${mono.variable} ${inter.variable} ${sourceSans.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
@@ -289,14 +302,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       {/* ===== HERO ===== */}
       <div className="relative w-full px-5 md:px-14">
         <div className="relative w-full aspect-[21/9] max-h-[70vh] min-h-[300px] md:min-h-[400px] overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl">
-          {post.featured_image ? (
+          {featuredImageUrl ? (
             <img
-              src={`${API_URL}/assets/${post.featured_image}`}
+              src={featuredImageUrl}
               alt={post.title}
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-[#0E2540] flex items-center justify-center text-white/20">
+            <div className="w-full h-full bg-gradient-to-br from-[#0E2540] to-[#153455] flex items-center justify-center text-white/20">
               <span className={`${display.className} text-4xl`}>📖</span>
             </div>
           )}
@@ -393,18 +406,23 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 Gallery
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                {post.gallery_images.map((image: any, index: number) => (
-                  <div
-                    key={index}
-                    className="relative aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-[#F5F9FF] hover:shadow-lg transition-shadow group"
-                  >
-                    <img
-                      src={`${API_URL}/assets/${image}`}
-                      alt={`${post.title} - Image ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                ))}
+                {post.gallery_images.map((image: any, index: number) => {
+                  const imageUrl = typeof image === 'string' ? `${API_URL}/assets/${image}` : null;
+                  return (
+                    <div
+                      key={index}
+                      className="relative aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-[#F5F9FF] hover:shadow-lg transition-shadow group"
+                    >
+                      {imageUrl && (
+                        <img
+                          src={imageUrl}
+                          alt={`${post.title} - Image ${index + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -445,7 +463,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               } as React.CSSProperties
             }
           >
-            {/* ✅ This renders the HTML content with proper formatting */}
             <div
               className="[&_blockquote]:bg-[#E6F8FD] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
               dangerouslySetInnerHTML={{ __html: post.content || '' }}
