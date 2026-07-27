@@ -13,21 +13,6 @@ import {
   Play,
   Clock,
   Tag,
-  ChevronRight,
-  MessageCircle,
-  Heart,
-  Share2,
-  Bookmark,
-  Eye,
-  ThumbsUp,
-  Reply,
-  MoreHorizontal,
-  CheckCircle,
-  AlertCircle,
-  X,
-  Send,
-  Mail,
-  Award,
   Sparkles
 } from "lucide-react";
 import { ShareButtons } from "./ShareButtons";
@@ -64,17 +49,11 @@ const sourceSans = Source_Sans_3({
 // ============================================================
 const YPA_BLUE = "#00AEEF";
 const YPA_BLUE_LIGHT = "#33C1F5";
-const YPA_BLUE_SOFT = "#E6F8FD";
 const YPA_GOLD = "#F0B429";
 const NAVY = "#0E2540";
-const NAVY_SOFT = "#153455";
 const INK = "#0A1628";
 const MIST = "#F6F8FA";
-const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
-const TEXT_PRIMARY = "#0A1628";
-const TEXT_SECONDARY = "#2D3748";
-const BORDER_LIGHT = "#E8ECF0";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
@@ -87,9 +66,6 @@ interface Author {
   bio?: string;
   avatar?: string;
   role?: string;
-  email?: string;
-  social_linkedin?: string;
-  social_twitter?: string;
 }
 
 interface Post {
@@ -113,15 +89,34 @@ interface Post {
 // CATEGORIES
 // ============================================================
 const CATEGORIES = [
-  { value: "all", label: "All Posts", color: "bg-gray-100 text-gray-700" },
-  { value: "goats", label: "Goats", color: "bg-emerald-100 text-emerald-700" },
-  { value: "maize", label: "Maize", color: "bg-amber-100 text-amber-700" },
-  { value: "beekeeping", label: "Beekeeping", color: "bg-yellow-100 text-yellow-700" },
-  { value: "kids", label: "Youth", color: "bg-blue-100 text-blue-700" },
-  { value: "events", label: "Events", color: "bg-purple-100 text-purple-700" },
-  { value: "news", label: "News", color: "bg-rose-100 text-rose-700" },
-  { value: "general", label: "General", color: "bg-gray-100 text-gray-700" },
+  { value: "all", label: "All Posts" },
+  { value: "goats", label: "Goats" },
+  { value: "maize", label: "Maize" },
+  { value: "beekeeping", label: "Beekeeping" },
+  { value: "kids", label: "Youth" },
+  { value: "events", label: "Events" },
+  { value: "news", label: "News" },
+  { value: "general", label: "General" },
 ];
+
+// ============================================================
+// ✅ FIXED: Get image URL - handles both Cloudinary and Directus
+// ============================================================
+function getImageUrl(image: string | undefined): string | null {
+  if (!image) return null;
+  
+  // If it's already a full URL (Cloudinary, etc.), return it as-is
+  if (image.startsWith('http://') || image.startsWith('https://')) {
+    return image;
+  }
+  
+  // If it's a Directus file ID, build the URL
+  if (image.length > 0 && !image.startsWith('/')) {
+    return `${API_URL}/assets/${image}`;
+  }
+  
+  return null;
+}
 
 // ============================================================
 // VIDEO EMBED
@@ -140,26 +135,6 @@ function getVideoEmbedUrl(url: string) {
 }
 
 // ============================================================
-// HELPER: Get image URL - FIXED ✅
-// Handles both Cloudinary URLs and Directus file IDs
-// ============================================================
-function getImageUrl(image: string | undefined): string | null {
-  if (!image) return null;
-  
-  // ✅ If it's already a full URL (Cloudinary, etc.), return it
-  if (image.startsWith('http://') || image.startsWith('https://')) {
-    return image;
-  }
-  
-  // ✅ If it's a Directus file ID, build the URL
-  if (image.length > 0) {
-    return `${API_URL}/assets/${image}`;
-  }
-  
-  return null;
-}
-
-// ============================================================
 // DATA FETCHING
 // ============================================================
 async function getPost(slug: string): Promise<Post | null> {
@@ -170,9 +145,7 @@ async function getPost(slug: string): Promise<Post | null> {
     );
     if (!res.ok) return null;
     const data = await res.json();
-    const post = data.data?.[0] || null;
-    
-    return post;
+    return data.data?.[0] || null;
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
@@ -196,7 +169,7 @@ async function getRelatedPosts(category: string | undefined, currentId: string) 
 }
 
 // ============================================================
-// METADATA FOR SEO
+// METADATA
 // ============================================================
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -209,51 +182,35 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  // ✅ Use getImageUrl helper
-  const imageUrl = getImageUrl(post.featured_image) || `${API_URL}/assets/default-og-image.jpg`;
-  
+  const imageUrl = getImageUrl(post.featured_image) || '';
   const authorName = post.author_id && typeof post.author_id === 'object' 
     ? post.author_id.name 
     : post.author || "YPA Team";
-  
-  const tags = Array.isArray(post.tags) ? post.tags.join(", ") : post.category || "YPA, Youth Platform Africa, agribusiness";
 
   return {
     title: post.title,
     description: post.excerpt || post.title,
-    keywords: tags,
     openGraph: {
       title: post.title,
       description: post.excerpt || post.title,
       url: `https://ypa-website-b3uh-ashy.vercel.app/blog/${slug}`,
       siteName: "Youth Platform Africa",
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: post.title,
-        },
-      ],
+      images: imageUrl ? [{ url: imageUrl, width: 1200, height: 630, alt: post.title }] : [],
       type: "article",
       publishedTime: post.published_at,
       authors: [authorName],
-      tags: Array.isArray(post.tags) ? post.tags : [post.category || "YPA"],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.excerpt || post.title,
-      images: [imageUrl],
-    },
-    alternates: {
-      canonical: `https://ypa-website-b3uh-ashy.vercel.app/blog/${slug}`,
+      images: imageUrl ? [imageUrl] : [],
     },
   };
 }
 
 // ============================================================
-// MAIN PAGE COMPONENT
+// MAIN COMPONENT
 // ============================================================
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -272,23 +229,22 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const authorName = author?.name || post.author || "YPA Team";
   const authorInitial = authorName.charAt(0).toUpperCase();
 
-  // ✅ Get featured image URL using the helper
+  // ✅ Get the image URL using the helper
   const featuredImageUrl = getImageUrl(post.featured_image);
 
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${inter.variable} ${sourceSans.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#00AEEF]/30`}
+      className={`${display.variable} ${mono.variable} ${inter.variable} ${sourceSans.variable} min-h-screen bg-white font-sans antialiased`}
     >
       <Navigation />
 
-      {/* ===== FLOATING GLASS NAV ===== */}
+      {/* ===== FLOATING NAV ===== */}
       <div className="sticky top-20 z-30 flex justify-center px-4 py-3">
         <div
-          className="inline-flex items-center justify-between w-full max-w-3xl px-4 md:px-6 py-2.5 md:py-3 rounded-full transition-all duration-300"
+          className="inline-flex items-center justify-between w-full max-w-3xl px-4 md:px-6 py-2.5 md:py-3 rounded-full"
           style={{
             background: "rgba(14,37,64,0.85)",
-            backdropFilter: "blur(20px) saturate(1.3)",
-            boxShadow: "0 8px 40px rgba(0,174,239,0.25), inset 0 1px 0 rgba(255,255,255,0.10)",
+            backdropFilter: "blur(20px)",
             border: "1px solid rgba(255,255,255,0.08)",
           }}
         >
@@ -351,7 +307,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               )}
             </div>
             <h1
-              className={`${display.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-medium text-white tracking-tight leading-[1.05] max-w-4xl drop-shadow-xl`}
+              className={`${display.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-tight leading-[1.05] max-w-4xl`}
             >
               {post.title}
             </h1>
@@ -373,11 +329,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5" />
                     {post.published_at ? format(new Date(post.published_at), "MMM d, yyyy") : "Recent"}
-                  </span>
-                  <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                    {readingTime} min read
                   </span>
                 </div>
               </div>
@@ -408,7 +359,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          {/* ===== GALLERY IMAGES ===== */}
+          {/* ===== GALLERY ===== */}
           {post.gallery_images && Array.isArray(post.gallery_images) && post.gallery_images.length > 0 && (
             <div className="mb-8 md:mb-12">
               <h3
@@ -420,7 +371,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {post.gallery_images.map((image: any, index: number) => {
-                  // ✅ Handle both Cloudinary URLs and Directus file IDs
                   const imageUrl = typeof image === 'string' ? getImageUrl(image) : null;
                   return (
                     <div
@@ -433,7 +383,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                           alt={`${post.title} - Image ${index + 1}`}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           onError={(e) => {
-                            console.error('Gallery image failed to load:', imageUrl);
+                            console.error('Gallery image failed:', imageUrl);
                             e.currentTarget.style.display = 'none';
                           }}
                         />
@@ -448,43 +398,22 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           {/* ===== CONTENT ===== */}
           <div
             className={`${sourceSans.className} prose prose-base md:prose-lg max-w-none
-              prose-headings:font-display prose-headings:font-medium prose-headings:tracking-tight prose-headings:text-[#0A1628]
-              prose-h1:text-4xl md:prose-h1:text-5xl prose-h1:mt-12 prose-h1:mb-6
-              prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-10 prose-h2:mb-5 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-100
-              prose-h3:text-2xl md:prose-h3:text-3xl prose-h3:mt-8 prose-h3:mb-4
-              prose-h4:text-xl md:prose-h4:text-2xl prose-h4:mt-6 prose-h4:mb-3
-              prose-p:text-[17px] md:prose-p:text-[19px] prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-[#1E2A3A] prose-p:font-light
-              prose-strong:font-semibold prose-strong:text-[#0A1628]
-              prose-a:text-[#00AEEF] hover:prose-a:underline prose-a:font-medium
-              prose-ul:text-[17px] md:prose-ul:text-[19px] prose-ul:leading-[1.8] prose-ul:mb-6 prose-ul:pl-6 prose-ul:text-[#1E2A3A]
-              prose-li:text-[17px] md:prose-li:text-[19px] prose-li:leading-[1.8] prose-li:text-[#1E2A3A] prose-li:marker:text-[#00AEEF]
-              prose-blockquote:border-l-4 prose-blockquote:border-l-[#00AEEF] prose-blockquote:bg-[#E6F8FD] prose-blockquote:px-5 md:prose-blockquote:px-8 prose-blockquote:py-4 md:prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[18px] md:prose-blockquote:text-[20px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#0A1628] prose-blockquote:shadow-sm
-              prose-blockquote:mx-0 prose-blockquote:my-8
+              prose-headings:font-display prose-headings:font-medium prose-headings:tracking-tight
+              prose-p:text-[17px] md:prose-p:text-[19px] prose-p:leading-[1.8] prose-p:mb-6
+              prose-strong:font-semibold
+              prose-a:text-[#00AEEF] hover:prose-a:underline
+              prose-ul:text-[17px] md:prose-ul:text-[19px] prose-ul:leading-[1.8] prose-ul:mb-6 prose-ul:pl-6
+              prose-li:text-[17px] md:prose-li:text-[19px] prose-li:leading-[1.8] prose-li:marker:text-[#00AEEF]
+              prose-blockquote:border-l-4 prose-blockquote:border-l-[#00AEEF] prose-blockquote:bg-[#E6F8FD] prose-blockquote:px-5 md:prose-blockquote:px-8 prose-blockquote:py-4 md:prose-blockquote:py-6 prose-blockquote:rounded-2xl
               prose-blockquote:before:content-none prose-blockquote:after:content-none
               prose-img:rounded-2xl md:prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-8
-              prose-hr:my-12 prose-hr:border-gray-200
               [&_*]:text-[#1E2A3A]
               [&_h1]:!text-[#0A1628] [&_h2]:!text-[#0A1628] [&_h3]:!text-[#0A1628] [&_h4]:!text-[#0A1628]
               [&_strong]:!text-[#0A1628]
               [&_p]:!text-[#1E2A3A]
-              [&_li]:!text-[#1E2A3A]
-              [&_blockquote]:!text-[#0A1628]`}
-            style={
-              {
-                "--tw-prose-body": "#1E2A3A",
-                "--tw-prose-bold": "#0A1628",
-                "--tw-prose-headings": "#0A1628",
-                "--tw-prose-links": YPA_BLUE,
-                "--tw-prose-bullets": YPA_BLUE,
-                "--tw-prose-quotes": "#0A1628",
-                "--tw-prose-quote-borders": YPA_BLUE,
-              } as React.CSSProperties
-            }
+              [&_li]:!text-[#1E2A3A]`}
           >
-            <div
-              className="[&_blockquote]:bg-[#E6F8FD] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
-              dangerouslySetInnerHTML={{ __html: post.content || '' }}
-            />
+            <div dangerouslySetInnerHTML={{ __html: post.content || '' }} />
           </div>
 
           {/* ===== TAGS ===== */}
@@ -517,7 +446,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             <div className="mt-10 overflow-hidden rounded-2xl border" style={{ borderColor: "#E8ECF0" }}>
               <div className="relative">
                 <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${YPA_BLUE_LIGHT}, ${YPA_GOLD})` }} />
-                
                 <div className="p-6 md:p-8" style={{ background: MIST }}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <div
@@ -527,7 +455,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                       {authorInitial}
                     </div>
                     <div>
-                      <div className={`${inter.className} text-base md:text-lg font-semibold`} style={{ color: TEXT_PRIMARY }}>
+                      <div className={`${inter.className} text-base md:text-lg font-semibold`} style={{ color: INK }}>
                         Written by {author.name}
                       </div>
                       {author.bio && (
@@ -550,7 +478,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           {/* ===== RELATED POSTS ===== */}
           {relatedPosts.length > 0 && (
             <div className="mt-12 md:mt-16 pt-8 md:pt-10 border-t" style={{ borderColor: "#E8ECF0" }}>
-              <h3 className={`${display.className} text-xl md:text-2xl font-medium mb-4 md:mb-6`} style={{ color: INK_ON_LIGHT }}>
+              <h3 className={`${display.className} text-xl md:text-2xl font-medium mb-4 md:mb-6`} style={{ color: INK }}>
                 Related Posts
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -578,7 +506,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                       )}
                     </div>
                     <div className="p-3 md:p-4">
-                      <h4 className={`${inter.className} text-sm md:text-base font-medium line-clamp-2 group-hover:text-[#00AEEF] transition-colors`} style={{ color: INK_ON_LIGHT }}>
+                      <h4 className={`${inter.className} text-sm md:text-base font-medium line-clamp-2 group-hover:text-[#00AEEF] transition-colors`} style={{ color: INK }}>
                         {related.title}
                       </h4>
                       <p className={`${inter.className} text-xs text-[#5B6B7A] mt-1 line-clamp-1 font-light`}>
@@ -591,7 +519,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          {/* ===== COMMENTS SECTION ===== */}
+          {/* ===== COMMENTS ===== */}
           <div className="mt-12 md:mt-16 pt-8 md:pt-10 border-t" style={{ borderColor: "#E8ECF0" }}>
             <Comments postId={post.id} postSlug={post.slug} />
           </div>
