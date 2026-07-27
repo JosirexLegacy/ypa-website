@@ -230,9 +230,9 @@ export default function TeamPage() {
 
       <Navigation />
 
-      {/* ===== HERO - YPA Brand Colors ===== */}
+      {/* ===== HERO - YPA Light Blue ===== */}
       <section className="relative pt-28 md:pt-32 pb-12 md:pb-16 px-5 md:px-14 overflow-hidden" style={{ background: NAVY }}>
-        {/* Background Pattern - Subtle Grid */}
+        {/* Background Pattern */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
           <div className="absolute inset-0" style={{
             backgroundImage: "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
@@ -240,22 +240,22 @@ export default function TeamPage() {
           }} />
         </div>
         
-        {/* Animated Blobs - YPA Blue & Gold */}
+        {/* Animated Blobs - Light Blue */}
         <motion.div
           className="absolute top-[-30%] right-[-10%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${YPA_BLUE}15` }}
+          style={{ background: `${YPA_BLUE_LIGHT}12` }}
           animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           className="absolute bottom-[-30%] left-[-10%] w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${YPA_BLUE_LIGHT}10` }}
+          style={{ background: `${YPA_BLUE}10` }}
           animate={{ x: [0, -30, 20, 0], y: [0, 30, -20, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
         <motion.div
           className="absolute top-[20%] left-[30%] w-[200px] h-[200px] rounded-full blur-3xl pointer-events-none hidden md:block"
-          style={{ background: `${GOLD}08` }}
+          style={{ background: `${YPA_BLUE_LIGHT}08` }}
           animate={{ scale: [1, 1.2, 1], x: [0, 20, -10, 0] }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
@@ -263,22 +263,22 @@ export default function TeamPage() {
         {/* Decorative Goat Mark */}
         <div className="absolute right-0 bottom-0 w-[300px] h-[300px] pointer-events-none opacity-[0.06]">
           <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M200 50 C180 50 160 60 150 80 C140 60 120 55 110 70 C100 85 110 100 120 110 C100 115 80 130 70 150 C60 170 55 195 60 220 C65 245 75 265 90 280 C105 295 125 305 145 310 C165 315 185 315 200 310 C215 305 235 295 250 280 C265 265 275 245 280 220 C285 195 280 170 270 150 C260 130 240 115 220 110 C230 100 240 85 230 70 C220 55 200 60 190 80 C180 60 160 50 200 50Z" fill={YPA_BLUE} />
+            <path d="M200 50 C180 50 160 60 150 80 C140 60 120 55 110 70 C100 85 110 100 120 110 C100 115 80 130 70 150 C60 170 55 195 60 220 C65 245 75 265 90 280 C105 295 125 305 145 310 C165 315 185 315 200 310 C215 305 235 295 250 280 C265 265 275 245 280 220 C285 195 280 170 270 150 C260 130 240 115 220 110 C230 100 240 85 230 70 C220 55 200 60 190 80 C180 60 160 50 200 50Z" fill={YPA_BLUE_LIGHT} />
           </svg>
         </div>
 
         <div className="relative container mx-auto max-w-6xl z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              {/* Trust Badge - Glass Effect */}
+              {/* Trust Badge - Light Blue Glass */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-sm border mb-4"
                 style={{ 
-                  background: `linear-gradient(135deg, ${YPA_BLUE}20, ${YPA_BLUE_LIGHT}10)`,
-                  borderColor: `${YPA_BLUE}30`
+                  background: `linear-gradient(135deg, ${YPA_BLUE_LIGHT}20, ${YPA_BLUE}10)`,
+                  borderColor: `${YPA_BLUE_LIGHT}30`
                 }}
               >
                 <Shield className="w-3.5 h-3.5" style={{ color: YPA_BLUE_LIGHT }} />
@@ -294,7 +294,7 @@ export default function TeamPage() {
                 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight"
               >
                 The People <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00AEEF] to-[#33C1F5]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#33C1F5] to-[#00AEEF]">
                   Behind YPA
                 </span>
               </motion.h1>
@@ -318,8 +318,8 @@ export default function TeamPage() {
               className="flex items-center gap-3 flex-wrap"
             >
               <div className="flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border" style={{ 
-                background: `rgba(255,255,255,0.05)`,
-                borderColor: `${YPA_BLUE}20`
+                background: `rgba(51,193,245,0.08)`,
+                borderColor: `${YPA_BLUE_LIGHT}20`
               }}>
                 <Users className="w-4 h-4" style={{ color: YPA_BLUE_LIGHT }} />
                 <span className="text-sm text-white/80 font-medium">{members.length}</span>
