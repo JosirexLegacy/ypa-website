@@ -28,7 +28,7 @@ import {
 import { Space_Grotesk, IBM_Plex_Mono, Inter } from 'next/font/google';
 
 // ============================================================
-// CUSTOM SVG ICONS (Same as Contact Page)
+// CUSTOM SVG ICONS
 // ============================================================
 const LinkedInIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -101,11 +101,6 @@ const getImageUrl = (image: string | undefined): string | null => {
   if (image.startsWith('http')) return image;
   return `${API_URL}/assets/${image}`;
 };
-
-// ============================================================
-// FALLBACK IMAGE
-// ============================================================
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=400&q=80';
 
 // ============================================================
 // DATA FETCHING
@@ -235,17 +230,17 @@ export default function TeamPage() {
 
       <Navigation />
 
-      {/* ===== HERO - Enhanced ===== */}
+      {/* ===== HERO - YPA Brand Colors ===== */}
       <section className="relative pt-28 md:pt-32 pb-12 md:pb-16 px-5 md:px-14 overflow-hidden" style={{ background: NAVY }}>
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
+        {/* Background Pattern - Subtle Grid */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
           <div className="absolute inset-0" style={{
             backgroundImage: "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
             backgroundSize: "48px 48px"
           }} />
         </div>
         
-        {/* Animated Blobs */}
+        {/* Animated Blobs - YPA Blue & Gold */}
         <motion.div
           className="absolute top-[-30%] right-[-10%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
           style={{ background: `${YPA_BLUE}15` }}
@@ -258,19 +253,36 @@ export default function TeamPage() {
           animate={{ x: [0, -30, 20, 0], y: [0, 30, -20, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
+        <motion.div
+          className="absolute top-[20%] left-[30%] w-[200px] h-[200px] rounded-full blur-3xl pointer-events-none hidden md:block"
+          style={{ background: `${GOLD}08` }}
+          animate={{ scale: [1, 1.2, 1], x: [0, 20, -10, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+
+        {/* Decorative Goat Mark */}
+        <div className="absolute right-0 bottom-0 w-[300px] h-[300px] pointer-events-none opacity-[0.06]">
+          <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M200 50 C180 50 160 60 150 80 C140 60 120 55 110 70 C100 85 110 100 120 110 C100 115 80 130 70 150 C60 170 55 195 60 220 C65 245 75 265 90 280 C105 295 125 305 145 310 C165 315 185 315 200 310 C215 305 235 295 250 280 C265 265 275 245 280 220 C285 195 280 170 270 150 C260 130 240 115 220 110 C230 100 240 85 230 70 C220 55 200 60 190 80 C180 60 160 50 200 50Z" fill={YPA_BLUE} />
+          </svg>
+        </div>
 
         <div className="relative container mx-auto max-w-6xl z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              {/* Trust Badge */}
+              {/* Trust Badge - Glass Effect */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-4"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-sm border mb-4"
+                style={{ 
+                  background: `linear-gradient(135deg, ${YPA_BLUE}20, ${YPA_BLUE_LIGHT}10)`,
+                  borderColor: `${YPA_BLUE}30`
+                }}
               >
-                <Shield className="w-3.5 h-3.5 text-[#33C1F5]" />
-                <span className="text-[10px] font-medium tracking-[0.15em] uppercase text-white/60">
+                <Shield className="w-3.5 h-3.5" style={{ color: YPA_BLUE_LIGHT }} />
+                <span className="text-[10px] font-medium tracking-[0.15em] uppercase" style={{ color: `${YPA_BLUE_LIGHT}80` }}>
                   Verified Leadership
                 </span>
               </motion.div>
@@ -291,7 +303,8 @@ export default function TeamPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-sm md:text-base text-white/50 mt-2 max-w-xl font-light leading-relaxed"
+                className="text-sm md:text-base mt-2 max-w-xl font-light leading-relaxed"
+                style={{ color: `${YPA_BLUE_LIGHT}50` }}
               >
                 Meet the dedicated professionals driving agricultural transformation across Africa — 
                 <span className="text-white/70"> experts in agribusiness, finance, and community development.</span>
@@ -304,14 +317,20 @@ export default function TeamPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="flex items-center gap-3 flex-wrap"
             >
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
-                <Users className="w-4 h-4 text-[#33C1F5]" />
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border" style={{ 
+                background: `rgba(255,255,255,0.05)`,
+                borderColor: `${YPA_BLUE}20`
+              }}>
+                <Users className="w-4 h-4" style={{ color: YPA_BLUE_LIGHT }} />
                 <span className="text-sm text-white/80 font-medium">{members.length}</span>
                 <span className="text-xs text-white/40">members</span>
               </div>
               {leadership.length > 0 && (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#F0B429]/10 backdrop-blur-sm border border-[#F0B429]/20">
-                  <Award className="w-4 h-4 text-[#F0B429]" />
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border" style={{ 
+                  background: `rgba(240,180,41,0.10)`,
+                  borderColor: `${GOLD}30`
+                }}>
+                  <Award className="w-4 h-4" style={{ color: GOLD }} />
                   <span className="text-sm text-white/80 font-medium">{leadership.length}</span>
                   <span className="text-xs text-white/40">leadership</span>
                 </div>
@@ -321,7 +340,7 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* ===== FILTERS - Enhanced ===== */}
+      {/* ===== FILTERS ===== */}
       <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8ECF0] py-3 px-5 md:px-14 shadow-sm">
         <div className="container mx-auto max-w-6xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 md:gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
@@ -378,7 +397,7 @@ export default function TeamPage() {
         </div>
       </div>
 
-      {/* ===== LEADERSHIP SPOTLIGHT - Enhanced ===== */}
+      {/* ===== LEADERSHIP SPOTLIGHT ===== */}
       {leadership.length > 0 && activeDepartment === 'all' && (
         <section className="px-5 md:px-14 py-10 md:py-16" style={{ background: MIST }}>
           <div className="container mx-auto max-w-6xl">
@@ -418,7 +437,7 @@ export default function TeamPage() {
                         </span>
                       </div>
 
-                      {/* Name & Role - Overlay */}
+                      {/* Name & Role */}
                       <div className="absolute bottom-0 left-0 right-0 p-5">
                         <h3 className="text-lg font-bold text-white group-hover:text-[#33C1F5] transition-colors">
                           {member.name}
@@ -557,7 +576,7 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* ===== MEMBER DETAIL MODAL - Enhanced ===== */}
+      {/* ===== MEMBER DETAIL MODAL ===== */}
       <AnimatePresence>
         {selectedMember && (
           <motion.div
@@ -678,7 +697,7 @@ export default function TeamPage() {
         )}
       </AnimatePresence>
 
-      {/* ===== CTA - Enhanced ===== */}
+      {/* ===== CTA ===== */}
       <section className="px-5 md:px-14 py-12 md:py-16" style={{ background: NAVY }}>
         <div className="container mx-auto max-w-4xl">
           <motion.div
