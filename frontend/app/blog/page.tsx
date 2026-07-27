@@ -90,6 +90,25 @@ const POSITIVE = "#34D399";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
+// ✅ HELPER: Get image URL - handles both Cloudinary and Directus
+// ============================================================
+function getImageUrl(image: string | undefined): string | null {
+  if (!image) return null;
+  
+  // If it's already a full URL (Cloudinary), return it as-is
+  if (image.startsWith('http://') || image.startsWith('https://')) {
+    return image;
+  }
+  
+  // If it's a Directus file ID, build the URL
+  if (image.length > 0 && !image.startsWith('/')) {
+    return `${API_URL}/assets/${image}`;
+  }
+  
+  return null;
+}
+
+// ============================================================
 // CATEGORIES
 // ============================================================
 const CATEGORIES = [
@@ -327,7 +346,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* ===== CATEGORY FILTER - CENTERED & SYMMETRICAL ===== */}
+      {/* ===== CATEGORY FILTER ===== */}
       <div className="sticky top-20 z-30 flex justify-center px-3 md:px-4 -mt-4">
         <div
           className="inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-2xl md:rounded-full transition-all duration-300 max-w-full"
@@ -343,7 +362,6 @@ export default function BlogPage() {
             Filter:
           </span>
           
-          {/* ✅ CENTERED & SYMMETRICAL - Same on mobile & desktop */}
           <div className="flex items-center justify-center gap-1 md:gap-1.5 flex-wrap">
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
@@ -406,14 +424,14 @@ export default function BlogPage() {
               >
                 <div className="grid md:grid-cols-5 gap-0">
                   <div className="relative h-[250px] md:h-[380px] md:col-span-2 overflow-hidden bg-[#F5F9FF]">
+                    {/* ✅ FIXED: Use getImageUrl helper */}
                     {featuredPost.featured_image ? (
                       <img
-                        src={`${API_URL}/assets/${featuredPost.featured_image}`}
+                        src={getImageUrl(featuredPost.featured_image) || ''}
                         alt={featuredPost.title}
                         crossOrigin="anonymous"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
                         }}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
@@ -534,14 +552,14 @@ export default function BlogPage() {
                       style={{ borderColor: "#E8ECF0" }}
                     >
                       <div className="relative w-full h-44 md:h-52 min-h-[176px] md:min-h-[208px] overflow-hidden bg-[#F5F9FF] flex-shrink-0">
+                        {/* ✅ FIXED: Use getImageUrl helper */}
                         {post.featured_image ? (
                           <img
-                            src={`${API_URL}/assets/${post.featured_image}`}
+                            src={getImageUrl(post.featured_image) || ''}
                             alt={post.title}
                             crossOrigin="anonymous"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
                             }}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           />
