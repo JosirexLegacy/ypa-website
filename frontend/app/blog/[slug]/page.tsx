@@ -140,19 +140,30 @@ function getVideoEmbedUrl(url: string) {
 }
 
 // ============================================================
-// HELPER: Get image URL
+// HELPER: Get image URL - FIXED ✅
+// Handles both Cloudinary URLs and Directus file IDs
 // ============================================================
 function getImageUrl(image: string | undefined): string | null {
   if (!image) return null;
-  return `${API_URL}/assets/${image}`;
+  
+  // ✅ If it's already a full URL (Cloudinary, etc.), return it
+  if (image.startsWith('http://') || image.startsWith('https://')) {
+    return image;
+  }
+  
+  // ✅ If it's a Directus file ID, build the URL
+  if (image.length > 0) {
+    return `${API_URL}/assets/${image}`;
+  }
+  
+  return null;
 }
 
 // ============================================================
-// DATA FETCHING - FIXED ✅
+// DATA FETCHING
 // ============================================================
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    // ✅ Fetch post with author relation fields explicitly
     const res = await fetch(
       `${API_URL}/items/posts?filter[slug][_eq]=${slug}&filter[status][_eq]=published&fields=*,author_id.id,author_id.name,author_id.bio,author_id.role,author_id.avatar`,
       { cache: "no-store" }
@@ -160,10 +171,6 @@ async function getPost(slug: string): Promise<Post | null> {
     if (!res.ok) return null;
     const data = await res.json();
     const post = data.data?.[0] || null;
-    
-    // ✅ Debug log to check author data
-    console.log('📝 Post data:', post);
-    console.log('👤 Author data:', post?.author_id);
     
     return post;
   } catch (error) {
@@ -202,9 +209,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
+  // ✅ Use getImageUrl helper
   const imageUrl = getImageUrl(post.featured_image) || `${API_URL}/assets/default-og-image.jpg`;
   
-  // ✅ Safely get author name
   const authorName = post.author_id && typeof post.author_id === 'object' 
     ? post.author_id.name 
     : post.author || "YPA Team";
@@ -261,12 +268,11 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const category = CATEGORIES.find((c) => c.value === post.category);
   const relatedPosts = await getRelatedPosts(post.category, post.id);
 
-  // ✅ Get author data - check if it's an object or string
   const author = post.author_id && typeof post.author_id === 'object' ? post.author_id : null;
   const authorName = author?.name || post.author || "YPA Team";
   const authorInitial = authorName.charAt(0).toUpperCase();
 
-  // ✅ Get featured image URL
+  // ✅ Get featured image URL using the helper
   const featuredImageUrl = getImageUrl(post.featured_image);
 
   return (
@@ -310,6 +316,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               src={featuredImageUrl}
               alt={post.title}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                console.error('Image failed to load:', featuredImageUrl);
+                e.currentTarget.style.display = 'none';
+              }}
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#0E2540] to-[#153455] flex items-center justify-center text-white/20">
@@ -410,6 +420,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {post.gallery_images.map((image: any, index: number) => {
+                  // ✅ Handle both Cloudinary URLs and Directus file IDs
                   const imageUrl = typeof image === 'string' ? getImageUrl(image) : null;
                   return (
                     <div
@@ -421,6 +432,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                           src={imageUrl}
                           alt={`${post.title} - Image ${index + 1}`}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          onError={(e) => {
+                            console.error('Gallery image failed to load:', imageUrl);
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       )}
                     </div>
@@ -552,6 +567,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                           src={getImageUrl(related.featured_image) || ''}
                           alt={related.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[#5B6B7A]/30">
