@@ -100,12 +100,12 @@ const CATEGORIES = [
 ];
 
 // ============================================================
-// ✅ FIXED: Get image URL - handles both Cloudinary and Directus
+// ✅ FIXED: Get image URL - returns full URL without Next.js optimization
 // ============================================================
 function getImageUrl(image: string | undefined): string | null {
   if (!image) return null;
   
-  // If it's already a full URL (Cloudinary, etc.), return it as-is
+  // If it's already a full URL (Cloudinary), return it as-is
   if (image.startsWith('http://') || image.startsWith('https://')) {
     return image;
   }
@@ -496,6 +496,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                           alt={related.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           onError={(e) => {
+                            console.error('Related image failed:', related.featured_image);
                             e.currentTarget.style.display = 'none';
                           }}
                         />
