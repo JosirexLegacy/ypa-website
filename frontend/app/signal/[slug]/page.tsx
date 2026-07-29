@@ -4,9 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Source_Serif_4, Inter } from "next/font/google";
 import { format } from "date-fns";
-import { Calendar, ArrowLeft, Clock, Tag, ArrowUpRight, Share2, ArrowRight, Sparkles } from "lucide-react";
+import { Calendar, ArrowLeft, Clock, Tag, ArrowUpRight, Share2, ArrowRight, Sparkles, BookOpen } from "lucide-react";
 import { useState, useEffect, use } from "react";
 
 // ============================================================
@@ -24,18 +24,25 @@ const mono = IBM_Plex_Mono({
 });
 const serif = Source_Serif_4({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-serif",
+});
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
 });
 
 // ============================================================
 // DESIGN TOKENS
 // ============================================================
 const INK = "#060B14";
-const BLUE = "#2196F3";
+const BLUE = "#00AEEF";
+const BLUE_LIGHT = "#33C1F5";
 const SKY = "#7EC8FF";
 const MUTE_ON_LIGHT = "#5B6B7A";
 const MIST = "#F6F8FA";
+const NAVY = "#0E2540";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
@@ -106,6 +113,134 @@ function ArticleImage({ src, alt, fallback }: { src: string; alt: string; fallba
 }
 
 // ============================================================
+// RECENT ARTICLES COMPONENT
+// ============================================================
+function RecentArticles({ currentSlug }: { currentSlug: string }) {
+  const [recentArticles, setRecentArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRecent = async () => {
+      try {
+        const res = await fetch(
+          `${API_URL}/items/signal_articles?filter[status][_eq]=published&sort[]=-date&limit=4`,
+          { cache: "no-store" }
+        );
+        if (!res.ok) throw new Error("Network response was not ok");
+        const data = await res.json();
+        // Filter out current article and limit to 3
+        const filtered = (data.data || [])
+          .filter((a: any) => a.slug !== currentSlug)
+          .slice(0, 3);
+        setRecentArticles(filtered);
+      } catch (_) {
+        // Fallback to hardcoded articles
+        const fallback = getFallbackArticles()
+          .filter(a => a.slug !== currentSlug)
+          .slice(0, 3);
+        setRecentArticles(fallback);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecent();
+  }, [currentSlug]);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="animate-pulse">
+            <div className="bg-[#F6F8FA] rounded-xl h-48 w-full" />
+            <div className="mt-4 h-4 bg-[#F6F8FA] rounded w-3/4" />
+            <div className="mt-2 h-3 bg-[#F6F8FA] rounded w-1/2" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (recentArticles.length === 0) return null;
+
+  return (
+    <div className="mt-16 pt-12 border-t" style={{ borderColor: "#E8ECF0" }}>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <BookOpen className="w-5 h-5" style={{ color: BLUE }} />
+          <h3 className={`${display.className} text-2xl font-medium`} style={{ color: INK }}>
+            Recent Stories
+          </h3>
+          <span className={`${mono.className} text-xs px-2.5 py-0.5 rounded-full`} style={{ background: `${BLUE}10`, color: BLUE }}>
+            {recentArticles.length}
+          </span>
+        </div>
+        <Link
+          href="/signal"
+          className="inline-flex items-center gap-1.5 text-sm font-medium transition-all hover:gap-3 group"
+          style={{ color: BLUE }}
+        >
+          <span>View all</span>
+          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {recentArticles.map((article) => {
+          const imageUrl = article.image?.startsWith("http")
+            ? article.image
+            : `${API_URL}/assets/${article.image}`;
+          const fallbackImage = "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80";
+
+          return (
+            <Link
+              key={article.slug}
+              href={`/signal/${article.slug}`}
+              className="group block rounded-xl overflow-hidden border hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+              style={{ borderColor: "#E8ECF0", background: "white" }}
+            >
+              <div className="relative aspect-[16/9] overflow-hidden bg-[#F6F8FA]">
+                <img
+                  src={imageUrl}
+                  alt={article.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackImage;
+                  }}
+                />
+                <div className="absolute top-3 left-3">
+                  <span
+                    className={`${mono.className} px-2.5 py-1 text-[9px] font-semibold tracking-[0.08em] uppercase rounded-full backdrop-blur-sm`}
+                    style={{ background: "rgba(0,0,0,0.6)", color: "#fff" }}
+                  >
+                    {article.tag || "Feature"}
+                  </span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h4 className={`${display.className} text-base font-medium text-[#111111] group-hover:text-[#00AEEF] transition-colors line-clamp-2`}>
+                  {article.title}
+                </h4>
+                <p className="text-xs text-[#5B6B7A] mt-1.5 line-clamp-2 font-light">
+                  {article.description}
+                </p>
+                <div className="flex items-center gap-3 mt-2.5 text-[10px] text-[#5B6B7A]">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {article.readTime || "3 min read"}
+                  </span>
+                  <span className="w-0.5 h-0.5 rounded-full bg-[#D1D9E0]" />
+                  <span>{article.date ? format(new Date(article.date), "MMM d") : "Recent"}</span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // MAIN COMPONENT
 // ============================================================
 export default function SignalDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -143,7 +278,7 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
 
   if (loading) {
     return (
-      <main className={`${display.variable} ${mono.variable} ${serif.variable} min-h-screen bg-white`}>
+      <main className={`${display.variable} ${mono.variable} ${serif.variable} ${inter.variable} min-h-screen bg-white`}>
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="w-10 h-10 border-[3px] rounded-full animate-spin" style={{ borderColor: "#E3F2FD", borderTopColor: BLUE }} />
@@ -165,18 +300,18 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
 
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${serif.variable} min-h-screen bg-white antialiased`}
+      className={`${display.variable} ${mono.variable} ${serif.variable} ${inter.variable} min-h-screen bg-white antialiased`}
     >
       <Navigation />
 
-      {/* ===== FLOATING GLASS CHIP – centered, pill shape, with glow ===== */}
+      {/* ===== FLOATING GLASS CHIP ===== */}
       <div className="sticky top-24 z-30 flex justify-center px-4">
         <div
           className="inline-flex items-center justify-between w-full max-w-3xl px-6 py-3 rounded-full transition-all duration-300"
           style={{
             background: "rgba(14,37,64,0.65)",
             backdropFilter: "blur(20px) saturate(1.3)",
-            boxShadow: "0 8px 40px rgba(33,150,243,0.30), inset 0 1px 0 rgba(255,255,255,0.10)",
+            boxShadow: "0 8px 40px rgba(0,174,239,0.25), inset 0 1px 0 rgba(255,255,255,0.10)",
             border: "1px solid rgba(255,255,255,0.08)",
           }}
         >
@@ -193,7 +328,7 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
         </div>
       </div>
 
-      {/* ===== HERO – with top padding and rounded corners ===== */}
+      {/* ===== HERO ===== */}
       <div className="relative w-full pt-6 md:pt-8 px-6 md:px-14">
         <div className="relative w-full aspect-[21/9] max-h-[70vh] min-h-[400px] overflow-hidden rounded-3xl shadow-2xl">
           <ArticleImage src={imageUrl} alt={article.title} fallback={fallbackImage} />
@@ -202,7 +337,7 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
 
           <div className="absolute inset-x-0 bottom-0 z-10 px-8 md:px-12 pb-10 md:pb-12">
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className={`${mono.className} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-[0.08em] uppercase bg-blue-500/30 backdrop-blur-sm text-blue-200 border border-white/10`}>
+              <span className={`${mono.className} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-[0.08em] uppercase bg-[#00AEEF]/30 backdrop-blur-sm text-[#33C1F5] border border-white/10`}>
                 <Tag className="w-3 h-3" />
                 {article.tag}
               </span>
@@ -210,6 +345,12 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
                 <Clock className="w-3 h-3" />
                 {article.readTime || `${readingTime} min read`}
               </span>
+              {article.big && (
+                <span className={`${mono.className} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-[0.08em] uppercase bg-[#F0B429]/30 backdrop-blur-sm text-[#F0B429] border border-white/10`}>
+                  <Sparkles className="w-3 h-3" />
+                  Featured
+                </span>
+              )}
             </div>
             <h1 className={`${display.className} text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium text-white tracking-tight leading-[1.05] max-w-4xl drop-shadow-xl`}>
               {article.title}
@@ -217,7 +358,7 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
             <div className="flex items-center gap-4 mt-6">
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-white font-medium text-base shrink-0 border-2 border-white/20"
-                style={{ background: `linear-gradient(135deg, ${BLUE}, ${SKY})` }}
+                style={{ background: `linear-gradient(135deg, ${BLUE}, ${BLUE_LIGHT})` }}
               >
                 {article.author ? article.author.charAt(0).toUpperCase() : "Y"}
               </div>
@@ -252,10 +393,10 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
               prose-h4:text-2xl prose-h4:mt-8 prose-h4:mb-4
               prose-p:text-[19px] prose-p:leading-[1.9] prose-p:mb-7 prose-p:text-[#1E2A3A] prose-p:font-light
               prose-strong:font-semibold prose-strong:text-[#0E2540]
-              prose-a:text-[#2196F3] hover:prose-a:underline
+              prose-a:text-[#00AEEF] hover:prose-a:underline
               prose-ul:text-[19px] prose-ul:leading-[1.9] prose-ul:mb-7 prose-ul:pl-7 prose-ul:text-[#1E2A3A]
-              prose-li:text-[19px] prose-li:leading-[1.9] prose-li:text-[#1E2A3A] prose-li:marker:text-[#2196F3]
-              prose-blockquote:border-l-4 prose-blockquote:border-l-[#2196F3] prose-blockquote:bg-[#F5F9FF] prose-blockquote:px-8 prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[20px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#0E2540] prose-blockquote:shadow-sm
+              prose-li:text-[19px] prose-li:leading-[1.9] prose-li:text-[#1E2A3A] prose-li:marker:text-[#00AEEF]
+              prose-blockquote:border-l-4 prose-blockquote:border-l-[#00AEEF] prose-blockquote:bg-[#E6F8FD] prose-blockquote:px-8 prose-blockquote:py-6 prose-blockquote:rounded-2xl prose-blockquote:text-[20px] prose-blockquote:font-medium prose-blockquote:not-italic prose-blockquote:text-[#0E2540] prose-blockquote:shadow-sm
               prose-blockquote:mx-0 prose-blockquote:my-10
               prose-blockquote:before:content-none prose-blockquote:after:content-none
               prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-10
@@ -279,7 +420,7 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
             }
           >
             <div
-              className="[&_blockquote]:bg-[#F5F9FF] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
+              className="[&_blockquote]:bg-[#E6F8FD] [&_p]:text-[#1E2A3A] [&_span]:text-[#1E2A3A] [&_li]:text-[#1E2A3A]"
               dangerouslySetInnerHTML={{ __html: article.content }}
             />
           </div>
@@ -296,7 +437,7 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
             </div>
           </div>
 
-          {/* ===== SHARE & NAVIGATION (with better buttons) ===== */}
+          {/* ===== SHARE & NAVIGATION ===== */}
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <span className={`${mono.className} text-xs tracking-[0.15em] uppercase`} style={{ color: MUTE_ON_LIGHT }}>
@@ -319,7 +460,6 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
                 <Share2 className="w-5 h-5" style={{ color: MUTE_ON_LIGHT }} />
               </button>
             </div>
-            {/* ✅ "Browse all stories" now points to /signal */}
             <Link
               href="/signal"
               className="inline-flex items-center gap-2 text-sm font-medium transition-all hover:gap-3 group"
@@ -329,6 +469,9 @@ export default function SignalDetailPage({ params }: { params: Promise<{ slug: s
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
+
+          {/* ===== RECENT ARTICLES ===== */}
+          <RecentArticles currentSlug={slug} />
 
           {/* ===== BACK TO TOP ===== */}
           <div className="mt-16 pt-10 border-t" style={{ borderColor: "#E8ECF0" }}>
