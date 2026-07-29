@@ -166,7 +166,7 @@ async function getEvents() {
 async function getBlogPosts() {
   try {
     const res = await fetch(
-      `${API_URL}/items/posts?filter[status][_eq]=published&sort[]=-featured&sort[]=-published_at&limit=3`,
+      `${API_URL}/items/posts?filter[status][_eq]=published&sort[]=-featured&sort[]=-published_at&limit=4`,
       { cache: "no-store" }
     );
     if (!res.ok) {
@@ -258,6 +258,7 @@ const SECTIONS = [
   { id: "signal", label: "Inside YPA" },
   { id: "voices", label: "Member Voices" },
   { id: "press", label: "Press" },
+  { id: "blog", label: "Blog" },
   { id: "cta", label: "Join" },
 ];
 
@@ -1368,6 +1369,226 @@ const PressSignal = ({ pressItems }: { pressItems: any[] }) => {
 };
 
 // ============================================================
+// RECENT BLOG SECTION - Beautiful Blog Showcase
+// ============================================================
+const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
+  if (!blogs || blogs.length === 0) return null;
+
+  // Get featured blog (first one)
+  const featured = blogs[0];
+  const rest = blogs.slice(1, 4);
+
+  return (
+    <section id="blog" className="px-5 md:px-14 py-16 md:py-24 max-w-7xl mx-auto">
+      <ScrollReveal>
+        <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
+          <div>
+            <span className={`${mono.className} text-[11px] md:text-[13px] text-[#5B6B7A] mb-2 block`}>
+              Latest Stories
+            </span>
+            <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-[#111111]`}>
+              From the <span style={{ color: YPA_BLUE }}>Blog</span>
+            </h2>
+          </div>
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 text-sm font-medium group transition-all hover:gap-3 text-[#00AEEF]"
+          >
+            View all posts
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+      </ScrollReveal>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        {/* Featured Blog - Large */}
+        <ScrollReveal className="lg:col-span-2" delay={0.05}>
+          <Link href={`/blog/${featured.slug}`} className="group block h-full">
+            <div className="relative rounded-2xl overflow-hidden h-full min-h-[320px] md:min-h-[400px] bg-[#F6F8FA] border border-[#E8ECF0] hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+              {featured.featured_image ? (
+                <img
+                  src={getImageUrl(featured.featured_image, FALLBACK_IMAGES.default)}
+                  alt={featured.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#00AEEF]/10 to-[#33C1F5]/10">
+                  <BookOpen className="w-16 h-16 text-[#00AEEF]/20" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/80 via-[#111111]/30 to-transparent" />
+              
+              {/* Featured Badge */}
+              <div className="absolute top-4 left-4">
+                <span className="bg-[#00AEEF] text-white text-[10px] font-medium px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                  <Sparkles className="w-3 h-3" />
+                  Featured
+                </span>
+              </div>
+
+              {/* Content overlay */}
+              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8">
+                <div className="flex items-center gap-3 text-xs text-white/60 mb-2">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {featured.published_at ? new Date(featured.published_at).toLocaleDateString() : "Recent"}
+                  </span>
+                  <span className="w-1 h-1 rounded-full bg-white/30" />
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {Math.ceil((featured.content?.length || 500) / 1000)} min read
+                  </span>
+                </div>
+                <h3 className={`${display.className} text-xl md:text-2xl lg:text-3xl font-medium text-white leading-snug group-hover:text-[#33C1F5] transition-colors`}>
+                  {featured.title}
+                </h3>
+                <p className="text-white/60 text-sm mt-2 line-clamp-2">{featured.excerpt}</p>
+                <div className="mt-4 inline-flex items-center gap-2 text-white/80 group-hover:text-[#33C1F5] transition-colors text-sm font-medium">
+                  Read more
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+          </Link>
+        </ScrollReveal>
+
+        {/* Side blogs */}
+        <div className="space-y-4 md:space-y-6">
+          {rest.map((blog, index) => (
+            <ScrollReveal key={blog.id} delay={0.08 + index * 0.06}>
+              <Link href={`/blog/${blog.slug}`} className="group block">
+                <div className="flex gap-3 md:gap-4 items-start bg-white rounded-xl border border-[#E8ECF0] p-3 md:p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden shrink-0 bg-[#F6F8FA]">
+                    {blog.featured_image ? (
+                      <img
+                        src={getImageUrl(blog.featured_image, FALLBACK_IMAGES.default)}
+                        alt={blog.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-[#00AEEF]/5">
+                        <BookOpen className="w-6 h-6 text-[#00AEEF]/20" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 text-[10px] text-[#5B6B7A]">
+                      <Calendar className="w-3 h-3" />
+                      {blog.published_at ? new Date(blog.published_at).toLocaleDateString() : "Recent"}
+                    </div>
+                    <h4 className={`${display.className} text-sm md:text-base font-medium text-[#111111] group-hover:text-[#00AEEF] transition-colors line-clamp-2 mt-0.5`}>
+                      {blog.title}
+                    </h4>
+                    <p className="text-xs text-[#5B6B7A] line-clamp-1 mt-0.5">{blog.excerpt}</p>
+                  </div>
+                </div>
+              </Link>
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================================
+// EVENTS BANNER - Beautiful Upcoming Events Showcase
+// ============================================================
+const EventsBanner = ({ events }: { events: any[] }) => {
+  if (!events || events.length === 0) return null;
+
+  const upcomingEvents = events.slice(0, 3);
+
+  return (
+    <section className="px-5 md:px-14 py-16 md:py-20 bg-[#0E2540] overflow-hidden border-y border-[#1F3B57]">
+      <div className="max-w-7xl mx-auto">
+        <ScrollReveal>
+          <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
+            <div>
+              <span className={`${mono.className} text-[11px] md:text-[13px] text-[#33C1F5]/60 mb-2 block`}>
+                Stay Connected
+              </span>
+              <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-white`}>
+                Upcoming <span style={{ color: YPA_BLUE_LIGHT }}>Events</span>
+              </h2>
+            </div>
+            <Link
+              href="/events"
+              className="inline-flex items-center gap-2 text-sm font-medium group transition-all hover:gap-3 text-[#33C1F5]"
+            >
+              View all events
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {upcomingEvents.map((event, index) => {
+            const isSoon = new Date(event.date) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+            return (
+              <ScrollReveal key={event.id} delay={index * 0.06}>
+                <Link href={`/events/${event.slug}`} className="group block">
+                  <div className="relative bg-[#153455] border border-[#1F3B57] rounded-2xl p-5 md:p-6 hover:border-[#33C1F5]/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    {/* Soon Badge */}
+                    {isSoon && (
+                      <div className="absolute -top-2 -right-2">
+                        <span className="bg-[#F0B429] text-[#111111] text-[9px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                          <span className="relative flex h-1.5 w-1.5">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#111111] opacity-75" />
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#111111]" />
+                          </span>
+                          Soon
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex items-start gap-3">
+                      <div className="flex flex-col items-center justify-center bg-[#00AEEF]/10 rounded-xl px-3 py-2 min-w-[56px]">
+                        <span className="text-2xl font-bold text-[#00AEEF]">
+                          {new Date(event.date).getDate()}
+                        </span>
+                        <span className="text-[10px] font-medium text-[#33C1F5]/60 uppercase">
+                          {new Date(event.date).toLocaleString('default', { month: 'short' })}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className={`${display.className} text-base font-medium text-white group-hover:text-[#33C1F5] transition-colors line-clamp-1`}>
+                          {event.title}
+                        </h3>
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-white/50">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          {event.location && (
+                            <>
+                              <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
+                              <span className="flex items-center gap-1 truncate">
+                                <MapPin className="w-3 h-3 shrink-0" />
+                                {event.location}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hover glow */}
+                    <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
+                      background: `radial-gradient(circle at 50% 50%, ${YPA_BLUE}08, transparent 70%)`,
+                    }} />
+                  </div>
+                </Link>
+              </ScrollReveal>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================================
 // SOCIAL MEDIA — Mobile Optimized
 // ============================================================
 const LinkedinIcon = ({ className = "h-5 w-5" }) => (
@@ -1715,6 +1936,8 @@ export default function Home() {
       <Signal signalArticles={signalArticles} />
       <MemberVoices />
       <PressSignal pressItems={press} />
+      <RecentBlogs blogs={blogs} />
+      <EventsBanner events={events} />
       <SocialMedia />
       <FinalCTA />
       <LivePanel events={events} blogs={blogs} />
