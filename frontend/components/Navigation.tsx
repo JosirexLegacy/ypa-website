@@ -16,7 +16,6 @@ const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -25,7 +24,6 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle dropdown timeouts
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -59,7 +57,7 @@ const Navigation = () => {
     }, 150);
   };
 
-  // Menu structure - updated with "Our Team"
+  // Menu structure - UPDATED with YPA SACCO link
   const menuItems = {
     about: {
       items: [
@@ -81,7 +79,7 @@ const Navigation = () => {
     ecosystem: {
       items: [
         { name: "Mbuzi Choma", href: "/sister-companies/mbuzi-choma" },
-        { name: "YPA SACCO", href: "/sister-companies/ypa-sacco" },
+        { name: "YPA SACCO", href: "https://ypa-wealth-depot.vercel.app/" }, // ✅ UPDATED LINK
         { name: "Machinery Hub", href: "/sister-companies/machinery-hub" },
         { name: "Agribusiness School", href: "/sister-companies/agribusiness-school" },
       ]
@@ -117,7 +115,6 @@ const Navigation = () => {
     { name: "Contact", href: "/contact" },
   ];
 
-  // Brand red (subtle, fiery)
   const RED_GLOW = "rgba(229, 57, 53, 0.25)";
   const RED_FIRE = "rgba(229, 57, 53, 0.4)";
 
@@ -174,13 +171,12 @@ const Navigation = () => {
                     <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${
                       activeDropdown === item.dropdown ? 'rotate-180' : ''
                     }`} />
-                    {/* 🔥 Subtle red glow on hover */}
                     <span className="absolute inset-0 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
                           style={{ boxShadow: `0 0 30px ${RED_GLOW}` }} />
                   </button>
                 ) : (
                   <Link 
-                    href={item.href || '#'} // ✅ FIXED: fallback to '#' if href is undefined
+                    href={item.href || '#'}
                     className={`relative px-3 py-2 text-sm font-light transition-all duration-300 rounded-md ${
                       item.name === "Home" && !isScrolled
                         ? 'text-white hover:text-white/80'
@@ -188,13 +184,11 @@ const Navigation = () => {
                     }`}
                   >
                     {item.name}
-                    {/* 🔥 Subtle red glow on hover */}
                     <span className="absolute inset-0 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
                           style={{ boxShadow: `0 0 30px ${RED_GLOW}` }} />
                   </Link>
                 )}
 
-                {/* Dropdown - with red accent on hover */}
                 {item.dropdown && activeDropdown === item.dropdown && (
                   <div 
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 min-w-[200px] bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-[#F0F0F0] overflow-hidden"
@@ -207,11 +201,15 @@ const Navigation = () => {
                           key={subItem.name}
                           href={subItem.href}
                           className="group block px-5 py-2.5 text-sm text-[#676767] hover:text-[#1A3A5C] hover:bg-[#F5F9FF] transition-all duration-200 relative"
+                          target={subItem.href.startsWith('http') ? '_blank' : undefined}
+                          rel={subItem.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                         >
                           <span className="flex items-center gap-2">
-                            {/* 🔥 Red accent dot that appears on hover */}
                             <span className="w-1.5 h-1.5 rounded-full bg-transparent group-hover:bg-[#E53935] transition-all duration-300 group-hover:shadow-[0_0_12px_rgba(229,57,53,0.5)]" />
                             {subItem.name}
+                            {subItem.href.startsWith('http') && (
+                              <span className="text-[8px] text-[#676767]/50 ml-auto">↗</span>
+                            )}
                           </span>
                         </Link>
                       ))}
@@ -235,7 +233,6 @@ const Navigation = () => {
               Get Started
             </Link>
             
-            {/* Mobile Menu Button */}
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className={`lg:hidden w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${
@@ -249,7 +246,7 @@ const Navigation = () => {
           </div>
         </div>
 
-        {/* ===== MOBILE MENU – with red accent ===== */}
+        {/* ===== MOBILE MENU ===== */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div 
@@ -281,8 +278,13 @@ const Navigation = () => {
                                 href={subItem.href}
                                 className="block px-8 py-2.5 text-sm text-[#676767] hover:text-[#1A3A5C] hover:bg-[#F5F9FF] transition-all duration-200"
                                 onClick={() => setMobileMenuOpen(false)}
+                                target={subItem.href.startsWith('http') ? '_blank' : undefined}
+                                rel={subItem.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                               >
                                 {subItem.name}
+                                {subItem.href.startsWith('http') && (
+                                  <span className="text-[8px] text-[#676767]/50 ml-2">↗</span>
+                                )}
                               </Link>
                             ))}
                           </div>
@@ -290,7 +292,7 @@ const Navigation = () => {
                       </div>
                     ) : (
                       <Link
-                        href={item.href || '#'} // ✅ FIXED: fallback for mobile as well
+                        href={item.href || '#'}
                         className="block px-5 py-3 text-sm text-[#676767] hover:text-[#1A3A5C] hover:bg-[#F5F9FF] transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
                       >
