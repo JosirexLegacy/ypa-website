@@ -1492,7 +1492,7 @@ const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
 };
 
 // ============================================================
-// EVENTS BANNER - Beautiful Upcoming Events Showcase
+// EVENTS BANNER - Creative & Mobile-Friendly with Fixed Links
 // ============================================================
 const EventsBanner = ({ events }: { events: any[] }) => {
   if (!events || events.length === 0) return null;
@@ -1500,21 +1500,27 @@ const EventsBanner = ({ events }: { events: any[] }) => {
   const upcomingEvents = events.slice(0, 3);
 
   return (
-    <section className="px-5 md:px-14 py-16 md:py-20 bg-[#0E2540] overflow-hidden border-y border-[#1F3B57]">
+    <section className="px-4 sm:px-5 md:px-14 py-12 md:py-20 bg-[#0E2540] overflow-hidden border-y border-[#1F3B57]">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
-          <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 md:mb-8 gap-3">
             <div>
-              <span className={`${mono.className} text-[11px] md:text-[13px] text-[#33C1F5]/60 mb-2 block`}>
-                Stay Connected
-              </span>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#33C1F5] opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#33C1F5]" />
+                </span>
+                <span className={`${mono.className} text-[10px] md:text-[11px] text-[#33C1F5]/60 tracking-[0.2em] uppercase`}>
+                  Stay Connected
+                </span>
+              </div>
               <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-white`}>
                 Upcoming <span style={{ color: YPA_BLUE_LIGHT }}>Events</span>
               </h2>
             </div>
             <Link
               href="/events"
-              className="inline-flex items-center gap-2 text-sm font-medium group transition-all hover:gap-3 text-[#33C1F5]"
+              className="inline-flex items-center gap-2 text-sm font-medium group transition-all hover:gap-3 text-[#33C1F5] bg-[#33C1F5]/10 px-4 py-2 rounded-full border border-[#33C1F5]/20 hover:bg-[#33C1F5]/20"
             >
               View all events
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -1522,61 +1528,105 @@ const EventsBanner = ({ events }: { events: any[] }) => {
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
           {upcomingEvents.map((event, index) => {
             const isSoon = new Date(event.date) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+            const eventDate = new Date(event.date);
+            const day = eventDate.getDate();
+            const month = eventDate.toLocaleString('default', { month: 'short' });
+            const year = eventDate.getFullYear();
+            
             return (
               <ScrollReveal key={event.id} delay={index * 0.06}>
-                <Link href={`/events/${event.slug}`} className="group block">
-                  <div className="relative bg-[#153455] border border-[#1F3B57] rounded-2xl p-5 md:p-6 hover:border-[#33C1F5]/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                {/* ✅ FIXED: Link to events page */}
+                <Link 
+                  href="/events"
+                  className="group block h-full"
+                >
+                  <div className="relative bg-gradient-to-br from-[#153455] to-[#1a3d5e] border border-[#1F3B57] rounded-2xl p-4 md:p-6 hover:border-[#33C1F5]/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#33C1F5]/5 h-full flex flex-col">
+                    
+                    {/* Decorative corner accent */}
+                    <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
+                      <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-[#33C1F5]/10 to-transparent rotate-45 transform origin-top-right" />
+                    </div>
+
                     {/* Soon Badge */}
                     {isSoon && (
-                      <div className="absolute -top-2 -right-2">
-                        <span className="bg-[#F0B429] text-[#111111] text-[9px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
-                          <span className="relative flex h-1.5 w-1.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#111111] opacity-75" />
-                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#111111]" />
+                      <div className="absolute -top-2 -right-2 z-10">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-[#F0B429] blur-md opacity-50 rounded-full" />
+                          <span className="relative bg-gradient-to-r from-[#F0B429] to-[#FFD700] text-[#111111] text-[9px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg shadow-[#F0B429]/30">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#111111] opacity-75" />
+                              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#111111]" />
+                            </span>
+                            🔥 Soon
                           </span>
-                          Soon
-                        </span>
+                        </div>
                       </div>
                     )}
 
-                    <div className="flex items-start gap-3">
-                      <div className="flex flex-col items-center justify-center bg-[#00AEEF]/10 rounded-xl px-3 py-2 min-w-[56px]">
-                        <span className="text-2xl font-bold text-[#00AEEF]">
-                          {new Date(event.date).getDate()}
+                    <div className="flex items-start gap-3 md:gap-4 flex-1">
+                      {/* Date Badge */}
+                      <div className="flex flex-col items-center justify-center bg-gradient-to-b from-[#00AEEF]/20 to-[#33C1F5]/10 rounded-xl px-3 py-2 min-w-[60px] border border-[#00AEEF]/20 group-hover:border-[#00AEEF]/40 transition-all duration-300">
+                        <span className="text-2xl md:text-3xl font-bold text-[#00AEEF] group-hover:scale-110 transition-transform duration-300">
+                          {String(day).padStart(2, '0')}
                         </span>
-                        <span className="text-[10px] font-medium text-[#33C1F5]/60 uppercase">
-                          {new Date(event.date).toLocaleString('default', { month: 'short' })}
+                        <span className="text-[9px] md:text-[10px] font-medium text-[#33C1F5]/70 uppercase tracking-wider">
+                          {month}
+                        </span>
+                        <span className="text-[7px] md:text-[8px] font-light text-white/30 mt-0.5">
+                          {year}
                         </span>
                       </div>
+
+                      {/* Event Info */}
                       <div className="flex-1 min-w-0">
-                        <h3 className={`${display.className} text-base font-medium text-white group-hover:text-[#33C1F5] transition-colors line-clamp-1`}>
+                        <h3 className={`${display.className} text-sm md:text-base font-medium text-white group-hover:text-[#33C1F5] transition-colors line-clamp-2`}>
                           {event.title}
                         </h3>
-                        <div className="flex items-center gap-3 mt-1.5 text-xs text-white/50">
+                        
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-white/50">
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            <Clock className="w-3 h-3 text-[#33C1F5]/60" />
+                            {eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                           {event.location && (
                             <>
                               <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
                               <span className="flex items-center gap-1 truncate">
-                                <MapPin className="w-3 h-3 shrink-0" />
-                                {event.location}
+                                <MapPin className="w-3 h-3 text-[#33C1F5]/60 shrink-0" />
+                                <span className="truncate">{event.location}</span>
                               </span>
                             </>
                           )}
                         </div>
+
+                        {/* Progress bar indicator */}
+                        <div className="mt-3">
+                          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                            <motion.div 
+                              className="h-full rounded-full bg-gradient-to-r from-[#00AEEF] to-[#33C1F5]"
+                              initial={{ width: 0 }}
+                              whileInView={{ width: isSoon ? '75%' : '30%' }}
+                              transition={{ duration: 1, delay: 0.3 }}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Hover glow */}
+                    {/* Hover glow effect */}
                     <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
-                      background: `radial-gradient(circle at 50% 50%, ${YPA_BLUE}08, transparent 70%)`,
+                      background: `radial-gradient(circle at 50% 50%, ${YPA_BLUE}06, transparent 70%)`,
                     }} />
+
+                    {/* Arrow indicator on hover */}
+                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                      <div className="w-6 h-6 rounded-full bg-[#00AEEF]/20 flex items-center justify-center border border-[#00AEEF]/30">
+                        <ArrowRight className="w-3 h-3 text-[#00AEEF]" />
+                      </div>
+                    </div>
                   </div>
                 </Link>
               </ScrollReveal>
@@ -1785,10 +1835,11 @@ const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
                 {events.slice(0, 3).map((event, i) => {
                   const soon = isEventSoon(event.date);
                   return (
-                    <Link key={i} href={`/events/${event.slug}`}>
+                    // ✅ FIXED: Link to events page
+                    <Link key={i} href="/events">
                       <motion.div
                         whileHover={{ x: 4 }}
-                        className={`p-3 rounded-xl border transition-all duration-300 ${
+                        className={`p-3 rounded-xl border transition-all duration-300 cursor-pointer ${
                           soon ? "ring-2 ring-[#F0B429] ring-opacity-60 animate-pulse" : ""
                         }`}
                         style={{
