@@ -80,18 +80,14 @@ const serif = Source_Serif_4({
 // ============================================================
 // DESIGN TOKENS
 // ============================================================
-const INK = "#0A1628";
-const NAVY = "#0E2540";
-const NAVY_SOFT = "#153455";
-const LINE = "#1F3B57";
+const VOID = "#0A0A0B";
 const BLUE = "#00AEEF";
 const BLUE_LIGHT = "#33C1F5";
-const SKY = "#7EC8FF";
 const GOLD = "#F0B429";
+const NAVY = "#0E2540";
 const MIST = "#F6F8FA";
 const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
-const POSITIVE = "#34D399";
 
 // ============================================================
 // API BASE
@@ -99,19 +95,16 @@ const POSITIVE = "#34D399";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
-// ✅ HELPER: Get image URL - handles both Cloudinary and Directus
+// HELPER: Get image URL
 // ============================================================
 function getImageUrl(image: string | undefined): string | null {
   if (!image) return null;
-  
   if (image.startsWith('http://') || image.startsWith('https://')) {
     return image;
   }
-  
   if (image.length > 0 && !image.startsWith('/')) {
     return `${API_URL}/assets/${image}`;
   }
-  
   return null;
 }
 
@@ -153,7 +146,7 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React
 };
 
 // ============================================================
-// PAGINATION COMPONENT
+// PAGINATION
 // ============================================================
 const Pagination = ({ currentPage, totalPages, category }: { currentPage: number; totalPages: number; category: string }) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -175,7 +168,7 @@ const Pagination = ({ currentPage, totalPages, category }: { currentPage: number
         }`}
         aria-label="Previous page"
       >
-        <ChevronLeft className="w-4 h-4" style={{ color: currentPage === 1 ? MUTE_ON_LIGHT : INK_ON_LIGHT }} />
+        <ChevronLeft className="w-4 h-4 text-[#5B6B7A]" />
       </Link>
 
       {showPages.map((p) => (
@@ -201,7 +194,7 @@ const Pagination = ({ currentPage, totalPages, category }: { currentPage: number
         }`}
         aria-label="Next page"
       >
-        <ChevronRight className="w-4 h-4" style={{ color: currentPage === totalPages ? MUTE_ON_LIGHT : INK_ON_LIGHT }} />
+        <ChevronRight className="w-4 h-4 text-[#5B6B7A]" />
       </Link>
     </div>
   );
@@ -310,72 +303,60 @@ export default function BlogPage() {
 
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${inter.variable} ${serif.variable} min-h-screen bg-white font-sans antialiased`}
+      className={`${display.variable} ${mono.variable} ${inter.variable} ${serif.variable} min-h-screen bg-[#0A0A0B] font-sans antialiased overflow-hidden`}
     >
       <Navigation />
 
-      {/* ===== HERO ===== */}
-      <section className="relative pt-28 md:pt-32 pb-16 px-4 md:px-6 overflow-hidden" style={{ background: NAVY }}>
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
-          <div className="absolute inset-0" style={{
-            backgroundImage: "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-            backgroundSize: "48px 48px"
-          }} />
-        </div>
+      {/* ===== HERO - VOID with Gold/Blue Accents ===== */}
+      <section className="relative pt-28 md:pt-32 pb-16 px-4 md:px-6 overflow-hidden bg-[#0A0A0B]">
+        {/* Gold top hairline */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#F0B429] via-50% to-[#00AEEF] to-80% via-[#F0B429] to-transparent" />
+        
+        {/* Dot grid */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.035]"
+          style={{
+            backgroundImage: `radial-gradient(${BLUE} 1px, transparent 1px)`,
+            backgroundSize: "30px 30px",
+            WebkitMaskImage: "linear-gradient(180deg, #000 0%, transparent 70%)",
+            maskImage: "linear-gradient(180deg, #000 0%, transparent 70%)",
+          }}
+        />
         
         {/* Animated Blobs */}
         <motion.div
           className="absolute top-[-30%] right-[-10%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${BLUE}15` }}
+          style={{ background: `${BLUE}10` }}
           animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           className="absolute bottom-[-30%] left-[-10%] w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${BLUE_LIGHT}10` }}
+          style={{ background: `${GOLD}06` }}
           animate={{ x: [0, -30, 20, 0], y: [0, 30, -20, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        />
-        <motion.div
-          className="absolute top-[20%] left-[30%] w-[200px] h-[200px] rounded-full blur-3xl pointer-events-none hidden md:block"
-          style={{ background: `${GOLD}08` }}
-          animate={{ scale: [1, 1.2, 1], x: [0, 20, -10, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
 
         <div className="container mx-auto max-w-7xl relative z-10">
           <ScrollReveal>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6">
               <div>
-                <div className={`${mono.className} inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase mb-3`} style={{ color: `${BLUE_LIGHT}60` }}>
-                  <BookOpen className="w-3.5 h-3.5" style={{ color: BLUE_LIGHT }} />
+                <div className={`${mono.className} inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase mb-3 text-[#33C1F5]/60`}>
+                  <BookOpen className="w-3.5 h-3.5 text-[#33C1F5]" />
                   Stories & Insights
                 </div>
-                <h1
-                  className={`${display.className} text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-white`}
-                >
+                <h1 className={`${display.className} text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-white`}>
                   The <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00AEEF] to-[#33C1F5]">YPA</span> Blog
                 </h1>
-                <p
-                  className={`${inter.className} text-sm md:text-base mt-2 max-w-xl text-white/50 font-light`}
-                >
+                <p className={`${inter.className} text-sm md:text-base mt-2 max-w-xl text-white/40 font-light`}>
                   Insights, stories, and updates from Youth Platform Africa's agribusiness journey
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <div
-                  className={`${mono.className} flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border`}
-                  style={{ 
-                    background: "rgba(255,255,255,0.05)",
-                    borderColor: "rgba(255,255,255,0.1)",
-                  }}
-                >
-                  <BookOpen className="w-3.5 h-3.5" style={{ color: BLUE_LIGHT }} />
-                  <span className="text-xs text-white/50">Total posts</span>
-                  <span className="font-medium text-sm text-white">
-                    {total}
-                  </span>
+                <div className={`${mono.className} flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5`}>
+                  <BookOpen className="w-3.5 h-3.5 text-[#33C1F5]" />
+                  <span className="text-xs text-white/40">Total posts</span>
+                  <span className="font-medium text-sm text-white">{total}</span>
                 </div>
               </div>
             </div>
@@ -383,12 +364,12 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* ===== CATEGORY FILTER ===== */}
-      <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8ECF0] py-3 px-4 md:px-6 shadow-sm">
+      {/* ===== CATEGORY FILTER - VOID with Gold/Blue ===== */}
+      <div className="sticky top-20 z-30 bg-[#0A0A0B]/95 backdrop-blur-md border-b border-[#F0B429]/10 py-3 px-4 md:px-6">
         <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 scrollbar-hide">
-            <Filter className="w-3.5 h-3.5 text-[#5B6B7A] shrink-0" />
-            <span className={`${mono.className} text-[9px] tracking-[0.1em] uppercase text-[#5B6B7A] mr-1 hidden sm:inline shrink-0`}>
+            <Filter className="w-3.5 h-3.5 text-white/30 shrink-0" />
+            <span className={`${mono.className} text-[9px] tracking-[0.1em] uppercase text-white/30 mr-1 hidden sm:inline shrink-0`}>
               Filter:
             </span>
             {CATEGORIES.map((cat) => {
@@ -401,7 +382,7 @@ export default function BlogPage() {
                   className={`px-3 py-1 rounded-full text-[10px] md:text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
                     isActive
                       ? "bg-[#00AEEF] text-white shadow-sm shadow-[#00AEEF]/25"
-                      : "text-[#5B6B7A] hover:text-[#0A1628] hover:bg-[#F6F8FA]"
+                      : "text-white/50 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   <Icon className="w-2.5 h-2.5 md:w-3 md:h-3" />
@@ -411,13 +392,13 @@ export default function BlogPage() {
               );
             })}
           </div>
-          <div className="flex items-center gap-1.5 border-l border-[#E8ECF0] pl-3">
+          <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded-lg transition-all duration-300 ${
                 viewMode === 'grid' 
                   ? 'text-[#00AEEF] bg-[#00AEEF]/10' 
-                  : 'text-[#5B6B7A] hover:text-[#0A1628]'
+                  : 'text-white/30 hover:text-white'
               }`}
               aria-label="Grid view"
             >
@@ -428,7 +409,7 @@ export default function BlogPage() {
               className={`p-1.5 rounded-lg transition-all duration-300 ${
                 viewMode === 'list' 
                   ? 'text-[#00AEEF] bg-[#00AEEF]/10' 
-                  : 'text-[#5B6B7A] hover:text-[#0A1628]'
+                  : 'text-white/30 hover:text-white'
               }`}
               aria-label="List view"
             >
@@ -440,21 +421,18 @@ export default function BlogPage() {
 
       {searchParams.category !== "all" && (
         <div className="flex justify-center mt-4 px-4">
-          <div
-            className={`${mono.className} flex items-center gap-2 text-[9px] md:text-[10px] px-3 py-1 rounded-full border`}
-            style={{ background: MIST, borderColor: "#E8ECF0", color: MUTE_ON_LIGHT }}
-          >
+          <div className={`${mono.className} flex items-center gap-2 text-[9px] md:text-[10px] px-3 py-1 rounded-full border border-white/10 bg-white/5 text-white/50`}>
             <span>Showing</span>
-            <span className="font-medium" style={{ color: INK_ON_LIGHT }}>
+            <span className="font-medium text-white">
               {CATEGORIES.find((c) => c.value === searchParams.category)?.label}
             </span>
-            <span className="w-1 h-1 rounded-full bg-[#D1D9E0]" />
+            <span className="w-1 h-1 rounded-full bg-white/20" />
             <span>
               {total} {total === 1 ? "post" : "posts"}
             </span>
             {totalPages > 1 && (
               <>
-                <span className="w-1 h-1 rounded-full bg-[#D1D9E0]" />
+                <span className="w-1 h-1 rounded-full bg-white/20" />
                 <span>
                   Page {searchParams.page} of {totalPages}
                 </span>
@@ -469,12 +447,9 @@ export default function BlogPage() {
         <section className="px-4 md:px-6 py-8 md:py-12 max-w-7xl mx-auto">
           <ScrollReveal>
             <Link href={`/blog/${featuredPost.slug}`} className="group block">
-              <div
-                className="relative rounded-2xl md:rounded-3xl overflow-hidden border bg-white transition-all duration-500 hover:shadow-xl hover:-translate-y-1"
-                style={{ borderColor: "#E8ECF0" }}
-              >
+              <div className="relative rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 bg-[#0A0A0B] transition-all duration-500 hover:shadow-xl hover:shadow-[#00AEEF]/5 hover:-translate-y-1">
                 <div className="grid md:grid-cols-5 gap-0">
-                  <div className="relative h-[250px] md:h-[380px] md:col-span-2 overflow-hidden bg-[#F5F9FF]">
+                  <div className="relative h-[250px] md:h-[380px] md:col-span-2 overflow-hidden bg-[#0A0A0B]">
                     {featuredPost.featured_image ? (
                       <img
                         src={getImageUrl(featuredPost.featured_image) || ''}
@@ -487,13 +462,10 @@ export default function BlogPage() {
                       />
                     ) : null}
                     <div className={`absolute inset-0 flex items-center justify-center ${featuredPost.featured_image ? 'hidden' : ''}`}>
-                      <BookOpen className="w-20 h-20" style={{ color: `${BLUE}15` }} />
+                      <BookOpen className="w-20 h-20 text-[#00AEEF]/15" />
                     </div>
                     <div className="absolute top-3 md:top-4 left-3 md:left-4 flex gap-2">
-                      <span
-                        className={`${mono.className} px-2 md:px-3 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase text-white rounded-full flex items-center gap-1`}
-                        style={{ background: BLUE, boxShadow: `0 4px 12px ${BLUE}44` }}
-                      >
+                      <span className={`${mono.className} px-2 md:px-3 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase text-white rounded-full flex items-center gap-1 bg-[#00AEEF] shadow-lg shadow-[#00AEEF]/30`}>
                         <Sparkles className="w-2 h-2 md:w-3 md:h-3" />
                         Featured
                       </span>
@@ -504,9 +476,7 @@ export default function BlogPage() {
                           const cat = CATEGORIES.find((c) => c.value === featuredPost.category);
                           const CatIcon = cat?.icon || Tag;
                           return (
-                            <span
-                              className={`${mono.className} px-2 md:px-3 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase backdrop-blur-md bg-black/40 text-white rounded-full flex items-center gap-1.5 border border-white/10`}
-                            >
+                            <span className={`${mono.className} px-2 md:px-3 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase backdrop-blur-md bg-black/60 text-white rounded-full flex items-center gap-1.5 border border-white/10`}>
                               <CatIcon className="w-2.5 h-2.5 md:w-3 md:h-3" />
                               {cat?.label || featuredPost.category}
                             </span>
@@ -517,42 +487,33 @@ export default function BlogPage() {
                   </div>
 
                   <div className="p-5 md:p-10 md:col-span-3 flex flex-col justify-center">
-                    <div
-                      className={`${mono.className} flex flex-wrap items-center gap-2 md:gap-4 text-[10px] md:text-[11px] mb-2 md:mb-3`}
-                      style={{ color: MUTE_ON_LIGHT }}
-                    >
+                    <div className={`${mono.className} flex flex-wrap items-center gap-2 md:gap-4 text-[10px] md:text-[11px] mb-2 md:mb-3 text-white/40`}>
                       <span className="flex items-center gap-1 md:gap-1.5">
                         <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         {featuredPost.published_at
                           ? format(new Date(featuredPost.published_at), "MMMM d, yyyy")
                           : "Recent"}
                       </span>
-                      <span className="w-1 h-1 rounded-full bg-[#D1D9E0]" />
+                      <span className="w-1 h-1 rounded-full bg-white/20" />
                       <span className="flex items-center gap-1 md:gap-1.5">
                         <User className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         {featuredPost.author || "YPA Team"}
                       </span>
-                      <span className="w-1 h-1 rounded-full bg-[#D1D9E0]" />
+                      <span className="w-1 h-1 rounded-full bg-white/20" />
                       <span className="flex items-center gap-1 md:gap-1.5">
                         <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         {Math.ceil((featuredPost.content?.length || 500) / 1000)} min read
                       </span>
                     </div>
-                    <h2
-                      className={`${display.className} text-xl md:text-3xl lg:text-4xl font-medium tracking-tight group-hover:text-[#00AEEF] transition-colors leading-tight`}
-                      style={{ color: INK_ON_LIGHT }}
-                    >
+                    <h2 className={`${display.className} text-xl md:text-3xl lg:text-4xl font-medium tracking-tight text-white group-hover:text-[#33C1F5] transition-colors leading-tight`}>
                       {featuredPost.title}
                     </h2>
-                    <p className={`${inter.className} text-xs md:text-sm leading-relaxed mt-2 md:mt-3 font-light`} style={{ color: MUTE_ON_LIGHT }}>
+                    <p className={`${inter.className} text-xs md:text-sm leading-relaxed mt-2 md:mt-3 text-white/40 font-light`}>
                       {featuredPost.excerpt ||
                         "Read the full story to discover insights from YPA's agribusiness journey..."}
                     </p>
                     <div className="mt-3 md:mt-5 flex items-center gap-2 md:gap-3">
-                      <span
-                        className={`${mono.className} inline-flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium group-hover:gap-2 md:group-hover:gap-3 transition-all`}
-                        style={{ color: BLUE }}
-                      >
+                      <span className={`${mono.className} inline-flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium text-[#00AEEF] group-hover:gap-2 md:group-hover:gap-3 transition-all`}>
                         Read full article
                         <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
                       </span>
@@ -568,14 +529,14 @@ export default function BlogPage() {
       {/* ===== POSTS GRID ===== */}
       <section className="px-4 md:px-6 py-6 md:py-8 max-w-7xl mx-auto">
         {posts.length === 0 ? (
-          <div className="text-center py-16 md:py-20 border rounded-2xl md:rounded-3xl" style={{ borderColor: "#E8ECF0", background: MIST }}>
+          <div className="text-center py-16 md:py-20 border border-white/10 rounded-2xl md:rounded-3xl bg-white/5">
             <div className="flex justify-center mb-4">
-              <BookOpen className="w-12 h-12 md:w-16 md:h-16" style={{ color: MUTE_ON_LIGHT, opacity: 0.3 }} />
+              <BookOpen className="w-12 h-12 md:w-16 md:h-16 text-white/10" />
             </div>
-            <h3 className={`${display.className} text-xl md:text-2xl font-medium`} style={{ color: INK_ON_LIGHT }}>
+            <h3 className={`${display.className} text-xl md:text-2xl font-medium text-white`}>
               No posts found
             </h3>
-            <p className={`${inter.className} text-xs md:text-sm mt-2 max-w-sm mx-auto font-light`} style={{ color: MUTE_ON_LIGHT }}>
+            <p className={`${inter.className} text-xs md:text-sm mt-2 max-w-sm mx-auto text-white/40 font-light`}>
               {searchParams.category !== "all"
                 ? `No posts in "${CATEGORIES.find((c) => c.value === searchParams.category)?.label}" category yet`
                 : "Check back soon for updates from YPA"}
@@ -583,8 +544,7 @@ export default function BlogPage() {
             {searchParams.category !== "all" && (
               <button
                 onClick={() => updateParams("all", 1)}
-                className="inline-flex items-center gap-2 mt-4 md:mt-6 font-medium text-xs md:text-sm px-5 md:px-6 py-2 md:py-2.5 rounded-full border bg-white hover:shadow-md transition-all"
-                style={{ color: BLUE, borderColor: "#E8ECF0" }}
+                className="inline-flex items-center gap-2 mt-4 md:mt-6 font-medium text-xs md:text-sm px-5 md:px-6 py-2 md:py-2.5 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all"
               >
                 View all posts
                 <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -602,11 +562,8 @@ export default function BlogPage() {
                 <ScrollReveal key={post.id} delay={(index % 6) * 0.04}>
                   <Link href={`/blog/${post.slug}`} className="group block h-full">
                     {viewMode === 'grid' ? (
-                      <div
-                        className="relative rounded-xl md:rounded-2xl border bg-white overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col"
-                        style={{ borderColor: "#E8ECF0" }}
-                      >
-                        <div className="relative w-full h-44 md:h-52 min-h-[176px] md:min-h-[208px] overflow-hidden bg-[#F5F9FF] flex-shrink-0">
+                      <div className="relative rounded-xl md:rounded-2xl border border-white/10 bg-[#0A0A0B] overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-[#00AEEF]/5 hover:-translate-y-1 h-full flex flex-col">
+                        <div className="relative w-full h-44 md:h-52 min-h-[176px] md:min-h-[208px] overflow-hidden bg-[#0A0A0B] flex-shrink-0">
                           {post.featured_image ? (
                             <img
                               src={getImageUrl(post.featured_image) || ''}
@@ -619,7 +576,7 @@ export default function BlogPage() {
                             />
                           ) : null}
                           <div className={`absolute inset-0 flex items-center justify-center ${post.featured_image ? 'hidden' : ''}`}>
-                            <BookOpen className="w-10 h-10 md:w-12 md:h-12" style={{ color: `${BLUE}15` }} />
+                            <BookOpen className="w-10 h-10 md:w-12 md:h-12 text-[#00AEEF]/10" />
                           </div>
                           {post.category && (
                             <div className="absolute top-2 md:top-3 left-2 md:left-3">
@@ -627,10 +584,7 @@ export default function BlogPage() {
                                 const cat = CATEGORIES.find((c) => c.value === post.category);
                                 const CatIcon = cat?.icon || Tag;
                                 return (
-                                  <span
-                                    className={`${mono.className} px-1.5 md:px-2.5 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase rounded-full flex items-center gap-1 bg-white/90 backdrop-blur-sm border`}
-                                    style={{ color: INK_ON_LIGHT, borderColor: "#E8ECF0" }}
-                                  >
+                                  <span className={`${mono.className} px-1.5 md:px-2.5 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase rounded-full flex items-center gap-1 bg-black/60 backdrop-blur-sm border border-white/10 text-white/80`}>
                                     <CatIcon className="w-2 h-2 md:w-3 md:h-3" />
                                     {cat?.label || post.category}
                                   </span>
@@ -639,10 +593,7 @@ export default function BlogPage() {
                             </div>
                           )}
                           <div className="absolute top-2 md:top-3 right-2 md:right-3">
-                            <span
-                              className={`${mono.className} px-1.5 md:px-2.5 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase rounded-full bg-white/90 backdrop-blur-sm border`}
-                              style={{ color: MUTE_ON_LIGHT, borderColor: "#E8ECF0" }}
-                            >
+                            <span className={`${mono.className} px-1.5 md:px-2.5 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-white/50`}>
                               {Math.ceil((post.content?.length || 300) / 1000)} min
                             </span>
                           </div>
@@ -650,37 +601,28 @@ export default function BlogPage() {
 
                         <div className="p-3 md:p-5 flex-1 flex flex-col justify-between">
                           <div>
-                            <div
-                              className={`${mono.className} flex flex-wrap items-center gap-2 md:gap-3 text-[9px] md:text-[10px] text-[#5B6B7A] mb-1 md:mb-2`}
-                            >
+                            <div className={`${mono.className} flex flex-wrap items-center gap-2 md:gap-3 text-[9px] md:text-[10px] text-white/30 mb-1 md:mb-2`}>
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-2.5 h-2.5 md:w-3 md:h-3" />
                                 {post.published_at
                                   ? format(new Date(post.published_at), "MMM d, yyyy")
                                   : "Recent"}
                               </span>
-                              <span className="w-1 h-1 rounded-full bg-gray-300" />
+                              <span className="w-1 h-1 rounded-full bg-white/20" />
                               <span className="flex items-center gap-1">
                                 <User className="w-2.5 h-2.5 md:w-3 md:h-3" />
                                 {post.author || "YPA Team"}
                               </span>
                             </div>
-                            <h3
-                              className={`${display.className} text-base md:text-lg font-medium group-hover:text-[#00AEEF] transition-colors leading-tight line-clamp-2`}
-                              style={{ color: INK_ON_LIGHT }}
-                            >
+                            <h3 className={`${display.className} text-base md:text-lg font-medium text-white group-hover:text-[#33C1F5] transition-colors leading-tight line-clamp-2`}>
                               {post.title}
                             </h3>
-                            <p
-                              className={`${inter.className} text-xs md:text-sm text-[#5B6B7A] leading-relaxed mt-1 line-clamp-2 font-light`}
-                            >
+                            <p className={`${inter.className} text-xs md:text-sm text-white/40 leading-relaxed mt-1 line-clamp-2 font-light`}>
                               {post.excerpt || "Read more about this update from YPA..."}
                             </p>
                           </div>
                           <div className="mt-3 md:mt-4 flex items-center gap-1.5 md:gap-2">
-                            <span
-                              className={`${mono.className} inline-flex items-center gap-1 text-xs md:text-sm font-medium text-[#00AEEF] group-hover:gap-1.5 md:group-hover:gap-2 transition-all`}
-                            >
+                            <span className={`${mono.className} inline-flex items-center gap-1 text-xs md:text-sm font-medium text-[#00AEEF] group-hover:gap-1.5 md:group-hover:gap-2 transition-all`}>
                               Read more
                               <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 group-hover:translate-x-0.5 transition-transform" />
                             </span>
@@ -688,11 +630,8 @@ export default function BlogPage() {
                         </div>
                       </div>
                     ) : (
-                      <div
-                        className="flex flex-col sm:flex-row gap-4 p-4 md:p-5 rounded-xl md:rounded-2xl border bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                        style={{ borderColor: "#E8ECF0" }}
-                      >
-                        <div className="relative w-full sm:w-48 h-32 sm:h-40 rounded-lg overflow-hidden bg-[#F5F9FF] flex-shrink-0">
+                      <div className="flex flex-col sm:flex-row gap-4 p-4 md:p-5 rounded-xl md:rounded-2xl border border-white/10 bg-[#0A0A0B] hover:shadow-lg hover:shadow-[#00AEEF]/5 transition-all duration-300 hover:-translate-y-1">
+                        <div className="relative w-full sm:w-48 h-32 sm:h-40 rounded-lg overflow-hidden bg-[#0A0A0B] flex-shrink-0">
                           {post.featured_image ? (
                             <img
                               src={getImageUrl(post.featured_image) || ''}
@@ -705,7 +644,7 @@ export default function BlogPage() {
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <BookOpen className="w-8 h-8" style={{ color: `${BLUE}15` }} />
+                              <BookOpen className="w-8 h-8 text-[#00AEEF]/15" />
                             </div>
                           )}
                           {post.category && (
@@ -714,10 +653,7 @@ export default function BlogPage() {
                                 const cat = CATEGORIES.find((c) => c.value === post.category);
                                 const CatIcon = cat?.icon || Tag;
                                 return (
-                                  <span
-                                    className={`${mono.className} px-2 py-0.5 text-[8px] text-[10px] tracking-[0.1em] uppercase rounded-full flex items-center gap-1 bg-white/90 backdrop-blur-sm border`}
-                                    style={{ color: INK_ON_LIGHT, borderColor: "#E8ECF0" }}
-                                  >
+                                  <span className={`${mono.className} px-2 py-0.5 text-[8px] text-[10px] tracking-[0.1em] uppercase rounded-full flex items-center gap-1 bg-black/60 backdrop-blur-sm border border-white/10 text-white/80`}>
                                     <CatIcon className="w-2 h-2" />
                                     {cat?.label || post.category}
                                   </span>
@@ -727,35 +663,30 @@ export default function BlogPage() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0 flex flex-col justify-center">
-                          <div className={`${mono.className} flex flex-wrap items-center gap-2 text-[9px] md:text-[10px] text-[#5B6B7A] mb-1`}>
+                          <div className={`${mono.className} flex flex-wrap items-center gap-2 text-[9px] md:text-[10px] text-white/30 mb-1`}>
                             <span className="flex items-center gap-1">
                               <Calendar className="w-2.5 h-2.5" />
                               {post.published_at ? format(new Date(post.published_at), "MMM d, yyyy") : "Recent"}
                             </span>
-                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                            <span className="w-1 h-1 rounded-full bg-white/20" />
                             <span className="flex items-center gap-1">
                               <User className="w-2.5 h-2.5" />
                               {post.author || "YPA Team"}
                             </span>
-                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                            <span className="w-1 h-1 rounded-full bg-white/20" />
                             <span className="flex items-center gap-1">
                               <Clock className="w-2.5 h-2.5" />
                               {Math.ceil((post.content?.length || 300) / 1000)} min
                             </span>
                           </div>
-                          <h3
-                            className={`${display.className} text-base md:text-lg font-medium group-hover:text-[#00AEEF] transition-colors leading-tight line-clamp-2`}
-                            style={{ color: INK_ON_LIGHT }}
-                          >
+                          <h3 className={`${display.className} text-base md:text-lg font-medium text-white group-hover:text-[#33C1F5] transition-colors leading-tight line-clamp-2`}>
                             {post.title}
                           </h3>
-                          <p className={`${inter.className} text-xs md:text-sm text-[#5B6B7A] leading-relaxed mt-1 line-clamp-1 font-light`}>
+                          <p className={`${inter.className} text-xs md:text-sm text-white/40 leading-relaxed mt-1 line-clamp-1 font-light`}>
                             {post.excerpt || "Read more about this update from YPA..."}
                           </p>
                           <div className="mt-2 flex items-center gap-1.5">
-                            <span
-                              className={`${mono.className} inline-flex items-center gap-1 text-xs font-medium text-[#00AEEF] group-hover:gap-1.5 transition-all`}
-                            >
+                            <span className={`${mono.className} inline-flex items-center gap-1 text-xs font-medium text-[#00AEEF] group-hover:gap-1.5 transition-all`}>
                               Read more
                               <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                             </span>
@@ -777,30 +708,23 @@ export default function BlogPage() {
         )}
       </section>
 
-      {/* ===== CTA ===== */}
-      <section className="px-4 md:px-6 py-16 md:py-20 border-t" style={{ borderColor: "#E8ECF0", background: MIST }}>
+      {/* ===== CTA - VOID with Gold/Blue ===== */}
+      <section className="px-4 md:px-6 py-16 md:py-20 border-t border-[#F0B429]/10 bg-[#0A0A0B]">
         <div className="container mx-auto max-w-3xl text-center">
           <ScrollReveal>
-            <div
-              className="rounded-2xl md:rounded-3xl p-8 md:p-12 border bg-white/80 backdrop-blur-sm shadow-sm"
-              style={{ borderColor: "#E8ECF0" }}
-            >
-              <div
-                className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-4"
-                style={{ background: `${BLUE}10` }}
-              >
-                <TrendingUp className="w-5 h-5 md:w-6 md:h-6" style={{ color: BLUE }} />
+            <div className="rounded-2xl md:rounded-3xl p-8 md:p-12 border border-white/10 bg-white/5 backdrop-blur-sm">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-4 bg-[#00AEEF]/10">
+                <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-[#00AEEF]" />
               </div>
-              <h3 className={`${display.className} text-xl md:text-2xl font-medium`} style={{ color: INK_ON_LIGHT }}>
+              <h3 className={`${display.className} text-xl md:text-2xl font-medium text-white`}>
                 Share Your Story
               </h3>
-              <p className={`${inter.className} text-xs md:text-sm mt-2 max-w-sm mx-auto font-light`} style={{ color: MUTE_ON_LIGHT }}>
+              <p className={`${inter.className} text-xs md:text-sm mt-2 max-w-sm mx-auto text-white/40 font-light`}>
                 Have an inspiring experience from your YPA journey? We'd love to feature it.
               </p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 mt-4 md:mt-6 text-white px-6 md:px-8 py-2.5 md:py-3.5 rounded-full text-xs md:text-sm font-medium transition-all hover:-translate-y-0.5"
-                style={{ background: BLUE, boxShadow: `0 20px 40px -12px ${BLUE}66` }}
+                className="inline-flex items-center gap-2 mt-4 md:mt-6 text-white px-6 md:px-8 py-2.5 md:py-3.5 rounded-full text-xs md:text-sm font-medium transition-all hover:-translate-y-0.5 bg-[#00AEEF] shadow-lg shadow-[#00AEEF]/30"
               >
                 Get in touch
                 <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
