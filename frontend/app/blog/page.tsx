@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, IBM_Plex_Mono, Poppins } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Inter, Source_Serif_4 } from "next/font/google";
 import {
   motion,
   useInView,
@@ -32,6 +32,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  Grid3x3,
+  LayoutGrid,
+  Search,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -63,24 +66,30 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
   variable: "--font-mono",
 });
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-inter",
+});
+const serif = Source_Serif_4({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-serif",
 });
 
 // ============================================================
 // DESIGN TOKENS
 // ============================================================
-const INK = "#060B14";
+const INK = "#0A1628";
 const NAVY = "#0E2540";
 const NAVY_SOFT = "#153455";
 const LINE = "#1F3B57";
-const BLUE = "#2196F3";
+const BLUE = "#00AEEF";
+const BLUE_LIGHT = "#33C1F5";
 const SKY = "#7EC8FF";
 const GOLD = "#F0B429";
 const MIST = "#F6F8FA";
-const INK_ON_LIGHT = "#0E2540";
+const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
 const POSITIVE = "#34D399";
 
@@ -95,12 +104,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 function getImageUrl(image: string | undefined): string | null {
   if (!image) return null;
   
-  // If it's already a full URL (Cloudinary), return it as-is
   if (image.startsWith('http://') || image.startsWith('https://')) {
     return image;
   }
   
-  // If it's a Directus file ID, build the URL
   if (image.length > 0 && !image.startsWith('/')) {
     return `${API_URL}/assets/${image}`;
   }
@@ -112,14 +119,14 @@ function getImageUrl(image: string | undefined): string | null {
 // CATEGORIES
 // ============================================================
 const CATEGORIES = [
-  { value: "all", label: "All Posts", icon: BookOpen, color: "text-[#1A3A5C]" },
-  { value: "goats", label: "Goats", icon: Award, color: "text-emerald-600" },
-  { value: "maize", label: "Maize", icon: Wheat, color: "text-amber-600" },
-  { value: "beekeeping", label: "Beekeeping", icon: Droplets, color: "text-yellow-600" },
-  { value: "kids", label: "Youth", icon: Users, color: "text-blue-600" },
-  { value: "events", label: "Events", icon: CalendarDays, color: "text-purple-600" },
-  { value: "news", label: "News", icon: Newspaper, color: "text-rose-600" },
-  { value: "general", label: "General", icon: Lightbulb, color: "text-gray-600" },
+  { value: "all", label: "All Posts", icon: BookOpen },
+  { value: "goats", label: "Goats", icon: Award },
+  { value: "maize", label: "Maize", icon: Wheat },
+  { value: "beekeeping", label: "Beekeeping", icon: Droplets },
+  { value: "kids", label: "Youth", icon: Users },
+  { value: "events", label: "Events", icon: CalendarDays },
+  { value: "news", label: "News", icon: Newspaper },
+  { value: "general", label: "General", icon: Lightbulb },
 ];
 
 const POSTS_PER_PAGE = 9;
@@ -135,9 +142,9 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: { children: React
   return (
     <motion.div
       ref={ref}
-      initial={reduce ? {} : { opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 40 }}
-      transition={{ duration: 0.7, delay, ease: [0.25, 0.1, 0.25, 1] }}
+      initial={reduce ? {} : { opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 30 }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}
@@ -164,7 +171,7 @@ const Pagination = ({ currentPage, totalPages, category }: { currentPage: number
         className={`p-2 rounded-full border transition-all ${
           currentPage === 1
             ? "opacity-30 pointer-events-none border-gray-200"
-            : "hover:border-[#2196F3] hover:bg-[#2196F3]/5 border-gray-200"
+            : "hover:border-[#00AEEF] hover:bg-[#00AEEF]/5 border-gray-200"
         }`}
         aria-label="Previous page"
       >
@@ -177,8 +184,8 @@ const Pagination = ({ currentPage, totalPages, category }: { currentPage: number
           href={`/blog?category=${category}&page=${p}`}
           className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all ${
             p === currentPage
-              ? "bg-[#2196F3] text-white shadow-md shadow-[#2196F3]/25"
-              : "text-[#1A3A5C] hover:bg-[#2196F3]/10 border border-transparent hover:border-[#2196F3]/20"
+              ? "bg-[#00AEEF] text-white shadow-md shadow-[#00AEEF]/25"
+              : "text-[#0A1628] hover:bg-[#00AEEF]/10 border border-transparent hover:border-[#00AEEF]/20"
           }`}
         >
           {p}
@@ -190,7 +197,7 @@ const Pagination = ({ currentPage, totalPages, category }: { currentPage: number
         className={`p-2 rounded-full border transition-all ${
           currentPage === totalPages
             ? "opacity-30 pointer-events-none border-gray-200"
-            : "hover:border-[#2196F3] hover:bg-[#2196F3]/5 border-gray-200"
+            : "hover:border-[#00AEEF] hover:bg-[#00AEEF]/5 border-gray-200"
         }`}
         aria-label="Next page"
       >
@@ -245,6 +252,7 @@ export default function BlogPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -285,7 +293,7 @@ export default function BlogPage() {
 
   if (loading) {
     return (
-      <main className={`${display.variable} ${mono.variable} ${poppins.variable} min-h-screen bg-white`}>
+      <main className={`${display.variable} ${mono.variable} ${inter.variable} ${serif.variable} min-h-screen bg-white`}>
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <motion.div
@@ -302,41 +310,70 @@ export default function BlogPage() {
 
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${poppins.variable} min-h-screen bg-white font-sans antialiased selection:bg-[#2196F3]/30`}
+      className={`${display.variable} ${mono.variable} ${inter.variable} ${serif.variable} min-h-screen bg-white font-sans antialiased`}
     >
       <Navigation />
 
       {/* ===== HERO ===== */}
-      <section className="relative pt-32 pb-16 px-4 md:px-6 overflow-hidden" style={{ background: MIST }}>
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-3xl" style={{ background: `${BLUE}08` }} />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-3xl" style={{ background: `${SKY}08` }} />
+      <section className="relative pt-28 md:pt-32 pb-16 px-4 md:px-6 overflow-hidden" style={{ background: NAVY }}>
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
+          <div className="absolute inset-0" style={{
+            backgroundImage: "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
+            backgroundSize: "48px 48px"
+          }} />
+        </div>
         
+        {/* Animated Blobs */}
+        <motion.div
+          className="absolute top-[-30%] right-[-10%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: `${BLUE}15` }}
+          animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[-30%] left-[-10%] w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: `${BLUE_LIGHT}10` }}
+          animate={{ x: [0, -30, 20, 0], y: [0, 30, -20, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+        <motion.div
+          className="absolute top-[20%] left-[30%] w-[200px] h-[200px] rounded-full blur-3xl pointer-events-none hidden md:block"
+          style={{ background: `${GOLD}08` }}
+          animate={{ scale: [1, 1.2, 1], x: [0, 20, -10, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+
         <div className="container mx-auto max-w-7xl relative z-10">
           <ScrollReveal>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6">
               <div>
+                <div className={`${mono.className} inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase mb-3`} style={{ color: `${BLUE_LIGHT}60` }}>
+                  <BookOpen className="w-3.5 h-3.5" style={{ color: BLUE_LIGHT }} />
+                  Stories & Insights
+                </div>
                 <h1
-                  className={`${display.className} text-3xl md:text-4xl lg:text-6xl font-medium tracking-tight`}
-                  style={{ color: INK_ON_LIGHT }}
+                  className={`${display.className} text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-white`}
                 >
-                  Stories & <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2196F3] to-[#64B5F6]">Updates</span>
+                  The <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00AEEF] to-[#33C1F5]">YPA</span> Blog
                 </h1>
                 <p
-                  className={`${mono.className} text-sm mt-2`}
-                  style={{ color: MUTE_ON_LIGHT }}
+                  className={`${inter.className} text-sm md:text-base mt-2 max-w-xl text-white/50 font-light`}
                 >
-                  Insights from Youth Platform Africa's agribusiness journey
+                  Insights, stories, and updates from Youth Platform Africa's agribusiness journey
                 </p>
               </div>
-              <div className="flex items-center gap-3 md:gap-4">
+              <div className="flex items-center gap-3">
                 <div
-                  className={`${mono.className} flex items-center gap-2 md:gap-3 px-4 md:px-5 py-2 md:py-2.5 rounded-full border shadow-sm bg-white/70 backdrop-blur-sm`}
-                  style={{ borderColor: "#E8ECF0" }}
+                  className={`${mono.className} flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border`}
+                  style={{ 
+                    background: "rgba(255,255,255,0.05)",
+                    borderColor: "rgba(255,255,255,0.1)",
+                  }}
                 >
-                  <BookOpen className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: BLUE }} />
-                  <span className="text-xs md:text-sm" style={{ color: MUTE_ON_LIGHT }}>Total posts</span>
-                  <span className="font-medium text-sm md:text-base" style={{ color: INK_ON_LIGHT }}>
+                  <BookOpen className="w-3.5 h-3.5" style={{ color: BLUE_LIGHT }} />
+                  <span className="text-xs text-white/50">Total posts</span>
+                  <span className="font-medium text-sm text-white">
                     {total}
                   </span>
                 </div>
@@ -347,22 +384,13 @@ export default function BlogPage() {
       </section>
 
       {/* ===== CATEGORY FILTER ===== */}
-      <div className="sticky top-20 z-30 flex justify-center px-3 md:px-4 -mt-4">
-        <div
-          className="inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-2xl md:rounded-full transition-all duration-300 max-w-full"
-          style={{
-            background: "rgba(255,255,255,0.85)",
-            backdropFilter: "blur(20px) saturate(1.3)",
-            boxShadow: "0 8px 40px rgba(33,150,243,0.12), inset 0 1px 0 rgba(255,255,255,0.6)",
-            border: "1px solid rgba(255,255,255,0.4)",
-          }}
-        >
-          <Filter className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" style={{ color: MUTE_ON_LIGHT }} />
-          <span className={`${mono.className} text-[8px] md:text-[10px] tracking-[0.1em] uppercase text-[#5B6B7A] mr-0.5 md:mr-1 hidden sm:inline flex-shrink-0`}>
-            Filter:
-          </span>
-          
-          <div className="flex items-center justify-center gap-1 md:gap-1.5 flex-wrap">
+      <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8ECF0] py-3 px-4 md:px-6 shadow-sm">
+        <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 scrollbar-hide">
+            <Filter className="w-3.5 h-3.5 text-[#5B6B7A] shrink-0" />
+            <span className={`${mono.className} text-[9px] tracking-[0.1em] uppercase text-[#5B6B7A] mr-1 hidden sm:inline shrink-0`}>
+              Filter:
+            </span>
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
               const isActive = searchParams.category === cat.value;
@@ -370,12 +398,11 @@ export default function BlogPage() {
                 <button
                   key={cat.value}
                   onClick={() => updateParams(cat.value, 1)}
-                  className={`px-2.5 md:px-3.5 py-1 rounded-full text-[9px] md:text-xs font-medium transition-all duration-200 flex items-center gap-1 md:gap-1.5 whitespace-nowrap ${
+                  className={`px-3 py-1 rounded-full text-[10px] md:text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
                     isActive
-                      ? "bg-[#2196F3] text-white shadow-md shadow-[#2196F3]/25"
-                      : "hover:bg-[#F5F9FF] border border-transparent hover:border-[#E8ECF0]"
+                      ? "bg-[#00AEEF] text-white shadow-sm shadow-[#00AEEF]/25"
+                      : "text-[#5B6B7A] hover:text-[#0A1628] hover:bg-[#F6F8FA]"
                   }`}
-                  style={isActive ? {} : { color: INK_ON_LIGHT }}
                 >
                   <Icon className="w-2.5 h-2.5 md:w-3 md:h-3" />
                   <span className="hidden xs:inline">{cat.label}</span>
@@ -384,26 +411,50 @@ export default function BlogPage() {
               );
             })}
           </div>
+          <div className="flex items-center gap-1.5 border-l border-[#E8ECF0] pl-3">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg transition-all duration-300 ${
+                viewMode === 'grid' 
+                  ? 'text-[#00AEEF] bg-[#00AEEF]/10' 
+                  : 'text-[#5B6B7A] hover:text-[#0A1628]'
+              }`}
+              aria-label="Grid view"
+            >
+              <Grid3x3 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-lg transition-all duration-300 ${
+                viewMode === 'list' 
+                  ? 'text-[#00AEEF] bg-[#00AEEF]/10' 
+                  : 'text-[#5B6B7A] hover:text-[#0A1628]'
+              }`}
+              aria-label="List view"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
       {searchParams.category !== "all" && (
-        <div className="flex justify-center mt-3 md:mt-4 px-4">
+        <div className="flex justify-center mt-4 px-4">
           <div
-            className={`${mono.className} flex items-center gap-2 text-[9px] md:text-[10px] px-2.5 md:px-3 py-1 md:py-1.5 rounded-full border`}
+            className={`${mono.className} flex items-center gap-2 text-[9px] md:text-[10px] px-3 py-1 rounded-full border`}
             style={{ background: MIST, borderColor: "#E8ECF0", color: MUTE_ON_LIGHT }}
           >
             <span>Showing</span>
             <span className="font-medium" style={{ color: INK_ON_LIGHT }}>
               {CATEGORIES.find((c) => c.value === searchParams.category)?.label}
             </span>
-            <span className="w-1 h-1 rounded-full" style={{ background: "#D1D9E0" }} />
+            <span className="w-1 h-1 rounded-full bg-[#D1D9E0]" />
             <span>
               {total} {total === 1 ? "post" : "posts"}
             </span>
             {totalPages > 1 && (
               <>
-                <span className="w-1 h-1 rounded-full" style={{ background: "#D1D9E0" }} />
+                <span className="w-1 h-1 rounded-full bg-[#D1D9E0]" />
                 <span>
                   Page {searchParams.page} of {totalPages}
                 </span>
@@ -424,7 +475,6 @@ export default function BlogPage() {
               >
                 <div className="grid md:grid-cols-5 gap-0">
                   <div className="relative h-[250px] md:h-[380px] md:col-span-2 overflow-hidden bg-[#F5F9FF]">
-                    {/* ✅ FIXED: Use getImageUrl helper */}
                     {featuredPost.featured_image ? (
                       <img
                         src={getImageUrl(featuredPost.featured_image) || ''}
@@ -477,24 +527,24 @@ export default function BlogPage() {
                           ? format(new Date(featuredPost.published_at), "MMMM d, yyyy")
                           : "Recent"}
                       </span>
-                      <span className="w-1 h-1 rounded-full" style={{ background: "#D1D9E0" }} />
+                      <span className="w-1 h-1 rounded-full bg-[#D1D9E0]" />
                       <span className="flex items-center gap-1 md:gap-1.5">
                         <User className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         {featuredPost.author || "YPA Team"}
                       </span>
-                      <span className="w-1 h-1 rounded-full" style={{ background: "#D1D9E0" }} />
+                      <span className="w-1 h-1 rounded-full bg-[#D1D9E0]" />
                       <span className="flex items-center gap-1 md:gap-1.5">
                         <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         {Math.ceil((featuredPost.content?.length || 500) / 1000)} min read
                       </span>
                     </div>
                     <h2
-                      className={`${display.className} text-xl md:text-3xl lg:text-4xl font-medium tracking-tight group-hover:text-[#2196F3] transition-colors leading-tight`}
+                      className={`${display.className} text-xl md:text-3xl lg:text-4xl font-medium tracking-tight group-hover:text-[#00AEEF] transition-colors leading-tight`}
                       style={{ color: INK_ON_LIGHT }}
                     >
                       {featuredPost.title}
                     </h2>
-                    <p className="text-xs md:text-sm leading-relaxed mt-2 md:mt-3" style={{ color: MUTE_ON_LIGHT }}>
+                    <p className={`${inter.className} text-xs md:text-sm leading-relaxed mt-2 md:mt-3 font-light`} style={{ color: MUTE_ON_LIGHT }}>
                       {featuredPost.excerpt ||
                         "Read the full story to discover insights from YPA's agribusiness journey..."}
                     </p>
@@ -525,7 +575,7 @@ export default function BlogPage() {
             <h3 className={`${display.className} text-xl md:text-2xl font-medium`} style={{ color: INK_ON_LIGHT }}>
               No posts found
             </h3>
-            <p className="text-xs md:text-sm mt-2 max-w-sm mx-auto" style={{ color: MUTE_ON_LIGHT }}>
+            <p className={`${inter.className} text-xs md:text-sm mt-2 max-w-sm mx-auto font-light`} style={{ color: MUTE_ON_LIGHT }}>
               {searchParams.category !== "all"
                 ? `No posts in "${CATEGORIES.find((c) => c.value === searchParams.category)?.label}" category yet`
                 : "Check back soon for updates from YPA"}
@@ -543,96 +593,176 @@ export default function BlogPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className={`grid gap-4 md:gap-6 ${
+              viewMode === 'grid' 
+                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                : 'grid-cols-1'
+            }`}>
               {(searchParams.page === 1 ? remainingPosts : posts).map((post, index) => (
-                <ScrollReveal key={post.id} delay={(index % 6) * 0.05}>
+                <ScrollReveal key={post.id} delay={(index % 6) * 0.04}>
                   <Link href={`/blog/${post.slug}`} className="group block h-full">
-                    <div
-                      className="relative rounded-xl md:rounded-2xl border bg-white overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col"
-                      style={{ borderColor: "#E8ECF0" }}
-                    >
-                      <div className="relative w-full h-44 md:h-52 min-h-[176px] md:min-h-[208px] overflow-hidden bg-[#F5F9FF] flex-shrink-0">
-                        {/* ✅ FIXED: Use getImageUrl helper */}
-                        {post.featured_image ? (
-                          <img
-                            src={getImageUrl(post.featured_image) || ''}
-                            alt={post.title}
-                            crossOrigin="anonymous"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          />
-                        ) : null}
-                        <div className={`absolute inset-0 flex items-center justify-center ${post.featured_image ? 'hidden' : ''}`}>
-                          <BookOpen className="w-10 h-10 md:w-12 md:h-12" style={{ color: `${BLUE}15` }} />
-                        </div>
-                        {post.category && (
-                          <div className="absolute top-2 md:top-3 left-2 md:left-3">
-                            {(() => {
-                              const cat = CATEGORIES.find((c) => c.value === post.category);
-                              const CatIcon = cat?.icon || Tag;
-                              return (
-                                <span
-                                  className={`${mono.className} px-1.5 md:px-2.5 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase rounded-full flex items-center gap-1 bg-white/90 backdrop-blur-sm border`}
-                                  style={{ color: INK_ON_LIGHT, borderColor: "#E8ECF0" }}
-                                >
-                                  <CatIcon className="w-2 h-2 md:w-3 md:h-3" />
-                                  {cat?.label || post.category}
-                                </span>
-                              );
-                            })()}
+                    {viewMode === 'grid' ? (
+                      <div
+                        className="relative rounded-xl md:rounded-2xl border bg-white overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col"
+                        style={{ borderColor: "#E8ECF0" }}
+                      >
+                        <div className="relative w-full h-44 md:h-52 min-h-[176px] md:min-h-[208px] overflow-hidden bg-[#F5F9FF] flex-shrink-0">
+                          {post.featured_image ? (
+                            <img
+                              src={getImageUrl(post.featured_image) || ''}
+                              alt={post.title}
+                              crossOrigin="anonymous"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                          ) : null}
+                          <div className={`absolute inset-0 flex items-center justify-center ${post.featured_image ? 'hidden' : ''}`}>
+                            <BookOpen className="w-10 h-10 md:w-12 md:h-12" style={{ color: `${BLUE}15` }} />
                           </div>
-                        )}
-                        <div className="absolute top-2 md:top-3 right-2 md:right-3">
-                          <span
-                            className={`${mono.className} px-1.5 md:px-2.5 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase rounded-full bg-white/90 backdrop-blur-sm border`}
-                            style={{ color: MUTE_ON_LIGHT, borderColor: "#E8ECF0" }}
-                          >
-                            {Math.ceil((post.content?.length || 300) / 1000)} min
-                          </span>
+                          {post.category && (
+                            <div className="absolute top-2 md:top-3 left-2 md:left-3">
+                              {(() => {
+                                const cat = CATEGORIES.find((c) => c.value === post.category);
+                                const CatIcon = cat?.icon || Tag;
+                                return (
+                                  <span
+                                    className={`${mono.className} px-1.5 md:px-2.5 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase rounded-full flex items-center gap-1 bg-white/90 backdrop-blur-sm border`}
+                                    style={{ color: INK_ON_LIGHT, borderColor: "#E8ECF0" }}
+                                  >
+                                    <CatIcon className="w-2 h-2 md:w-3 md:h-3" />
+                                    {cat?.label || post.category}
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          )}
+                          <div className="absolute top-2 md:top-3 right-2 md:right-3">
+                            <span
+                              className={`${mono.className} px-1.5 md:px-2.5 py-0.5 md:py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase rounded-full bg-white/90 backdrop-blur-sm border`}
+                              style={{ color: MUTE_ON_LIGHT, borderColor: "#E8ECF0" }}
+                            >
+                              {Math.ceil((post.content?.length || 300) / 1000)} min
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="p-3 md:p-5 flex-1 flex flex-col justify-between">
+                          <div>
+                            <div
+                              className={`${mono.className} flex flex-wrap items-center gap-2 md:gap-3 text-[9px] md:text-[10px] text-[#5B6B7A] mb-1 md:mb-2`}
+                            >
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                                {post.published_at
+                                  ? format(new Date(post.published_at), "MMM d, yyyy")
+                                  : "Recent"}
+                              </span>
+                              <span className="w-1 h-1 rounded-full bg-gray-300" />
+                              <span className="flex items-center gap-1">
+                                <User className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                                {post.author || "YPA Team"}
+                              </span>
+                            </div>
+                            <h3
+                              className={`${display.className} text-base md:text-lg font-medium group-hover:text-[#00AEEF] transition-colors leading-tight line-clamp-2`}
+                              style={{ color: INK_ON_LIGHT }}
+                            >
+                              {post.title}
+                            </h3>
+                            <p
+                              className={`${inter.className} text-xs md:text-sm text-[#5B6B7A] leading-relaxed mt-1 line-clamp-2 font-light`}
+                            >
+                              {post.excerpt || "Read more about this update from YPA..."}
+                            </p>
+                          </div>
+                          <div className="mt-3 md:mt-4 flex items-center gap-1.5 md:gap-2">
+                            <span
+                              className={`${mono.className} inline-flex items-center gap-1 text-xs md:text-sm font-medium text-[#00AEEF] group-hover:gap-1.5 md:group-hover:gap-2 transition-all`}
+                            >
+                              Read more
+                              <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </span>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="p-3 md:p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                          <div
-                            className={`${mono.className} flex flex-wrap items-center gap-2 md:gap-3 text-[9px] md:text-[10px] text-[#5B6B7A] mb-1 md:mb-2`}
-                          >
+                    ) : (
+                      <div
+                        className="flex flex-col sm:flex-row gap-4 p-4 md:p-5 rounded-xl md:rounded-2xl border bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                        style={{ borderColor: "#E8ECF0" }}
+                      >
+                        <div className="relative w-full sm:w-48 h-32 sm:h-40 rounded-lg overflow-hidden bg-[#F5F9FF] flex-shrink-0">
+                          {post.featured_image ? (
+                            <img
+                              src={getImageUrl(post.featured_image) || ''}
+                              alt={post.title}
+                              crossOrigin="anonymous"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <BookOpen className="w-8 h-8" style={{ color: `${BLUE}15` }} />
+                            </div>
+                          )}
+                          {post.category && (
+                            <div className="absolute top-2 left-2">
+                              {(() => {
+                                const cat = CATEGORIES.find((c) => c.value === post.category);
+                                const CatIcon = cat?.icon || Tag;
+                                return (
+                                  <span
+                                    className={`${mono.className} px-2 py-0.5 text-[8px] text-[10px] tracking-[0.1em] uppercase rounded-full flex items-center gap-1 bg-white/90 backdrop-blur-sm border`}
+                                    style={{ color: INK_ON_LIGHT, borderColor: "#E8ECF0" }}
+                                  >
+                                    <CatIcon className="w-2 h-2" />
+                                    {cat?.label || post.category}
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <div className={`${mono.className} flex flex-wrap items-center gap-2 text-[9px] md:text-[10px] text-[#5B6B7A] mb-1`}>
                             <span className="flex items-center gap-1">
-                              <Calendar className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                              {post.published_at
-                                ? format(new Date(post.published_at), "MMM d, yyyy")
-                                : "Recent"}
+                              <Calendar className="w-2.5 h-2.5" />
+                              {post.published_at ? format(new Date(post.published_at), "MMM d, yyyy") : "Recent"}
                             </span>
                             <span className="w-1 h-1 rounded-full bg-gray-300" />
                             <span className="flex items-center gap-1">
-                              <User className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                              <User className="w-2.5 h-2.5" />
                               {post.author || "YPA Team"}
+                            </span>
+                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-2.5 h-2.5" />
+                              {Math.ceil((post.content?.length || 300) / 1000)} min
                             </span>
                           </div>
                           <h3
-                            className={`${display.className} text-base md:text-lg font-medium group-hover:text-[#2196F3] transition-colors leading-tight line-clamp-2`}
+                            className={`${display.className} text-base md:text-lg font-medium group-hover:text-[#00AEEF] transition-colors leading-tight line-clamp-2`}
                             style={{ color: INK_ON_LIGHT }}
                           >
                             {post.title}
                           </h3>
-                          <p
-                            className="text-xs md:text-sm text-[#5B6B7A] leading-relaxed mt-1 line-clamp-2"
-                          >
+                          <p className={`${inter.className} text-xs md:text-sm text-[#5B6B7A] leading-relaxed mt-1 line-clamp-1 font-light`}>
                             {post.excerpt || "Read more about this update from YPA..."}
                           </p>
-                        </div>
-                        <div className="mt-3 md:mt-4 flex items-center gap-1.5 md:gap-2">
-                          <span
-                            className={`${mono.className} inline-flex items-center gap-1 text-xs md:text-sm font-medium text-[#2196F3] group-hover:gap-1.5 md:group-hover:gap-2 transition-all`}
-                          >
-                            Read more
-                            <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                          </span>
+                          <div className="mt-2 flex items-center gap-1.5">
+                            <span
+                              className={`${mono.className} inline-flex items-center gap-1 text-xs font-medium text-[#00AEEF] group-hover:gap-1.5 transition-all`}
+                            >
+                              Read more
+                              <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </Link>
                 </ScrollReveal>
               ))}
@@ -652,7 +782,7 @@ export default function BlogPage() {
         <div className="container mx-auto max-w-3xl text-center">
           <ScrollReveal>
             <div
-              className="rounded-2xl md:rounded-3xl p-8 md:p-16 border bg-white/80 backdrop-blur-sm shadow-sm"
+              className="rounded-2xl md:rounded-3xl p-8 md:p-12 border bg-white/80 backdrop-blur-sm shadow-sm"
               style={{ borderColor: "#E8ECF0" }}
             >
               <div
@@ -664,7 +794,7 @@ export default function BlogPage() {
               <h3 className={`${display.className} text-xl md:text-2xl font-medium`} style={{ color: INK_ON_LIGHT }}>
                 Share Your Story
               </h3>
-              <p className="text-xs md:text-sm mt-2 max-w-sm mx-auto" style={{ color: MUTE_ON_LIGHT }}>
+              <p className={`${inter.className} text-xs md:text-sm mt-2 max-w-sm mx-auto font-light`} style={{ color: MUTE_ON_LIGHT }}>
                 Have an inspiring experience from your YPA journey? We'd love to feature it.
               </p>
               <Link
