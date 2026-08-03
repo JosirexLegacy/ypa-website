@@ -116,8 +116,20 @@ export const Footer = () => {
     { name: "Terms of Service", href: "/terms" },
   ];
 
-  const columnLabel = "text-[11px] tracking-[0.14em] uppercase font-medium mb-4";
   const linkClass = "text-[13px] font-normal transition-colors duration-200";
+
+  // Column headers styled as ledger entries
+  const columnHeader = (index: string, label: string) => (
+    <div className="flex items-center gap-2.5 mb-5">
+      <span className={`${mono.className} text-[10px] text-[#F0B429]`}>
+        {index}
+      </span>
+      <span className="h-px w-4 bg-[#F0B429]/35" />
+      <h4 className={`${mono.className} text-[11px] tracking-[0.14em] uppercase font-medium text-white/50`}>
+        {label}
+      </h4>
+    </div>
+  );
 
   return (
     <motion.footer
@@ -125,23 +137,28 @@ export const Footer = () => {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6 }}
-      className={`${display.variable} ${mono.variable} ${inter.variable} relative font-sans antialiased overflow-hidden`}
-      style={{ 
-        background: `linear-gradient(180deg, ${VOID} 0%, #0F0F10 60%, ${VOID} 100%)`,
-        borderTop: `1px solid ${GOLD}15`
-      }}
+      className={`${display.variable} ${mono.variable} ${inter.variable} relative font-sans antialiased overflow-hidden bg-[#0A0A0B]`}
     >
-      {/* Ambient Glow - Blue & Gold */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-30%] right-[-20%] w-[300px] h-[300px] rounded-full blur-3xl" style={{ background: `${YPA_BLUE}06` }} />
-        <div className="absolute bottom-[-30%] left-[-20%] w-[300px] h-[300px] rounded-full blur-3xl" style={{ background: `${GOLD}04` }} />
-      </div>
+      {/* closing hairline — gold fading into blue */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#F0B429] via-50% to-[#00AEEF] to-80% via-[#F0B429] to-transparent" />
+      
+      {/* faint dot-grid ledger paper */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.035]"
+        style={{
+          backgroundImage: `radial-gradient(${YPA_BLUE} 1px, transparent 1px)`,
+          backgroundSize: "30px 30px",
+          WebkitMaskImage: "linear-gradient(180deg, #000 0%, transparent 70%)",
+          maskImage: "linear-gradient(180deg, #000 0%, transparent 70%)",
+        }}
+      />
 
-      <div className="relative container mx-auto px-5 sm:px-6 md:px-10 lg:px-14 max-w-6xl pt-14 sm:pt-18 pb-8 sm:pb-10 z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-x-6 sm:gap-x-8 gap-y-10 sm:gap-y-12 pb-10 sm:pb-14">
+      <div className="relative container mx-auto px-5 sm:px-6 md:px-10 lg:px-14 max-w-6xl pt-16 sm:pt-20 pb-8 sm:pb-10">
+        {/* ===== MAIN GRID ===== */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-x-6 sm:gap-x-8 gap-y-10 sm:gap-y-12 pb-12 sm:pb-16">
           {/* Brand */}
           <div className="col-span-2 md:col-span-4 lg:col-span-4">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-5">
               <div className="relative w-12 h-12 rounded-full flex items-center justify-center shrink-0 overflow-hidden bg-white shadow-sm">
                 <Image
                   src="/images/ypa-logo.webp"
@@ -155,17 +172,31 @@ export const Footer = () => {
                 <span className={`${display.className} text-xl font-medium tracking-tight text-white block`}>
                   Youth Platform Africa
                 </span>
-                <span className="text-[10px] tracking-[0.15em] uppercase font-light" style={{ color: `${YPA_BLUE_LIGHT}50` }}>
+                <span className={`${mono.className} text-[9px] tracking-[0.18em] uppercase font-light text-[#33C1F5]`}>
                   discovering the genius in you
                 </span>
               </div>
             </div>
 
-            <p className="text-[13px] leading-relaxed max-w-[19rem] font-light" style={{ color: "rgba(245,246,247,0.4)" }}>
+            <p className="text-[13px] leading-relaxed max-w-[19rem] font-light text-white/40">
               Empowering Africa&rsquo;s youth through sustainable agribusiness and financial inclusion.
             </p>
 
-            <div className="flex flex-wrap gap-2 mt-5">
+            {/* ledger strip */}
+            <div className="flex items-center gap-4 mt-6 pt-5 border-t border-white/10">
+              {["Goats", "Maize", "SACCO"].map((tag, idx) => (
+                <div key={tag} className="flex items-center gap-1.5">
+                  <span className={`${mono.className} text-[9px] text-[#F0B429]/50`}>
+                    0{idx + 1}
+                  </span>
+                  <span className={`${mono.className} text-[10px] tracking-[0.08em] uppercase text-white/40`}>
+                    {tag}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 mt-6">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
                 return (
@@ -173,19 +204,7 @@ export const Footer = () => {
                     key={social.label}
                     href={social.href}
                     aria-label={social.label}
-                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border"
-                    style={{ 
-                      color: "rgba(255,255,255,0.3)",
-                      borderColor: "rgba(255,255,255,0.06)"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = YPA_BLUE_LIGHT;
-                      e.currentTarget.style.borderColor = YPA_BLUE_LIGHT;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "rgba(255,255,255,0.3)";
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
-                    }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 text-white/45 transition-all duration-200 hover:text-[#33C1F5] hover:border-[#F0B429]/40"
                   >
                     <Icon className="w-4 h-4" />
                   </a>
@@ -196,17 +215,13 @@ export const Footer = () => {
 
           {/* Quick Links */}
           <div className="col-span-1 md:col-span-1 lg:col-span-3">
-            <h4 className={`${columnLabel} flex items-center gap-2`} style={{ color: "rgba(245,246,247,0.35)" }}>
-              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: GOLD }} />
-              Explore
-            </h4>
-            <ul className="flex flex-col gap-1.5">
+            {columnHeader("01", "Explore")}
+            <ul className="flex flex-col gap-1">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`${linkClass} inline-block hover:text-white transition-colors`}
-                    style={{ color: "rgba(245,246,247,0.5)" }}
+                    className={`${linkClass} inline-block text-white/60 hover:text-white`}
                   >
                     {link.name}
                   </Link>
@@ -217,17 +232,13 @@ export const Footer = () => {
 
           {/* Programmes */}
           <div className="col-span-1 md:col-span-1 lg:col-span-2">
-            <h4 className={`${columnLabel} flex items-center gap-2`} style={{ color: "rgba(245,246,247,0.35)" }}>
-              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: YPA_BLUE }} />
-              Programmes
-            </h4>
-            <ul className="flex flex-col gap-1.5">
+            {columnHeader("02", "Programmes")}
+            <ul className="flex flex-col gap-1">
               {projectLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`${linkClass} inline-block hover:text-white transition-colors`}
-                    style={{ color: "rgba(245,246,247,0.5)" }}
+                    className={`${linkClass} inline-block text-white/60 hover:text-white`}
                   >
                     {link.name}
                   </Link>
@@ -238,17 +249,13 @@ export const Footer = () => {
 
           {/* Resources + Contact */}
           <div className="col-span-2 md:col-span-2 lg:col-span-3">
-            <h4 className={`${columnLabel} flex items-center gap-2`} style={{ color: "rgba(245,246,247,0.35)" }}>
-              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: `${GOLD}50` }} />
-              Resources
-            </h4>
-            <ul className="flex flex-col gap-1.5 mb-5">
+            {columnHeader("03", "Resources")}
+            <ul className="flex flex-col gap-1 mb-6">
               {resourceLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className={`${linkClass} inline-block hover:text-white transition-colors`}
-                    style={{ color: "rgba(245,246,247,0.5)" }}
+                    className={`${linkClass} inline-block text-white/60 hover:text-white`}
                   >
                     {link.name}
                   </Link>
@@ -256,79 +263,70 @@ export const Footer = () => {
               ))}
             </ul>
 
-            <div className="space-y-2.5 text-white/50">
+            <div className="space-y-2.5 pt-1 border-t border-white/10">
               <a
                 href="mailto:info@youthplatformafrica.com"
-                className="flex items-center gap-3 text-sm font-light transition-colors duration-200 hover:text-[#33C1F5]"
+                className="flex items-center gap-2.5 text-[13px] font-light text-white/50 transition-colors duration-200 pt-3 hover:text-[#33C1F5]"
               >
-                <MailIcon className="w-4 h-4 text-white/20" />
+                <MailIcon className="w-3.5 h-3.5 shrink-0 text-[#F0B429]" />
                 info@youthplatformafrica.com
               </a>
               <a
                 href="tel:+256774313551"
-                className="flex items-center gap-3 text-sm font-light transition-colors duration-200 hover:text-[#33C1F5]"
+                className="flex items-center gap-2.5 text-[13px] font-light text-white/50 transition-colors duration-200 hover:text-[#33C1F5]"
               >
-                <PhoneIcon className="w-4 h-4 text-white/20" />
+                <PhoneIcon className="w-3.5 h-3.5 shrink-0 text-[#F0B429]" />
                 +256 774 313 551
               </a>
-              <div className="flex items-center gap-3 text-sm font-light">
-                <MapPinIcon className="w-4 h-4 text-white/20" />
+              <div className="flex items-center gap-2.5 text-[13px] font-light text-white/50">
+                <MapPinIcon className="w-3.5 h-3.5 shrink-0 text-[#F0B429]" />
                 Kampala, Uganda
               </div>
             </div>
           </div>
         </div>
 
-        {/* Gold + Blue Gradient Divider */}
-        <div className="h-px w-full" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}25, ${YPA_BLUE}25, transparent)` }} />
+        {/* ===== HAIRLINE ===== */}
+        <div className="border-t border-white/10" />
 
-        {/* Bottom Bar */}
-        <div className="flex flex-col gap-5 pt-6 md:flex-row md:items-center md:justify-between md:gap-4">
-          <p className="text-[12px] text-center md:text-left" style={{ color: "rgba(245,246,247,0.3)" }}>
+        {/* ===== BOTTOM BAR ===== */}
+        <div className="flex flex-col gap-5 pt-8 md:flex-row md:items-center md:justify-between md:gap-4">
+          <p className={`${mono.className} text-[11px] tracking-[0.05em] text-center md:text-left text-white/30`}>
             &copy; {new Date().getFullYear()} Youth Platform Africa. All rights reserved.
-            <span className="hidden sm:inline ml-2 text-[10px]" style={{ color: `${GOLD}30` }}>·</span>
-            <span className="block sm:inline text-[10px] mt-1 sm:mt-0" style={{ color: `${YPA_BLUE}30` }}>
-              Est. 2014
-            </span>
           </p>
 
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-4">
             <div className="flex items-center gap-4">
               <Link
                 href="/privacy"
-                className="text-[12px] transition-colors duration-200 hover:text-white/70"
-                style={{ color: "rgba(245,246,247,0.3)" }}
+                className="text-[12px] text-white/35 transition-colors duration-200 hover:text-[#33C1F5]"
               >
                 Privacy Policy
               </Link>
-              <span className="w-px h-3" style={{ background: "rgba(255,255,255,0.06)" }} />
+              <span className="w-px h-3 bg-[#F0B429]/25" />
               <Link
                 href="/terms"
-                className="text-[12px] transition-colors duration-200 hover:text-white/70"
-                style={{ color: "rgba(245,246,247,0.3)" }}
+                className="text-[12px] text-white/35 transition-colors duration-200 hover:text-[#33C1F5]"
               >
                 Terms of Service
               </Link>
             </div>
 
-            <span className="hidden sm:block w-px h-3" style={{ background: "rgba(255,255,255,0.06)" }} />
+            <span className="hidden sm:block w-px h-3 bg-[#F0B429]/25" />
 
             <Link
               href="https://jlx-branding.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 opacity-40 hover:opacity-100 transition-opacity duration-300"
+              className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity duration-200"
             >
-              <span className="text-[12px]" style={{ color: "rgba(245,246,247,0.35)" }}>
-                Crafted by
-              </span>
+              <span className="text-[12px] text-white/50">Crafted by</span>
               <Image
                 src="/images/jlx-logo.png"
                 alt="JLX Branding Agency"
                 width={52}
                 height={20}
-                className="object-contain"
-                style={{ filter: "brightness(0) invert(1)", opacity: 0.6 }}
+                className="object-contain brightness-0 invert-1"
               />
             </Link>
           </div>
