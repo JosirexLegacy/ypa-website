@@ -139,23 +139,18 @@ export const Footer = () => {
 
       <div className="relative container mx-auto px-5 sm:px-6 md:px-10 lg:px-14 max-w-6xl pt-14 sm:pt-18 pb-8 sm:pb-10 z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-x-6 sm:gap-x-8 gap-y-10 sm:gap-y-12 pb-10 sm:pb-14">
-          {/* Brand */}
+          {/* Brand - ✅ LOGO ADDED */}
           <div className="col-span-2 md:col-span-4 lg:col-span-4">
             <div className="flex items-center gap-3 mb-4">
               <div 
-                className="relative w-12 h-12 rounded-lg flex items-center justify-center shrink-0 overflow-hidden"
-                style={{ 
-                  background: `linear-gradient(135deg, ${YPA_BLUE}20, ${GOLD}10)`,
-                  border: `1px solid ${YPA_BLUE}20`
-                }}
+                className="relative w-12 h-12 rounded-lg flex items-center justify-center shrink-0 overflow-hidden bg-white/5"
               >
                 <Image
-                  src="/favicon.ico.png"
+                  src="/images/ypa-logo.webp"
                   alt="YPA"
                   width={32}
                   height={32}
                   className="object-contain"
-                  style={{ filter: "brightness(0) invert(1)", opacity: 0.95 }}
                 />
               </div>
               <div>
@@ -243,7 +238,7 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Resources + Contact - ✅ FIXED CONTACT SECTION */}
+          {/* Resources + Contact */}
           <div className="col-span-2 md:col-span-2 lg:col-span-3">
             <h4 className={`${columnLabel} flex items-center gap-2`} style={{ color: "rgba(245,246,247,0.35)" }}>
               <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: `${GOLD}50` }} />
@@ -263,7 +258,6 @@ export const Footer = () => {
               ))}
             </ul>
 
-            {/* ✅ FIXED: No red lines, clean Tailwind classes */}
             <div className="space-y-2.5 text-white/50">
               <a
                 href="mailto:info@youthplatformafrica.com"
