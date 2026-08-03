@@ -398,11 +398,12 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: {
 };
 
 // ============================================================
-// HERO — Mobile Optimized
+// HERO — The Ledger: a manifest-style hero for three programmes
 // ============================================================
 const LINEUP = [
   {
-    kicker: "Model 01 — Livestock",
+    kicker: "Entry 01 — Livestock",
+    tag: "Goats",
     title: "The Goats Programme",
     titleHighlight: "Goats",
     line: "Mubende × Boer × Kalahari, raised for guaranteed off-take.",
@@ -411,14 +412,12 @@ const LINEUP = [
       { label: "Success rate", value: "95%" },
       { label: "Market access", value: "Guaranteed" },
     ],
-    gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/projects/goats",
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg",
-    aura: YPA_BLUE,
-    glowColor: YPA_BLUE,
   },
   {
-    kicker: "Model 02 — Cropping",
+    kicker: "Entry 02 — Cropping",
+    tag: "Maize",
     title: "Maize Contract Farming",
     titleHighlight: "Maize",
     line: "Modern inputs, guaranteed buyers, a return you can plan around.",
@@ -427,14 +426,12 @@ const LINEUP = [
       { label: "Avg. return", value: "3.0×" },
       { label: "Off-take", value: "Contracted" },
     ],
-    gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/projects/maize",
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
-    aura: YPA_BLUE_DARK,
-    glowColor: YPA_BLUE_DARK,
   },
   {
-    kicker: "Model 03 — Finance",
+    kicker: "Entry 03 — Finance",
+    tag: "SACCO",
     title: "YPA SACCO",
     titleHighlight: "SACCO",
     line: "Savings and credit built around the rhythm of a harvest, not a payslip.",
@@ -443,150 +440,25 @@ const LINEUP = [
       { label: "Branches", value: "12" },
       { label: "Founded", value: "2014" },
     ],
-    gradient: "from-white via-[#F0F9FE] to-[#E6F8FD]",
     href: "/sacco",
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717198/508159ef-6c90-4578-b1fb-dff1534873f4.jpg",
-    aura: YPA_BLUE_LIGHT,
-    glowColor: YPA_BLUE_LIGHT,
   },
 ];
 
-// ============================================================
-// HERO VISUAL — Fixed with regular <img> and smooth animations
-// ============================================================
-const HeroVisual = ({ item }: { item: (typeof LINEUP)[number] }) => {
-  const reduceMotion = useReducedMotion();
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reduceMotion) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width - 0.5;
-    const py = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ x: py * -10, y: px * 10 });
-  };
-  
-  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
-
-  return (
-    <div
-      className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[440px] mx-auto aspect-[4/3] lg:aspect-[4/5]"
-      style={{ perspective: 1200 }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      {/* animated ambient glow */}
-      <div className="absolute inset-0 -z-10 overflow-visible">
-        <motion.div
-          animate={reduceMotion ? {} : { x: [0, 14, 0], y: [0, -10, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[-18%] right-[-18%] w-[70%] h-[70%] rounded-full blur-3xl"
-          style={{ background: `${item.aura}22` }}
-        />
-        <motion.div
-          animate={reduceMotion ? {} : { x: [0, -12, 0], y: [0, 10, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[-18%] left-[-18%] w-[60%] h-[60%] rounded-full blur-3xl"
-          style={{ background: `${YPA_BLUE_LIGHT}18` }}
-        />
-      </div>
-
-      {/* slow rotating ring */}
-      <motion.div
-        className="absolute inset-[-10px] rounded-2xl lg:rounded-[2.2rem] border pointer-events-none"
-        style={{ borderColor: `${item.aura}28` }}
-        animate={reduceMotion ? {} : { rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-      />
-
-      {/* the frame itself tilts toward the cursor */}
-      <motion.div
-        className="relative w-full h-full rounded-2xl lg:rounded-[2rem] overflow-hidden border"
-        style={{
-          borderColor: `${item.aura}25`,
-          boxShadow: `0 25px 50px -20px ${item.aura}35, 0 0 0 1px ${item.aura}10 inset`,
-          transformStyle: "preserve-3d",
-        }}
-        animate={{ rotateX: tilt.x, rotateY: tilt.y }}
-        transition={{ type: "spring", stiffness: 150, damping: 14 }}
-      >
-        {/* ✅ Using regular <img> instead of next/image */}
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          onError={(e) => {
-            e.currentTarget.src = FALLBACK_IMAGES.default;
-          }}
-        />
-
-        {/* brand-blue duotone grade */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: item.aura, mixBlendMode: "color", opacity: 0.28 }}
-        />
-
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: `linear-gradient(to top, rgba(6,11,20,0.65) 0%, transparent 46%)`,
-        }} />
-
-        {/* viewfinder corners */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <g stroke="rgba(255,255,255,0.6)" strokeWidth="0.6" fill="none">
-            <path d="M6 18 V8 H16" />
-            <path d="M84 8 H94 V18" />
-            <path d="M94 82 V92 H84" />
-            <path d="M16 92 H6 V82" />
-          </g>
-        </svg>
-
-        {/* award chip */}
-        <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-white shadow-sm">
-          <Award className="h-3 w-3" style={{ color: item.aura }} />
-          <span className={`${mono.className} text-[9px] tracking-[0.1em] uppercase font-medium`} style={{ color: INK }}>
-            #1 in Africa
-          </span>
-        </div>
-
-        {/* spec callouts */}
-        <div className="hidden lg:flex absolute top-16 left-4 flex-col gap-2">
-          {item.specs.slice(0, 2).map((s, idx) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 + idx * 0.12, ease: EASE }}
-              className="rounded-xl px-3 py-2"
-              style={{ background: "rgba(6,11,20,0.45)", backdropFilter: "blur(8px)" }}
-            >
-              <div className="text-[8px] tracking-[0.1em] uppercase text-white/60">{s.label}</div>
-              <div className={`${mono.className} text-sm text-white font-medium`}>{s.value}</div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* kicker + live status dot */}
-        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-          <span className={`${mono.className} text-[10px] tracking-[0.12em] uppercase text-white/80`}>
-            {item.kicker}
-          </span>
-          <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
-            <span
-              className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-70"
-              style={{ background: item.aura }}
-            />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: item.aura }} />
-          </span>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-// ============================================================
-// HERO — Mobile Optimized
-// ============================================================
 const EASE = [0.22, 1, 0.36, 1] as const;
+const VOID = "#0A0A0B";
+
+// A quiet grain texture so the backdrop image reads as atmosphere,
+// never as an obvious "photo card."
+const GrainOverlay = () => (
+  <svg className="absolute inset-0 w-full h-full pointer-events-none mix-blend-overlay opacity-[0.35]" aria-hidden="true">
+    <filter id="ypaGrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#ypaGrain)" />
+  </svg>
+);
 
 const Hero = () => {
   const [i, setI] = useState(0);
@@ -595,215 +467,231 @@ const Hero = () => {
 
   useEffect(() => {
     if (paused || reduceMotion) return;
-    const t = setInterval(() => setI((p) => (p + 1) % LINEUP.length), 6500);
+    const t = setInterval(() => setI((p) => (p + 1) % LINEUP.length), 7000);
     return () => clearInterval(t);
   }, [paused, reduceMotion]);
 
   const current = LINEUP[i];
-
   const titleParts = current.title.split(current.titleHighlight);
   const beforeHighlight = titleParts[0] || "";
   const afterHighlight = titleParts.slice(1).join("");
+  const today = new Date();
 
   return (
     <section
       id="hero"
-      className="relative min-h-screen overflow-hidden bg-white"
+      className="relative min-h-screen overflow-hidden"
+      style={{ background: VOID }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-[#F0F9FE] to-[#E6F8FD]" />
-
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={reduceMotion ? {} : { x: [0, 60, -30, 0], y: [0, -50, 30, 0] }}
-          transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[6%] right-[4%] w-[420px] h-[420px] rounded-full blur-3xl"
-          style={{ background: `${current.aura}14` }}
-        />
-        <motion.div
-          animate={reduceMotion ? {} : { x: [0, -50, 30, 0], y: [0, 40, -40, 0] }}
-          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="hidden sm:block absolute bottom-[4%] left-[2%] w-[340px] h-[340px] rounded-full blur-3xl"
-          style={{ background: `${YPA_BLUE_LIGHT}10` }}
-        />
+      {/* Backdrop: full-bleed image, heavily duotoned into black+blue, felt rather than seen */}
+      <div className="absolute inset-0">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={current.image}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.4, ease: EASE }}
+            className="absolute inset-0"
+          >
+            <img
+              src={current.image}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover scale-105"
+              style={{ filter: "grayscale(0.55) brightness(0.55) contrast(1.05)" }}
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
+          </motion.div>
+        </AnimatePresence>
+        {/* duotone grade */}
+        <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.22 }} />
+        {/* black depth, strongest at edges so the image reads as ambience */}
+        <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${VOID} 0%, rgba(10,10,11,0.55) 28%, rgba(10,10,11,0.72) 62%, ${VOID} 100%)` }} />
+        <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${VOID} 0%, rgba(10,10,11,0.25) 38%, rgba(10,10,11,0.25) 62%, ${VOID} 100%)` }} />
+        <GrainOverlay />
       </div>
 
+      {/* faint dot-grid, only in the upper field, like graph paper on a ledger */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `radial-gradient(${YPA_BLUE} 1px, transparent 1px)`,
-          backgroundSize: "32px 32px",
-          opacity: 0.05,
-          WebkitMaskImage: "radial-gradient(ellipse 65% 60% at 50% 40%, #000 0%, transparent 78%)",
-          maskImage: "radial-gradient(ellipse 65% 60% at 50% 40%, #000 0%, transparent 78%)",
+          backgroundSize: "28px 28px",
+          opacity: 0.06,
+          WebkitMaskImage: "linear-gradient(180deg, #000 0%, transparent 55%)",
+          maskImage: "linear-gradient(180deg, #000 0%, transparent 55%)",
         }}
       />
 
-      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden flex items-center justify-center" aria-hidden="true">
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={`ghost-${i}`}
-            initial={{ opacity: 0 }}
-            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, x: [0, 10, 0] }}
-            exit={{ opacity: 0 }}
-            transition={
-              reduceMotion
-                ? { duration: 0.8 }
-                : { opacity: { duration: 1 }, x: { duration: 14, repeat: Infinity, ease: "easeInOut" } }
-            }
-            className={`${display.className} font-bold uppercase leading-none whitespace-nowrap text-[22vw] lg:text-[13rem]`}
-            style={{
-              color: "transparent",
-              WebkitTextStroke: `1px ${current.aura}1f`,
-              transform: "translateY(6%)",
-            }}
-          >
-            {current.titleHighlight}
-          </motion.span>
-        </AnimatePresence>
+      {/* gold hairline frame — the ledger's stitched border */}
+      <div className="absolute inset-x-4 md:inset-x-8 top-20 md:top-24 bottom-24 md:bottom-28 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.16)" }} />
+
+      {/* Desktop: vertical ledger tabs down the right edge */}
+      <div className="hidden lg:flex flex-col gap-3 absolute right-8 top-1/2 -translate-y-1/2 z-20">
+        {LINEUP.map((item, idx) => {
+          const isActive = idx === i;
+          return (
+            <button
+              key={item.tag}
+              onClick={() => setI(idx)}
+              className="group flex items-center gap-3 justify-end"
+              aria-label={`Show ${item.title}`}
+            >
+              <span
+                className={`${inter.className} text-[11px] tracking-[0.15em] uppercase transition-all duration-300 whitespace-nowrap`}
+                style={{
+                  color: isActive ? "#F5F6F7" : "rgba(245,246,247,0.35)",
+                  opacity: isActive ? 1 : 0,
+                  transform: isActive ? "translateX(0)" : "translateX(6px)",
+                }}
+              >
+                {item.tag}
+              </span>
+              <span
+                className="relative flex items-center justify-center rounded-full transition-all duration-300"
+                style={{
+                  width: isActive ? "34px" : "22px",
+                  height: "2px",
+                  background: isActive ? GOLD : "rgba(255,255,255,0.25)",
+                }}
+              />
+              <span
+                className={`${mono.className} text-[10px] w-4 text-right transition-colors duration-300`}
+                style={{ color: isActive ? GOLD : "rgba(255,255,255,0.3)" }}
+              >
+                0{idx + 1}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 md:px-14 py-8">
-        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-[1.15fr_0.85fr] gap-4 lg:gap-16 items-center">
-          <div className="order-2 lg:order-1">
+      <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 md:px-14 py-24">
+        <div className="max-w-4xl">
+          {/* Manifest stamp — top eyebrow */}
+          <motion.div
+            initial={reduceMotion ? {} : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE }}
+            className="flex items-center gap-3 mb-6"
+          >
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
+            </span>
+            <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
+              {current.kicker}
+            </span>
+            <span className="h-px flex-1 max-w-[64px]" style={{ background: "rgba(240,180,41,0.35)" }} />
+            <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/30 hidden sm:inline`}>
+              #1 in Africa
+            </span>
+          </motion.div>
+
+          <AnimatePresence mode="wait">
             <motion.div
-              initial={reduceMotion ? {} : { opacity: 0, y: 10 }}
+              key={i}
+              initial={reduceMotion ? {} : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
-              className="relative inline-flex items-center gap-2 rounded-full px-4 py-2 mb-4 bg-[#00AEEF] text-white shadow-lg overflow-hidden"
+              exit={reduceMotion ? {} : { opacity: 0, y: -16 }}
+              transition={{ duration: reduceMotion ? 0 : 0.55, ease: EASE }}
             >
-              {!reduceMotion && (
-                <motion.span
-                  aria-hidden="true"
-                  className="absolute inset-y-0 w-1/3 pointer-events-none"
-                  style={{ background: "linear-gradient(120deg, transparent, rgba(255,255,255,0.45), transparent)" }}
-                  animate={{ x: ["-120%", "220%"] }}
-                  transition={{ duration: 3.5, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
-                />
-              )}
-              <motion.span
-                animate={reduceMotion ? {} : { scale: [1, 1.15, 1] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                className="flex relative"
+              <h1
+                className={`${display.className} text-4xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-medium leading-[0.98] tracking-tight max-w-3xl`}
+                style={{ color: "#F5F6F7" }}
               >
-                <Award className="h-4 w-4" />
-              </motion.span>
-              <span className={`${inter.className} relative text-[10px] sm:text-[12px] tracking-[0.1em] uppercase font-bold`}>
-                Ranked #1 Goat Farming Programme
-              </span>
-            </motion.div>
+                {beforeHighlight}
+                <span className={`${serif.className} italic`} style={{ color: YPA_BLUE_LIGHT }}>
+                  {current.titleHighlight}
+                </span>
+                {afterHighlight}
+              </h1>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={i}
-                initial={reduceMotion ? {} : { opacity: 0, y: 20 }}
-                animate={reduceMotion ? {} : { opacity: 1, y: 0 }}
-                exit={reduceMotion ? {} : { opacity: 0, y: -20 }}
-                transition={{ duration: reduceMotion ? 0 : 0.5, ease: EASE }}
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span
-                      className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-                      style={{ background: current.aura }}
-                    />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: current.aura }} />
-                  </span>
-                  <span className={`${inter.className} text-[10px] tracking-[0.25em] uppercase font-medium`} style={{ color: current.aura }}>
-                    {current.kicker}
-                  </span>
-                </div>
+              <p className={`${inter.className} mt-5 text-base md:text-lg font-light max-w-lg leading-relaxed`} style={{ color: "rgba(245,246,247,0.55)" }}>
+                {current.line}
+              </p>
 
-                <h1
-                  className={`${inter.className} text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-semibold leading-[1.05] tracking-tight max-w-xl`}
-                  style={{ color: INK_ON_LIGHT }}
-                >
-                  {beforeHighlight}
-                  <span className={`${serif.className} relative inline-block italic`} style={{ color: current.aura }}>
-                    {current.titleHighlight}
-                    <motion.span
-                      key={`underline-${i}`}
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
-                      className="absolute bottom-0 left-0 h-[3px] w-full rounded-full origin-left"
-                      style={{ background: `linear-gradient(90deg, ${current.aura}, ${current.aura}80)` }}
-                    />
-                  </span>
-                  {afterHighlight}
-                </h1>
-
-                <p className={`${inter.className} mt-3 text-base md:text-lg font-light max-w-xl leading-relaxed text-[#5B6B7A]`}>
-                  {current.line}
-                </p>
-
-                <div className={`${inter.className} mt-6 flex flex-wrap gap-x-6 gap-y-2`}>
-                  {current.specs.map((s, idx) => (
-                    <div key={idx} className="flex flex-col">
-                      <span className="text-[9px] tracking-[0.15em] uppercase font-medium text-[#5B6B7A]">
-                        {s.label}
-                      </span>
-                      <span className="text-xl md:text-2xl font-semibold text-[#111111]">
-                        {s.value}
-                      </span>
+              {/* Ledger row — real ruled columns, not decorative pills */}
+              <div className="mt-9 flex items-stretch gap-0 max-w-xl border-t border-b" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+                {current.specs.map((s, idx) => (
+                  <div
+                    key={idx}
+                    className="flex-1 py-4 px-4 sm:px-5"
+                    style={{ borderLeft: idx > 0 ? "1px solid rgba(255,255,255,0.1)" : "none" }}
+                  >
+                    <div className={`${mono.className} text-[9px] tracking-[0.15em] uppercase mb-1`} style={{ color: "rgba(245,246,247,0.4)" }}>
+                      {s.label}
                     </div>
-                  ))}
-                </div>
+                    <div className={`${display.className} text-lg sm:text-xl md:text-2xl font-medium`} style={{ color: idx === 0 ? GOLD : "#F5F6F7" }}>
+                      {s.value}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Link
-                    href={current.href}
-                    className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] bg-[#00AEEF] shadow-lg"
-                  >
-                    Configure this programme
-                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Link>
-                  <Link
-                    href="/about"
-                    className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] border-2 border-[#00AEEF]/30 text-[#111111] bg-white/50 backdrop-blur-sm"
-                  >
-                    <Play className="h-4 w-4" />
-                    See how YPA works
-                  </Link>
-                </div>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Link
+                  href={current.href}
+                  className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-0.5"
+                  style={{ background: YPA_BLUE, color: VOID }}
+                >
+                  Configure this programme
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
+                <Link
+                  href="/about"
+                  className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-0.5 border"
+                  style={{ borderColor: "rgba(240,180,41,0.35)", color: "#F5F6F7" }}
+                >
+                  <Play className="h-4 w-4" style={{ color: GOLD }} />
+                  See how YPA works
+                </Link>
+              </div>
+            </motion.div>
+          </AnimatePresence>
 
-                <div className="flex gap-1.5 mt-8">
-                  {LINEUP.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setI(idx)}
-                      aria-label={`Show ${LINEUP[idx].title}`}
-                      className="rounded-full transition-all duration-500"
-                      style={{
-                        width: idx === i ? "32px" : "12px",
-                        height: "3px",
-                        background: idx === i ? current.aura : "rgba(6,11,20,0.12)",
-                      }}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <div className="order-1 lg:order-2 mb-2 lg:mb-0">
-            <HeroVisual item={current} />
+          {/* Mobile / tablet programme switcher — horizontal pills, no vertical rail */}
+          <div className="flex lg:hidden gap-2 mt-10">
+            {LINEUP.map((item, idx) => (
+              <button
+                key={item.tag}
+                onClick={() => setI(idx)}
+                className={`${mono.className} flex-1 rounded-full py-2 text-[10px] tracking-[0.12em] uppercase transition-all duration-300 border`}
+                style={{
+                  borderColor: idx === i ? GOLD : "rgba(255,255,255,0.15)",
+                  color: idx === i ? GOLD : "rgba(245,246,247,0.4)",
+                  background: idx === i ? "rgba(240,180,41,0.08)" : "transparent",
+                }}
+              >
+                {item.tag}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="hidden md:block absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
-        <a href="#index" className="flex flex-col items-center gap-1 group">
-          <span className={`${inter.className} text-[9px] tracking-[0.3em] uppercase font-medium text-[#5B6B7A]`}>
-            Explore
-          </span>
+      {/* corner manifest label — bottom right */}
+      <div className="hidden md:flex absolute bottom-8 right-8 z-10 items-center gap-2">
+        <span className={`${mono.className} text-[9px] tracking-[0.2em] uppercase text-white/30`}>
+          Est. 2014 — Kampala, UG
+        </span>
+      </div>
+
+      {/* scroll cue */}
+      <div className="absolute bottom-8 left-5 md:left-14 z-10">
+        <a href="#index" className="flex items-center gap-2 group">
           <motion.div
-            animate={reduceMotion ? {} : { y: [0, 6, 0] }}
+            animate={reduceMotion ? {} : { y: [0, 5, 0] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           >
-            <ChevronDown className="h-4 w-4 text-[#5B6B7A]" />
+            <ChevronDown className="h-4 w-4" style={{ color: "rgba(245,246,247,0.4)" }} />
           </motion.div>
+          <span className={`${inter.className} text-[9px] tracking-[0.3em] uppercase`} style={{ color: "rgba(245,246,247,0.4)" }}>
+            Explore
+          </span>
         </a>
       </div>
     </section>
@@ -811,13 +699,13 @@ const Hero = () => {
 };
 
 // ============================================================
-// FIELD INDEX — Mobile Optimized
+// FIELD INDEX — black ticker tape: blue live data, gold highlight
 // ============================================================
 const FIELD_INDEX = [
   { label: "Goats under care", value: "130,000+", delta: "95% success" },
   { label: "Acres cultivated", value: "5,000+", delta: "maize programme" },
   { label: "SACCO members", value: "1,000+", delta: "12 branches" },
-  { label: "Avg. farmer return", value: "3.0×", delta: "contract farming" },
+  { label: "Avg. farmer return", value: "3.0×", delta: "contract farming", featured: true },
   { label: "Operating since", value: "2014", delta: "URSB registered" },
   { label: "Hidden fees", value: "0", delta: "by policy" },
 ];
@@ -827,46 +715,53 @@ const FieldIndex = () => {
   const track = [...FIELD_INDEX, ...FIELD_INDEX];
 
   return (
-    <section id="index" className="relative overflow-hidden bg-[#00AEEF] py-4">
-      <div className="flex items-center gap-2 px-5 pt-3">
+    <section id="index" className="relative overflow-hidden py-3" style={{ background: VOID, borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+      <div className="flex items-center gap-2 px-5 md:px-14 pb-2.5">
         <span className="relative flex h-1.5 w-1.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
         </span>
-        <span className={`${display.className} text-[11px] sm:text-[13px] text-white/90`}>
-          Field Index — live across 12 branches
+        <span className={`${mono.className} text-[10px] sm:text-[11px] tracking-[0.15em] uppercase`} style={{ color: "rgba(245,246,247,0.45)" }}>
+          Field Index
+        </span>
+        <span className="text-white/15">—</span>
+        <span className={`${mono.className} text-[10px] sm:text-[11px]`} style={{ color: YPA_BLUE_LIGHT }}>
+          live across 12 branches
         </span>
       </div>
 
-      <div className="relative py-3">
+      <div className="relative py-1">
         <motion.div
-          className="flex gap-3 px-5"
+          className="flex items-center gap-0 px-5 md:px-14"
           animate={reduceMotion ? {} : { x: ["0%", "-50%"] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 32, repeat: Infinity, ease: "linear" }}
         >
           {track.map((m, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-2 shrink-0 rounded-xl px-3 py-2 border border-white/15 bg-white/10"
-            >
-              <div className="flex flex-col">
-                <span className="text-[9px] sm:text-[10px] text-white/70">{m.label}</span>
-                <span className={`${mono.className} text-base sm:text-lg text-white font-medium`}>{m.value}</span>
+            <div key={idx} className="flex items-center shrink-0">
+              <div className="flex items-baseline gap-2 pr-6">
+                <span className={`${mono.className} text-lg sm:text-xl font-medium`} style={{ color: m.featured ? GOLD : "#F5F6F7" }}>
+                  {m.value}
+                </span>
+                <span className={`${inter.className} text-[10px] sm:text-[11px]`} style={{ color: "rgba(245,246,247,0.4)" }}>
+                  {m.label}
+                </span>
+                <span className={`${mono.className} text-[9px] uppercase tracking-wide`} style={{ color: "rgba(0,174,239,0.6)" }}>
+                  {m.delta}
+                </span>
               </div>
-              <span
-                className="text-[8px] sm:text-[9px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap bg-[#33C1F5] text-white"
-              >
-                {m.delta}
+              <span className="pr-6 select-none" style={{ color: "rgba(240,180,41,0.4)" }} aria-hidden="true">
+                ·
               </span>
             </div>
           ))}
         </motion.div>
-        <div className="absolute inset-y-0 left-0 w-12 md:w-28 pointer-events-none bg-gradient-to-r from-[#00AEEF] to-transparent" />
-        <div className="absolute inset-y-0 right-0 w-12 md:w-28 pointer-events-none bg-gradient-to-l from-[#00AEEF] to-transparent" />
+        <div className="absolute inset-y-0 left-0 w-12 md:w-28 pointer-events-none" style={{ background: `linear-gradient(90deg, ${VOID}, transparent)` }} />
+        <div className="absolute inset-y-0 right-0 w-12 md:w-28 pointer-events-none" style={{ background: `linear-gradient(270deg, ${VOID}, transparent)` }} />
       </div>
     </section>
   );
 };
+
 
 // ============================================================
 // EXPLORE RAIL — ✅ FIXED: Using regular <img> tags
