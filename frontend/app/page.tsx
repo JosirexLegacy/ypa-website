@@ -1659,7 +1659,6 @@ const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
     return diff >= 0 && diff <= 3;
   };
 
-  // Hidden on mobile, visible on xl screens
   return (
     <motion.div
       initial={{ opacity: 0, x: 30 }}
@@ -1669,47 +1668,56 @@ const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
       style={{ scrollbarWidth: "thin" }}
     >
       <div
-        className="rounded-3xl p-6 shadow-2xl border border-white/15"
-        style={{ 
-          background: "rgba(255,255,255,0.10)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          boxShadow: `0 8px 32px rgba(0,0,0,0.08), 0 0 0 1px ${YPA_BLUE}15 inset, 0 0 40px ${YPA_BLUE}08, 0 0 20px ${GOLD}05`,
+        className="rounded-2xl p-5 border"
+        style={{
+          background: "rgba(10,10,11,0.82)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderColor: "rgba(240,180,41,0.18)",
+          boxShadow: `0 24px 48px -16px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset, 0 0 32px ${YPA_BLUE}0a`,
         }}
       >
-        <div className="mb-6">
-          <div className={`${mono.className} flex items-center gap-2 mb-4 text-[10px] tracking-[0.2em] uppercase text-white/80`}>
-            <span className="w-1 h-4 rounded-full" style={{ background: `linear-gradient(to bottom, ${YPA_BLUE}, ${GOLD})` }} />
-            About YPA
+        <div className="mb-5 pb-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
+            </span>
+            <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase`} style={{ color: "rgba(245,246,247,0.5)" }}>
+              About YPA
+            </span>
           </div>
           <AnimatePresence mode="wait">
             <motion.div
               key={active}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
+              exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.5 }}
             >
               <div
-                className="w-11 h-11 rounded-2xl flex items-center justify-center mb-3"
-                style={{ background: `linear-gradient(135deg, ${YPA_BLUE}30, ${GOLD}20)` }}
+                className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 border"
+                style={{ borderColor: "rgba(0,174,239,0.3)", background: "rgba(0,174,239,0.08)" }}
               >
                 {(() => {
                   const Icon = facts[active].icon;
-                  return <Icon className="w-5 h-5" style={{ color: YPA_BLUE }} />;
+                  return <Icon className="w-4 h-4" style={{ color: YPA_BLUE_LIGHT }} />;
                 })()}
               </div>
-              <h4 className="text-base font-medium text-white">{facts[active].title}</h4>
-              <p className="mt-2 text-sm text-white/70 font-light leading-relaxed">{facts[active].description}</p>
+              <h4 className={`${display.className} text-[15px] font-medium text-white`}>{facts[active].title}</h4>
+              <p className="mt-2 text-[13px] font-light leading-relaxed" style={{ color: "rgba(245,246,247,0.55)" }}>
+                {facts[active].description}
+              </p>
               <div className="flex gap-1.5 mt-4">
                 {facts.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setActive(i)}
-                    className="h-1 rounded-full transition-all duration-500"
-                    style={{ 
-                      width: i === active ? "22px" : "10px", 
-                      background: i === active ? `linear-gradient(90deg, ${YPA_BLUE}, ${GOLD})` : "rgba(255,255,255,0.2)" 
+                    aria-label={`Show fact ${i + 1}`}
+                    className="h-[2px] rounded-full transition-all duration-500"
+                    style={{
+                      width: i === active ? "20px" : "8px",
+                      background: i === active ? GOLD : "rgba(255,255,255,0.15)",
                     }}
                   />
                 ))}
@@ -1719,100 +1727,105 @@ const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
         </div>
 
         {events?.length > 0 && (
-          <>
-            <div className="border-t my-4 border-white/10" />
-            <div className="mb-6">
-              <div className={`${mono.className} flex items-center gap-2 mb-3 text-[10px] tracking-[0.2em] uppercase text-white/70`}>
-                <span className="w-1 h-4 rounded-full" style={{ background: GOLD }} />
+          <div className="mb-5 pb-5" style={{ borderBottom: blogs?.length > 0 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
+            <div className="flex items-center justify-between mb-3">
+              <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase`} style={{ color: "rgba(245,246,247,0.4)" }}>
                 Upcoming Events
-              </div>
-              <div className="space-y-2">
-                {events.slice(0, 3).map((event, i) => {
-                  const soon = isEventSoon(event.date);
-                  return (
-                    // ✅ FIXED: Link to events page
-                    <Link key={i} href="/events">
-                      <motion.div
-                        whileHover={{ x: 4 }}
-                        className={`p-3 rounded-xl border transition-all duration-300 cursor-pointer ${
-                          soon ? "ring-2 ring-[#F0B429] ring-opacity-60 animate-pulse" : ""
-                        }`}
-                        style={{
-                          background: "rgba(255,255,255,0.06)",
-                          borderColor: soon ? "rgba(240,180,41,0.5)" : "rgba(255,255,255,0.1)",
-                        }}
-                      >
-                        <div className="text-sm font-medium text-white line-clamp-1">{event.title}</div>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-white/50">
-                          <Calendar className="h-3 w-3 shrink-0" />
-                          <span>{event.date ? new Date(event.date).toLocaleDateString() : "TBD"}</span>
-                          <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
-                          <MapPin className="h-3 w-3 shrink-0" />
-                          <span className="truncate">{event.location || "Uganda"}</span>
-                          {soon && <span className="ml-auto text-[10px] font-medium text-[#F0B429]">Soon</span>}
-                        </div>
-                      </motion.div>
-                    </Link>
-                  );
-                })}
-              </div>
+              </span>
+              <span className="h-px flex-1 ml-3" style={{ background: "rgba(240,180,41,0.25)" }} />
             </div>
-          </>
-        )}
-
-        {blogs?.length > 0 && (
-          <>
-            <div className="border-t my-4 border-white/10" />
-            <div>
-              <div className={`${mono.className} flex items-center gap-2 mb-3 text-[10px] tracking-[0.2em] uppercase text-white/70`}>
-                <span className="w-1 h-4 rounded-full" style={{ background: YPA_BLUE }} />
-                Popular Blogs
-              </div>
-              <div className="space-y-2">
-                {blogs.slice(0, 3).map((blog, i) => (
-                  <Link key={i} href={`/blog/${blog.slug}`}>
+            <div className="space-y-1.5">
+              {events.slice(0, 3).map((event, i) => {
+                const soon = isEventSoon(event.date);
+                return (
+                  <Link key={i} href="/events">
                     <motion.div
-                      whileHover={{ x: 4 }}
-                      className="flex items-start gap-3 p-3 rounded-xl border transition-all duration-300"
+                      whileHover={{ x: 3 }}
+                      className="relative p-3 rounded-lg border transition-all duration-300 cursor-pointer"
                       style={{
-                        background: "rgba(255,255,255,0.06)",
-                        borderColor: "rgba(255,255,255,0.1)",
+                        background: "rgba(255,255,255,0.03)",
+                        borderColor: soon ? "rgba(240,180,41,0.4)" : "rgba(255,255,255,0.08)",
                       }}
                     >
-                      <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0" style={{ 
-                        background: `linear-gradient(135deg, ${YPA_BLUE}40, ${GOLD}20)` 
-                      }}>
-                        {blog.featured_image ? (
-                          <Image
-                            src={`${API_URL}/assets/${blog.featured_image}`}
-                            alt={blog.title}
-                            width={36}
-                            height={36}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            quality={60}
-                            onError={(e) => {
-                              e.currentTarget.src = FALLBACK_IMAGES.default;
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-white/20">
-                            <BookOpen className="h-4 w-4" />
-                          </div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="text-[13px] font-medium text-white/90 line-clamp-1">{event.title}</div>
+                        {soon && (
+                          <span
+                            className={`${mono.className} shrink-0 text-[8px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded`}
+                            style={{ color: GOLD, background: "rgba(240,180,41,0.12)" }}
+                          >
+                            Soon
+                          </span>
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-white line-clamp-2">{blog.title}</div>
-                        <div className="text-[11px] text-white/50 mt-0.5">
-                          {blog.published_at ? new Date(blog.published_at).toLocaleDateString() : "Recent"}
-                        </div>
+                      <div className="flex items-center gap-1.5 mt-1.5 text-[11px]" style={{ color: "rgba(245,246,247,0.4)" }}>
+                        <Calendar className="h-3 w-3 shrink-0" style={{ color: YPA_BLUE }} />
+                        <span>{event.date ? new Date(event.date).toLocaleDateString() : "TBD"}</span>
+                        <span className="w-0.5 h-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.2)" }} />
+                        <MapPin className="h-3 w-3 shrink-0" style={{ color: YPA_BLUE }} />
+                        <span className="truncate">{event.location || "Uganda"}</span>
                       </div>
                     </motion.div>
                   </Link>
-                ))}
-              </div>
+                );
+              })}
             </div>
-          </>
+          </div>
+        )}
+
+        {blogs?.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase`} style={{ color: "rgba(245,246,247,0.4)" }}>
+                Popular Blogs
+              </span>
+              <span className="h-px flex-1 ml-3" style={{ background: "rgba(0,174,239,0.25)" }} />
+            </div>
+            <div className="space-y-1.5">
+              {blogs.slice(0, 3).map((blog, i) => (
+                <Link key={i} href={`/blog/${blog.slug}`}>
+                  <motion.div
+                    whileHover={{ x: 3 }}
+                    className="flex items-start gap-3 p-3 rounded-lg border transition-all duration-300"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      borderColor: "rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    <div
+                      className="w-9 h-9 rounded-md overflow-hidden shrink-0 border"
+                      style={{ borderColor: "rgba(255,255,255,0.08)" }}
+                    >
+                      {blog.featured_image ? (
+                        <Image
+                          src={`${API_URL}/assets/${blog.featured_image}`}
+                          alt={blog.title}
+                          width={36}
+                          height={36}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          quality={60}
+                          onError={(e) => {
+                            e.currentTarget.src = FALLBACK_IMAGES.default;
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center" style={{ background: "rgba(0,174,239,0.08)" }}>
+                          <BookOpen className="h-4 w-4" style={{ color: "rgba(0,174,239,0.4)" }} />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-medium text-white/90 line-clamp-2">{blog.title}</div>
+                      <div className={`${mono.className} text-[10px] mt-1`} style={{ color: "rgba(245,246,247,0.35)" }}>
+                        {blog.published_at ? new Date(blog.published_at).toLocaleDateString() : "Recent"}
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </motion.div>
