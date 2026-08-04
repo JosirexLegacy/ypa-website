@@ -487,13 +487,14 @@ const VerifyStrip = () => {
                   <p className="text-[13px] md:text-sm lg:text-base font-semibold leading-snug break-words" style={{ color: fact.confirmed ? INK_ON_LIGHT : YPA_GOLD }}>
                     {fact.value}
                   </p>
-                  {!fact.confirmed && fact.tag && (
-                    <div className="mt-1.5 md:mt-2">
-                      <span className={`${mono.className} text-[7px] md:text-[9px] px-1.5 md:px-2 py-0.5 rounded-full`} style={{ background: `${YPA_GOLD}10`, color: YPA_GOLD, border: `1px solid ${YPA_GOLD}25` }}>
-                        {fact.tag}
-                      </span>
-                    </div>
-                  )}
+                {!fact.confirmed && (
+  <div className="mt-1.5 md:mt-2">
+    <span className={`${mono.className} text-[7px] md:text-[9px] px-1.5 md:px-2 py-0.5 rounded-full`} style={{ background: `${YPA_GOLD}10`, color: YPA_GOLD, border: `1px solid ${YPA_GOLD}25` }}>
+      Pending
+    </span>
+  </div>
+)}
+                  
                 </div>
               </motion.div>
             );
