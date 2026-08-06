@@ -84,6 +84,7 @@ const MIST = "#F6F8FA";
 const INK_ON_LIGHT = "#111111";
 const MUTE_ON_LIGHT = "#5B6B7A";
 const POSITIVE = "#34D399";
+const VOID = "#0A0A0B";
 
 // ✅ CORRECT: Define API_URL first
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
@@ -257,7 +258,6 @@ const SECTIONS = [
   { id: "trust", label: "Why Trust Us" },
   { id: "signal", label: "Inside YPA" },
   { id: "voices", label: "Member Voices" },
-  { id: "press", label: "Press" },
   { id: "blog", label: "Blog" },
   { id: "cta", label: "Join" },
 ];
@@ -446,7 +446,6 @@ const LINEUP = [
 ];
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const VOID = "#0A0A0B";
 
 // A quiet grain texture so the backdrop image reads as atmosphere,
 // never as an obvious "photo card."
@@ -763,49 +762,45 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// DRONE REEL — full-bleed moving footage, the site's "wow" beat.
-// Autoplay/muted/looped/inline so it plays on mobile without a tap.
-// Poster falls back to a real hosted photo until the actual drone
-// clip is dropped into the <source> below.
+// DRONE REEL — YouTube Video Embed (Creatively Styled)
 // ============================================================
 const DroneReel = () => {
   const [muted, setMuted] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLIFrameElement>(null);
+
+  // YouTube embed URL with autoplay, loop, mute
+  const videoSrc = "https://www.youtube.com/embed/ULOKzJezKc8?autoplay=1&mute=1&loop=1&playlist=ULOKzJezKc8&controls=0&rel=0&modestbranding=1";
 
   const toggleSound = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setMuted(videoRef.current.muted);
-    }
+    // This is a placeholder - YouTube iframes can't be unmuted programmatically
+    // without user interaction. This could open the video on YouTube instead.
+    window.open("https://youtu.be/ULOKzJezKc8", "_blank");
   };
 
   return (
     <section className="relative overflow-hidden" style={{ background: VOID }}>
       <div className="relative h-[62vh] sm:h-[75vh] md:h-[88vh]">
-        {/* TODO: swap the <source> below for the real aerial/drone MP4 of goats walking. 
-            The poster image keeps this section looking intentional until that lands. */}
-        <video
+        {/* YouTube Iframe */}
+        <iframe
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover"
-          poster="https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-        >
-          <source src="https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4" type="video/mp4" />
-        </video>
+          className="absolute inset-0 w-full h-full"
+          src={videoSrc}
+          title="Change your goat farm into a powerhouse with this YPA breed"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          loading="lazy"
+          style={{ pointerEvents: 'none' }}
+        />
 
-        {/* duotone + depth, same grammar as the hero */}
+        {/* Duotone and depth overlays */}
         <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.16 }} />
         <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(10,10,11,0.35) 0%, rgba(10,10,11,0.15) 35%, rgba(10,10,11,0.75) 100%)` }} />
         <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${VOID} 0%, transparent 25%, transparent 75%, ${VOID} 100%)`, opacity: 0.6 }} />
 
-        {/* gold hairline frame */}
+        {/* Gold hairline frame */}
         <div className="absolute inset-x-4 md:inset-x-8 top-6 md:top-8 bottom-6 md:bottom-8 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.18)" }} />
 
-        {/* kicker + sound toggle row */}
+        {/* Kicker + Watch on YouTube button */}
         <div className="absolute top-6 md:top-10 left-5 md:left-14 right-5 md:right-14 flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
             <span className="relative flex h-1.5 w-1.5">
@@ -813,35 +808,33 @@ const DroneReel = () => {
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
             </span>
             <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
-              Aerial Footage — Live Operations
+              YPA Breed Highlight — Video Feature
             </span>
           </div>
-          <button
-            onClick={toggleSound}
-            aria-label={muted ? "Unmute video" : "Mute video"}
-            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[9px] md:text-[10px] tracking-[0.1em] uppercase transition-colors"
+          <a
+            href="https://youtu.be/ULOKzJezKc8"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Watch video on YouTube"
+            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[9px] md:text-[10px] tracking-[0.1em] uppercase transition-colors hover:bg-white/5"
             style={{ borderColor: "rgba(240,180,41,0.35)", color: "#F5F6F7", background: "rgba(10,10,11,0.35)" }}
           >
-            <span
-              className="inline-block h-1.5 w-1.5 rounded-full"
-              style={{ background: muted ? "rgba(245,246,247,0.4)" : GOLD }}
-            />
-            {muted ? "Sound off" : "Sound on"}
-          </button>
+            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: GOLD }} />
+            Watch on YouTube
+          </a>
         </div>
 
-        {/* headline — the copy that makes the site "speak" */}
+        {/* Headline */}
         <div className="relative z-10 h-full flex flex-col justify-end px-5 md:px-14 pb-10 md:pb-16">
           <div className="max-w-3xl">
             <h2
               className={`${display.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium leading-[1.08] tracking-tight`}
               style={{ color: "#F5F6F7" }}
             >
-              We manage farms, build profitable agricultural projects, and{" "}
+              See the breed that's transforming{" "}
               <span className={`${serif.className} italic`} style={{ color: YPA_BLUE_LIGHT }}>
-                empower individuals and communities
-              </span>{" "}
-              through modern agribusiness.
+                goat farming across Africa
+              </span>
             </h2>
             <div className="mt-6 flex items-center gap-3">
               <span className="h-px flex-1 max-w-[48px]" style={{ background: "rgba(240,180,41,0.4)" }} />
@@ -855,8 +848,6 @@ const DroneReel = () => {
     </section>
   );
 };
-
-
 
 // ============================================================
 // EXPLORE RAIL — ✅ FIXED: Using regular <img> tags
@@ -929,7 +920,6 @@ const ExploreRail = () => {
                   item.tall ? "min-h-[280px] sm:min-h-[320px]" : "min-h-[200px] sm:min-h-[220px]"
                 }`}
               >
-                {/* ✅ Using regular <img> instead of next/image */}
                 <img
                   src={item.image}
                   alt={item.label}
@@ -1034,7 +1024,6 @@ const TheLineup = () => {
                   onMouseLeave={() => setHover(null)}
                   className="group block relative rounded-2xl overflow-hidden border border-[#1F3B57] h-[340px] sm:h-[380px] lg:h-[420px]"
                 >
-                  {/* ✅ Using regular <img> instead of next/image */}
                   <img
                     src={c.image}
                     alt={c.name}
@@ -1095,7 +1084,6 @@ const TheLineup = () => {
 
 // ============================================================
 // WHY CHOOSE YPA — stat ledger + arrow-list trust points
-// White background per brand direction; gold + blue accents only.
 // ============================================================
 const WHY_STATS = [
   { label: "Goats Managed", value: "130,000+", icon: Sprout, accent: GOLD },
@@ -1128,7 +1116,6 @@ const TrustBar = () => {
           </h2>
         </ScrollReveal>
 
-        {/* Stat ledger — ruled columns like the hero, on a light card */}
         <ScrollReveal delay={0.05}>
           <div className="grid grid-cols-2 lg:grid-cols-4 border rounded-2xl overflow-hidden" style={{ borderColor: "#E8ECF0" }}>
             {WHY_STATS.map((s, i) => {
@@ -1157,7 +1144,6 @@ const TrustBar = () => {
           </div>
         </ScrollReveal>
 
-        {/* Arrow list — quick-scan trust points */}
         <ScrollReveal delay={0.1} className="mt-6 md:mt-8">
           <div className="grid sm:grid-cols-2 gap-2 md:gap-3">
             {WHY_POINTS.map((point, i) => (
@@ -1332,73 +1318,11 @@ const MemberVoices = () => {
 };
 
 // ============================================================
-// PRESS SIGNAL — Mobile Optimized
-// ============================================================
-const PressSignal = ({ pressItems }: { pressItems: any[] }) => {
-  const press = pressItems || [];
-  if (press.length === 0) return null;
-
-  return (
-    <section id="press" className="px-5 md:px-14 py-16 md:py-24 max-w-5xl mx-auto">
-      <ScrollReveal>
-        <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
-          <div>
-            <div className={`${display.className} text-[11px] md:text-[13px] mb-2 text-[#5B6B7A]`}>
-              As covered by
-            </div>
-            <h2 className={`${display.className} text-2xl md:text-3xl font-medium tracking-tight text-[#111111]`}>
-              Press Signal
-            </h2>
-          </div>
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 text-sm font-medium group text-[#00AEEF]"
-          >
-            Open the media center
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </ScrollReveal>
-
-      <div className="divide-y divide-[#E8ECF0]">
-        {press.slice(0, 3).map((item, i) => {
-          const Icon = typeIcons[item.type as keyof typeof typeIcons] || Newspaper;
-          return (
-            <ScrollReveal key={i} delay={i * 0.05}>
-              <Link href={item.link || "#"} target="_blank" className="group flex items-center gap-3 md:gap-5 py-4 md:py-6">
-                <div
-                  className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: `${YPA_BLUE}12` }}
-                >
-                  <Icon className="h-3 w-3 md:h-4 md:w-4" style={{ color: YPA_BLUE }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4
-                    className="text-sm md:text-base font-medium truncate group-hover:underline text-[#111111]"
-                  >
-                    {item.title}
-                  </h4>
-                  <p className={`${mono.className} text-[10px] md:text-[11px] mt-0.5 text-[#5B6B7A]`}>
-                    {item.outlet} · {item.date ? new Date(item.date).toLocaleDateString() : ""}
-                  </p>
-                </div>
-                <ExternalLink className="h-3 w-3 md:h-4 md:w-4 shrink-0 opacity-30 group-hover:opacity-100 transition-opacity text-[#111111]" />
-              </Link>
-            </ScrollReveal>
-          );
-        })}
-      </div>
-    </section>
-  );
-};
-
-// ============================================================
 // RECENT BLOG SECTION - Beautiful Blog Showcase
 // ============================================================
 const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
   if (!blogs || blogs.length === 0) return null;
 
-  // Get featured blog (first one)
   const featured = blogs[0];
   const rest = blogs.slice(1, 4);
 
@@ -1425,7 +1349,6 @@ const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
       </ScrollReveal>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-        {/* Featured Blog - Large */}
         <ScrollReveal className="lg:col-span-2" delay={0.05}>
           <Link href={`/blog/${featured.slug}`} className="group block h-full">
             <div className="relative rounded-2xl overflow-hidden h-full min-h-[320px] md:min-h-[400px] bg-[#F6F8FA] border border-[#E8ECF0] hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
@@ -1442,7 +1365,6 @@ const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/80 via-[#111111]/30 to-transparent" />
               
-              {/* Featured Badge */}
               <div className="absolute top-4 left-4">
                 <span className="bg-[#00AEEF] text-white text-[10px] font-medium px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
                   <Sparkles className="w-3 h-3" />
@@ -1450,7 +1372,6 @@ const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
                 </span>
               </div>
 
-              {/* Content overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8">
                 <div className="flex items-center gap-3 text-xs text-white/60 mb-2">
                   <span className="flex items-center gap-1">
@@ -1476,7 +1397,6 @@ const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
           </Link>
         </ScrollReveal>
 
-        {/* Side blogs */}
         <div className="space-y-4 md:space-y-6">
           {rest.map((blog, index) => (
             <ScrollReveal key={blog.id} delay={0.08 + index * 0.06}>
@@ -1562,19 +1482,16 @@ const EventsBanner = ({ events }: { events: any[] }) => {
             
             return (
               <ScrollReveal key={event.id} delay={index * 0.06}>
-                {/* ✅ FIXED: Link to events page */}
                 <Link 
                   href="/events"
                   className="group block h-full"
                 >
                   <div className="relative bg-gradient-to-br from-[#153455] to-[#1a3d5e] border border-[#1F3B57] rounded-2xl p-4 md:p-6 hover:border-[#33C1F5]/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#33C1F5]/5 h-full flex flex-col">
                     
-                    {/* Decorative corner accent */}
                     <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
                       <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-[#33C1F5]/10 to-transparent rotate-45 transform origin-top-right" />
                     </div>
 
-                    {/* Soon Badge */}
                     {isSoon && (
                       <div className="absolute -top-2 -right-2 z-10">
                         <div className="relative">
@@ -1591,7 +1508,6 @@ const EventsBanner = ({ events }: { events: any[] }) => {
                     )}
 
                     <div className="flex items-start gap-3 md:gap-4 flex-1">
-                      {/* Date Badge */}
                       <div className="flex flex-col items-center justify-center bg-gradient-to-b from-[#00AEEF]/20 to-[#33C1F5]/10 rounded-xl px-3 py-2 min-w-[60px] border border-[#00AEEF]/20 group-hover:border-[#00AEEF]/40 transition-all duration-300">
                         <span className="text-2xl md:text-3xl font-bold text-[#00AEEF] group-hover:scale-110 transition-transform duration-300">
                           {String(day).padStart(2, '0')}
@@ -1604,7 +1520,6 @@ const EventsBanner = ({ events }: { events: any[] }) => {
                         </span>
                       </div>
 
-                      {/* Event Info */}
                       <div className="flex-1 min-w-0">
                         <h3 className={`${display.className} text-sm md:text-base font-medium text-white group-hover:text-[#33C1F5] transition-colors line-clamp-2`}>
                           {event.title}
@@ -1626,7 +1541,6 @@ const EventsBanner = ({ events }: { events: any[] }) => {
                           )}
                         </div>
 
-                        {/* Progress bar indicator */}
                         <div className="mt-3">
                           <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                             <motion.div 
@@ -1640,12 +1554,10 @@ const EventsBanner = ({ events }: { events: any[] }) => {
                       </div>
                     </div>
 
-                    {/* Hover glow effect */}
                     <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
                       background: `radial-gradient(circle at 50% 50%, ${YPA_BLUE}06, transparent 70%)`,
                     }} />
 
-                    {/* Arrow indicator on hover */}
                     <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
                       <div className="w-6 h-6 rounded-full bg-[#00AEEF]/20 flex items-center justify-center border border-[#00AEEF]/30">
                         <ArrowRight className="w-3 h-3 text-[#00AEEF]" />
@@ -2024,7 +1936,6 @@ export default function Home() {
       <TrustBar />
       <Signal signalArticles={signalArticles} />
       <MemberVoices />
-      <PressSignal pressItems={press} />
       <RecentBlogs blogs={blogs} />
       <EventsBanner events={events} />
       <SocialMedia />
