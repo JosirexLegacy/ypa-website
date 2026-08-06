@@ -38,6 +38,7 @@ import {
   Heart,
   BookOpen,
   ChevronDown,
+  X,
 } from "lucide-react";
 
 // ============================================================
@@ -762,88 +763,93 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// DRONE REEL — YouTube Video Embed (Creatively Styled)
+// DRONE REEL — YouTube Video Embed (Mobile Optimized)
 // ============================================================
 const DroneReel = () => {
-  const [muted, setMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLIFrameElement>(null);
 
-  // YouTube embed URL with autoplay, loop, mute
-  const videoSrc = "https://www.youtube.com/embed/ULOKzJezKc8?autoplay=1&mute=1&loop=1&playlist=ULOKzJezKc8&controls=0&rel=0&modestbranding=1";
+  // YouTube embed URL - optimized for mobile
+  const videoSrc = `https://www.youtube.com/embed/ULOKzJezKc8?autoplay=0&mute=0&loop=0&controls=1&rel=0&modestbranding=1&playsinline=1`;
 
-  const toggleSound = () => {
-    // This is a placeholder - YouTube iframes can't be unmuted programmatically
-    // without user interaction. This could open the video on YouTube instead.
-    window.open("https://youtu.be/ULOKzJezKc8", "_blank");
+  const handlePlayClick = () => {
+    setIsPlaying(true);
   };
 
   return (
     <section className="relative overflow-hidden" style={{ background: VOID }}>
-      <div className="relative h-[62vh] sm:h-[75vh] md:h-[88vh]">
-        {/* YouTube Iframe */}
-        <iframe
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full"
-          src={videoSrc}
-          title="Change your goat farm into a powerhouse with this YPA breed"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          loading="lazy"
-          style={{ pointerEvents: 'none' }}
-        />
+      <div className="relative h-[50vh] sm:h-[62vh] md:h-[88vh]">
+        {!isPlaying ? (
+          // Thumbnail with play button overlay - Mobile friendly
+          <div className="relative w-full h-full cursor-pointer" onClick={handlePlayClick}>
+            <img
+              src="https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp"
+              alt="YPA Goats Programme - Click to play video"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            
+            {/* Duotone overlay */}
+            <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.16 }} />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(10,10,11,0.2) 0%, rgba(10,10,11,0.4) 50%, rgba(10,10,11,0.8) 100%)` }} />
+            
+            {/* Gold hairline frame */}
+            <div className="absolute inset-x-4 md:inset-x-8 top-6 md:top-8 bottom-6 md:bottom-8 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.18)" }} />
 
-        {/* Duotone and depth overlays */}
-        <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.16 }} />
-        <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(10,10,11,0.35) 0%, rgba(10,10,11,0.15) 35%, rgba(10,10,11,0.75) 100%)` }} />
-        <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${VOID} 0%, transparent 25%, transparent 75%, ${VOID} 100%)`, opacity: 0.6 }} />
+            {/* Play button overlay */}
+            <div className="absolute inset-0 flex items-center justify-center hover:bg-black/10 transition-all duration-300">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center bg-white/95 shadow-2xl border-2 border-white/20"
+              >
+                <Play className="w-8 h-8 sm:w-10 sm:h-10 text-[#0A0A0B] ml-1" />
+              </motion.div>
+            </div>
 
-        {/* Gold hairline frame */}
-        <div className="absolute inset-x-4 md:inset-x-8 top-6 md:top-8 bottom-6 md:bottom-8 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.18)" }} />
-
-        {/* Kicker + Watch on YouTube button */}
-        <div className="absolute top-6 md:top-10 left-5 md:left-14 right-5 md:right-14 flex items-center justify-between z-10">
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
-            </span>
-            <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
-              YPA Breed Highlight — Video Feature
-            </span>
-          </div>
-          <a
-            href="https://youtu.be/ULOKzJezKc8"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Watch video on YouTube"
-            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[9px] md:text-[10px] tracking-[0.1em] uppercase transition-colors hover:bg-white/5"
-            style={{ borderColor: "rgba(240,180,41,0.35)", color: "#F5F6F7", background: "rgba(10,10,11,0.35)" }}
-          >
-            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: GOLD }} />
-            Watch on YouTube
-          </a>
-        </div>
-
-        {/* Headline */}
-        <div className="relative z-10 h-full flex flex-col justify-end px-5 md:px-14 pb-10 md:pb-16">
-          <div className="max-w-3xl">
-            <h2
-              className={`${display.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium leading-[1.08] tracking-tight`}
-              style={{ color: "#F5F6F7" }}
-            >
-              See the breed that's transforming{" "}
-              <span className={`${serif.className} italic`} style={{ color: YPA_BLUE_LIGHT }}>
-                goat farming across Africa
-              </span>
-            </h2>
-            <div className="mt-6 flex items-center gap-3">
-              <span className="h-px flex-1 max-w-[48px]" style={{ background: "rgba(240,180,41,0.4)" }} />
-              <span className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.2em] uppercase`} style={{ color: "rgba(245,246,247,0.45)" }}>
-                130,000+ Goats · 18,000+ Members · 12 Branches
-              </span>
+            {/* Title overlay */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 bg-gradient-to-t from-[#0A0A0B] via-[#0A0A0B]/60 to-transparent">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
+                </span>
+                <span className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
+                  YPA Breed Highlight
+                </span>
+              </div>
+              <h3 className="text-white text-sm sm:text-base md:text-xl font-medium">
+                Change your goat farm into a powerhouse
+              </h3>
+              <p className="text-white/40 text-xs sm:text-sm mt-0.5">
+                Click the play button to watch
+              </p>
             </div>
           </div>
-        </div>
+        ) : (
+          // YouTube iframe
+          <div className="relative w-full h-full">
+            <iframe
+              ref={videoRef}
+              className="w-full h-full"
+              src={videoSrc}
+              title="Change your goat farm into a powerhouse with this YPA breed"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin allow-presentation"
+            />
+            
+            {/* Close button */}
+            <button
+              onClick={() => setIsPlaying(false)}
+              className="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-white/10"
+              aria-label="Close video"
+            >
+              <X className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
