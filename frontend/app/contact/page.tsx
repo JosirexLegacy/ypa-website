@@ -99,6 +99,7 @@ const inter = Inter({
 // BRAND COLORS
 // ============================================================
 const INK = "#111111";
+const VOID = "#0A0A0B";
 const NAVY = "#0E2540";
 const LINE = "#1F3B57";
 const BLUE = "#00AEEF";
@@ -130,6 +131,18 @@ const NeedsInfo = ({ children = "Add details" }: { children?: string }) => (
     <Zap className="h-2.5 w-2.5" />
     {children}
   </span>
+);
+
+// Ledger-style eyebrow — mono index + gold hairline + label.
+// `dark` switches the label color for use on black sections.
+const LedgerLabel = ({ index, label, dark = false }: { index: string; label: string; dark?: boolean }) => (
+  <div className="inline-flex items-center gap-2.5">
+    <span className={`${mono.className} text-[10px]`} style={{ color: GOLD }}>{index}</span>
+    <span className="h-px w-5" style={{ background: "rgba(240,180,41,0.4)" }} />
+    <span className={`${mono.className} text-[10px] sm:text-[11px] font-medium tracking-[0.2em] uppercase`} style={{ color: dark ? "rgba(245,246,247,0.5)" : BLUE }}>
+      {label}
+    </span>
+  </div>
 );
 
 // ============================================================
@@ -345,37 +358,36 @@ export default function ContactPage() {
       <Navigation />
 
       {/* ============================================================
-          HERO SECTION - Mobile Optimized
+          HERO SECTION — The Ledger, Contact-page variant
       ============================================================ */}
-      <section id="hero" ref={heroRef} className="relative pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 md:px-14 overflow-hidden min-h-[80vh] sm:min-h-[70vh] md:min-h-[60vh] flex items-center" style={{ background: NAVY }}>
-        {/* Grid pattern overlay - lighter on mobile */}
+      <section id="hero" ref={heroRef} className="relative pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 md:px-14 overflow-hidden min-h-[80vh] sm:min-h-[70vh] md:min-h-[60vh] flex items-center" style={{ background: VOID }}>
+        {/* Grid pattern overlay */}
         <div
-          className="absolute inset-0 opacity-[0.03] sm:opacity-[0.05] pointer-events-none"
+          className="absolute inset-0 opacity-[0.04] pointer-events-none"
           style={{
             backgroundImage:
               "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
             backgroundSize: "48px 48px",
+            WebkitMaskImage: "linear-gradient(180deg, #000 0%, transparent 65%)",
+            maskImage: "linear-gradient(180deg, #000 0%, transparent 65%)",
           }}
         />
+
+        {/* gold hairline frame, matching the site-wide hero language */}
+        <div className="absolute inset-x-4 md:inset-x-8 top-16 md:top-20 bottom-8 md:bottom-10 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.14)" }} />
         
-        {/* Animated gradient blobs - scaled down on mobile */}
+        {/* Animated gradient blobs */}
         <motion.div
           className="absolute top-[-20%] right-[-20%] w-[300px] sm:w-[400px] md:w-[600px] h-[300px] sm:h-[400px] md:h-[600px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${BLUE}12` }}
+          style={{ background: `${BLUE}10` }}
           animate={reduce ? {} : { x: [0, 40, -30, 0], y: [0, -30, 40, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           className="absolute bottom-[-20%] left-[-20%] w-[250px] sm:w-[350px] md:w-[500px] h-[250px] sm:h-[350px] md:h-[500px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: `${BLUE_LIGHT}10` }}
+          style={{ background: `${GOLD}08` }}
           animate={reduce ? {} : { x: [0, -30, 20, 0], y: [0, 30, -20, 0] }}
           transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        />
-        <motion.div
-          className="absolute top-[30%] left-[30%] w-[150px] sm:w-[200px] md:w-[300px] h-[150px] sm:h-[200px] md:h-[300px] rounded-full blur-3xl pointer-events-none hidden sm:block"
-          style={{ background: `${GOLD}06` }}
-          animate={reduce ? {} : { scale: [1, 1.15, 1], x: [0, 20, -15, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
 
         {/* Goat mark - hidden on small mobile */}
@@ -398,7 +410,7 @@ export default function ContactPage() {
           animate={reduce ? {} : { y: [0, 15, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         >
-          <Award className="w-10 h-10" style={{ color: GOLD, opacity: 0.15 }} />
+          <Award className="w-10 h-10" style={{ color: GOLD, opacity: 0.2 }} />
         </motion.div>
 
         <div className="relative container mx-auto max-w-6xl z-10">
@@ -408,26 +420,16 @@ export default function ContactPage() {
             transition={{ duration: 0.6 }}
             className="max-w-2xl"
           >
-            {/* Status badge - mobile friendly */}
-            <motion.div 
-              className={`${mono.className} inline-flex items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/45 mb-3 sm:mb-4 relative overflow-hidden px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10`}
-              style={{ background: "rgba(255,255,255,0.05)" }}
-            >
-              {!reduce && (
-                <motion.span
-                  aria-hidden="true"
-                  className="absolute inset-0 w-1/3 pointer-events-none"
-                  style={{ background: `linear-gradient(120deg, transparent, ${BLUE}25, transparent)` }}
-                  animate={{ x: ["-150%", "250%"] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", repeatDelay: 2 }}
-                />
-              )}
+            {/* manifest stamp — live status */}
+            <motion.div className="flex items-center gap-3 mb-4 sm:mb-5">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34D399] opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34D399]" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: POSITIVE }} />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: POSITIVE }} />
               </span>
-              <span className="hidden xs:inline">Live Support — 24/7</span>
-              <span className="xs:hidden">24/7 Live</span>
+              <span className={`${mono.className} text-[10px] sm:text-[11px] tracking-[0.25em] uppercase`} style={{ color: BLUE_LIGHT }}>
+                Live Support — 24/7
+              </span>
+              <span className="h-px flex-1 max-w-[64px]" style={{ background: "rgba(240,180,41,0.35)" }} />
             </motion.div>
             
             <motion.h1 
@@ -438,22 +440,19 @@ export default function ContactPage() {
             >
               {content?.title || "We're here to help"}
               <motion.span
-                className="block mt-1"
+                className="block mt-1 italic"
                 initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
+                style={{ color: BLUE_LIGHT }}
               >
-                <span
-                  className="text-transparent bg-clip-text"
-                  style={{ backgroundImage: `linear-gradient(135deg, ${BLUE_LIGHT}, ${BLUE}, ${BLUE_DARK}, ${GOLD})` }}
-                >
-                  Every question answered
-                </span>
+                Every question answered
               </motion.span>
             </motion.h1>
 
             <motion.p 
-              className="text-sm sm:text-base md:text-lg text-white/50 mt-3 sm:mt-5 max-w-lg font-light leading-relaxed"
+              className="text-sm sm:text-base md:text-lg mt-3 sm:mt-5 max-w-lg font-light leading-relaxed"
+              style={{ color: "rgba(245,246,247,0.55)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -461,30 +460,32 @@ export default function ContactPage() {
               {content?.subtitle || "Reach out to us anytime. Our team is ready to help with anything you need."}
             </motion.p>
             
-            {/* Trust indicators - scrollable on mobile if needed */}
-            <motion.div 
-              className="flex flex-wrap items-center gap-3 sm:gap-6 mt-4 sm:mt-6"
+            {/* ledger row — trust indicators as ruled columns */}
+            <motion.div
+              className="mt-6 sm:mt-8 flex items-stretch gap-0 max-w-md border-t border-b"
+              style={{ borderColor: "rgba(255,255,255,0.1)" }}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.5 }}
             >
-              <div className="flex items-center gap-1.5 text-white/30 text-[10px] sm:text-xs">
-                <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5" style={{ color: BLUE_LIGHT }} />
-                <span>1,000+ members</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-white/30 text-[10px] sm:text-xs">
-                <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5" style={{ color: GOLD }} />
-                <span>4.9/5 rating</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-white/30 text-[10px] sm:text-xs">
-                <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5" style={{ color: BLUE }} />
-                <span>12 branches</span>
-              </div>
+              {[
+                { label: "Members", value: "1,000+", icon: Heart, accent: BLUE_LIGHT },
+                { label: "Rating", value: "4.9/5", icon: Star, accent: GOLD },
+                { label: "Branches", value: "12", icon: Globe, accent: BLUE_LIGHT },
+              ].map((s, idx) => (
+                <div key={idx} className="flex-1 py-3 px-3 sm:px-4" style={{ borderLeft: idx > 0 ? "1px solid rgba(255,255,255,0.1)" : "none" }}>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <s.icon className="w-3 h-3" style={{ color: s.accent }} />
+                    <span className={`${mono.className} text-[8px] sm:text-[9px] tracking-[0.1em] uppercase`} style={{ color: "rgba(245,246,247,0.4)" }}>{s.label}</span>
+                  </div>
+                  <div className={`${display.className} text-sm sm:text-base font-medium`} style={{ color: "#F5F6F7" }}>{s.value}</div>
+                </div>
+              ))}
             </motion.div>
             
-            {/* Buttons - mobile optimized */}
+            {/* Buttons */}
             <motion.div 
-              className="flex flex-wrap gap-2 sm:gap-3 mt-5 sm:mt-8"
+              className="flex flex-wrap gap-2 sm:gap-3 mt-6 sm:mt-8"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.6 }}
@@ -509,9 +510,10 @@ export default function ContactPage() {
                 href="#contact-form"
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium transition-all bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40 flex-1 sm:flex-none justify-center"
+                className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium transition-all border flex-1 sm:flex-none justify-center"
+                style={{ borderColor: "rgba(240,180,41,0.35)", color: "#fff" }}
               >
-                <Mail className="w-4 h-4" style={{ color: BLUE_LIGHT }} />
+                <Mail className="w-4 h-4" style={{ color: GOLD }} />
                 <span className="hidden xs:inline">Send Email</span>
                 <span className="xs:hidden">Email</span>
               </motion.a>
@@ -521,12 +523,12 @@ export default function ContactPage() {
       </section>
 
       {/* ============================================================
-          DIRECT LINES - Mobile Optimized
+          DIRECT LINES — black ledger row
       ============================================================ */}
-      <section className="border-y" style={{ background: NAVY, borderColor: LINE }}>
+      <section className="relative border-y" style={{ background: VOID, borderColor: "rgba(255,255,255,0.08)" }}>
         <div className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-14 pt-3 sm:pt-4">
           <Zap className="h-3 w-3 sm:h-3.5 sm:w-3.5" style={{ color: GOLD }} />
-          <span className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-white/40`}>
+          <span className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.2em] uppercase`} style={{ color: "rgba(245,246,247,0.4)" }}>
             Direct lines — no contact form required
           </span>
         </div>
@@ -536,8 +538,8 @@ export default function ContactPage() {
             const isClickable = d.href && d.value;
             const content = (
               <div key={i} className={mono.className}>
-                <div className="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] tracking-[0.12em] uppercase text-white/35">
-                  <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] tracking-[0.12em] uppercase" style={{ color: "rgba(245,246,247,0.35)" }}>
+                  <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" style={{ color: BLUE_LIGHT }} />
                   {d.label}
                 </div>
                 <div className="text-xs sm:text-sm md:text-base mt-1 break-words" style={{ color: d.value ? "#fff" : GOLD }}>
@@ -578,9 +580,9 @@ export default function ContactPage() {
             viewport={{ once: true, margin: "-50px" }}
             className="text-center mb-8 sm:mb-12"
           >
-            <span className={`${mono.className} text-[10px] sm:text-[11px] font-medium tracking-[0.2em] uppercase`} style={{ color: BLUE }}>
-              Help Center
-            </span>
+            <div className="flex justify-center mb-2">
+              <LedgerLabel index="01" label="Help Center" />
+            </div>
             <h2 className={`${display.className} text-2xl sm:text-3xl md:text-4xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
               Frequently Asked Questions
             </h2>
@@ -682,20 +684,23 @@ export default function ContactPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25, delay: index * 0.02 }}
                   className="border rounded-xl overflow-hidden transition-all"
-                  style={{ borderColor: expandedFaq === index ? BLUE : "#E8ECF0" }}
+                  style={{ borderColor: expandedFaq === index ? "rgba(240,180,41,0.45)" : "#E8ECF0" }}
                 >
                   <button
                     onClick={() => toggleFaq(index)}
                     className="w-full px-3 sm:px-5 py-3 sm:py-4 flex items-center justify-between text-left transition-colors hover:bg-[#F6F8FA] touch-manipulation"
                   >
-                    <span className={`text-xs sm:text-sm font-medium ${expandedFaq === index ? '' : ''}`} style={{ color: INK_ON_LIGHT }}>
-                      {faq.question}
+                    <span className="flex items-center gap-2">
+                      <span className={`${mono.className} text-[9px]`} style={{ color: "rgba(91,107,122,0.45)" }}>0{index + 1}</span>
+                      <span className="text-xs sm:text-sm font-medium" style={{ color: INK_ON_LIGHT }}>
+                        {faq.question}
+                      </span>
                     </span>
                     <motion.div
                       animate={{ rotate: expandedFaq === index ? 180 : 0 }}
                       transition={{ duration: 0.25 }}
                       className="shrink-0 ml-2 sm:ml-4"
-                      style={{ color: BLUE }}
+                      style={{ color: expandedFaq === index ? GOLD : BLUE }}
                     >
                       <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                     </motion.div>
@@ -752,9 +757,7 @@ export default function ContactPage() {
               transition={{ duration: 0.5 }}
               viewport={{ once: true, margin: "-50px" }}
             >
-              <span className={`${mono.className} text-[10px] sm:text-[11px] font-medium tracking-[0.2em] uppercase`} style={{ color: BLUE }}>
-                Reach out
-              </span>
+              <LedgerLabel index="02" label="Reach out" />
               <h2 className={`${display.className} text-xl sm:text-2xl md:text-3xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
                 Every channel, one team
               </h2>
@@ -850,11 +853,13 @@ export default function ContactPage() {
                         className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-300"
                         style={{ background: "#fff", border: "1px solid #E8ECF0", color: MUTE_ON_LIGHT }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = BLUE;
-                          e.currentTarget.style.color = "#fff";
+                          e.currentTarget.style.background = VOID;
+                          e.currentTarget.style.borderColor = "rgba(240,180,41,0.4)";
+                          e.currentTarget.style.color = BLUE_LIGHT;
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.background = "#fff";
+                          e.currentTarget.style.borderColor = "#E8ECF0";
                           e.currentTarget.style.color = MUTE_ON_LIGHT;
                         }}
                       >
@@ -872,9 +877,7 @@ export default function ContactPage() {
               transition={{ duration: 0.5 }}
               viewport={{ once: true, margin: "-50px" }}
             >
-              <span className={`${mono.className} text-[10px] sm:text-[11px] font-medium tracking-[0.2em] uppercase`} style={{ color: BLUE }}>
-                Send a message
-              </span>
+              <LedgerLabel index="03" label="Send a message" />
               <h2 className={`${display.className} text-xl sm:text-2xl md:text-3xl font-medium mt-2`} style={{ color: INK_ON_LIGHT }}>
                 Tell us what you need
               </h2>
@@ -882,7 +885,7 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 mt-4 sm:mt-6 bg-white rounded-xl sm:rounded-2xl border p-4 sm:p-6" style={{ borderColor: "#E8ECF0" }}>
                 <div>
                   <label htmlFor="name" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
-                    Full Name <span style={{ color: BLUE }}>*</span>
+                    Full Name <span style={{ color: GOLD }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -901,7 +904,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="email" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
-                    Email Address <span style={{ color: BLUE }}>*</span>
+                    Email Address <span style={{ color: GOLD }}>*</span>
                   </label>
                   <input
                     type="email"
@@ -963,7 +966,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="subject" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
-                    Subject <span style={{ color: BLUE }}>*</span>
+                    Subject <span style={{ color: GOLD }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -982,7 +985,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="message" className={`${mono.className} block text-[9px] sm:text-[10px] font-semibold tracking-[0.1em] uppercase mb-1`} style={{ color: MUTE_ON_LIGHT }}>
-                    Message <span style={{ color: BLUE }}>*</span>
+                    Message <span style={{ color: GOLD }}>*</span>
                   </label>
                   <textarea
                     id="message"
@@ -1012,14 +1015,14 @@ export default function ContactPage() {
                   whileTap={formStatus === "sending" ? {} : { scale: 0.98 }}
                   className="w-full py-3 sm:py-3.5 rounded-xl font-medium text-white transition-all duration-300 flex items-center justify-center gap-2 text-sm"
                   style={{
-                    background: formStatus === "sending" ? "#9CA3AF" : INK_ON_LIGHT,
+                    background: formStatus === "sending" ? "#9CA3AF" : VOID,
                     cursor: formStatus === "sending" ? "not-allowed" : "pointer",
                   }}
                   onMouseEnter={(e) => {
                     if (formStatus !== "sending") e.currentTarget.style.background = BLUE;
                   }}
                   onMouseLeave={(e) => {
-                    if (formStatus !== "sending") e.currentTarget.style.background = INK_ON_LIGHT;
+                    if (formStatus !== "sending") e.currentTarget.style.background = VOID;
                   }}
                 >
                   {formStatus === "sending" ? (
@@ -1057,11 +1060,12 @@ export default function ContactPage() {
       </section>
 
       {/* ============================================================
-          BRANCHES CTA - Mobile Optimized
+          BRANCHES CTA — black ledger close
       ============================================================ */}
-      <section className="px-4 sm:px-6 md:px-14 py-16 sm:py-20 md:py-24 relative overflow-hidden" style={{ background: NAVY }}>
-        <div className="absolute top-[-40%] right-[-10%] w-[300px] sm:w-[400px] md:w-[600px] h-[300px] sm:h-[400px] md:h-[600px] rounded-full blur-3xl pointer-events-none" style={{ background: `${BLUE}14` }} />
-        <div className="absolute bottom-[-30%] left-[-10%] w-[200px] sm:w-[300px] md:w-[400px] h-[200px] sm:h-[300px] md:h-[400px] rounded-full blur-3xl pointer-events-none" style={{ background: `${GOLD}10` }} />
+      <section className="px-4 sm:px-6 md:px-14 py-16 sm:py-20 md:py-24 relative overflow-hidden" style={{ background: VOID }}>
+        <div className="absolute top-[-40%] right-[-10%] w-[300px] sm:w-[400px] md:w-[600px] h-[300px] sm:h-[400px] md:h-[600px] rounded-full blur-3xl pointer-events-none" style={{ background: `${BLUE}10` }} />
+        <div className="absolute bottom-[-30%] left-[-10%] w-[200px] sm:w-[300px] md:w-[400px] h-[200px] sm:h-[300px] md:h-[400px] rounded-full blur-3xl pointer-events-none" style={{ background: `${GOLD}0a` }} />
+        <div className="absolute inset-x-4 md:inset-x-10 top-8 bottom-8 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.12)" }} />
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1070,18 +1074,21 @@ export default function ContactPage() {
           viewport={{ once: true, margin: "-50px" }}
           className="relative container mx-auto max-w-2xl text-center"
         >
-          <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-4 sm:mb-5 rounded-2xl border flex items-center justify-center" style={{ borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}>
+          <div className="flex justify-center mb-4 sm:mb-5">
+            <LedgerLabel index="04" label="Visit Us" dark />
+          </div>
+          <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-4 sm:mb-5 rounded-2xl border flex items-center justify-center" style={{ borderColor: "rgba(240,180,41,0.25)", background: "rgba(255,255,255,0.03)" }}>
             <Building className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: BLUE_LIGHT }} />
           </div>
           <h3 className={`${display.className} text-xl sm:text-2xl md:text-3xl font-medium text-white`}>Prefer to visit us in person?</h3>
-          <p className="text-white/40 text-xs sm:text-sm mt-2 max-w-md mx-auto font-light">
+          <p className="text-xs sm:text-sm mt-2 max-w-md mx-auto font-light" style={{ color: "rgba(245,246,247,0.45)" }}>
             Find a YPA branch near you and start your agribusiness journey face-to-face.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-5 sm:mt-6">
             <Link
               href="/branches"
-              className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium text-white transition-all hover:-translate-y-0.5"
-              style={{ background: BLUE, boxShadow: `0 16px 32px -12px ${BLUE}55` }}
+              className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium transition-all hover:-translate-y-0.5"
+              style={{ background: BLUE, color: VOID }}
             >
               <MapPin className="w-4 h-4" />
               View Branches
@@ -1091,13 +1098,8 @@ export default function ContactPage() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium transition-all hover:-translate-y-0.5"
-              style={{ 
-                background: "rgba(255,255,255,0.08)", 
-                backdropFilter: "blur(10px)",
-                color: "#fff",
-                border: "1px solid rgba(255,255,255,0.1)"
-              }}
+              className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium transition-all hover:-translate-y-0.5 border"
+              style={{ borderColor: "rgba(240,180,41,0.35)", color: "#fff" }}
             >
               <WhatsAppIcon />
               Chat on WhatsApp
