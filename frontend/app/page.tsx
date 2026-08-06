@@ -703,10 +703,10 @@ const Hero = () => {
 // ============================================================
 const FIELD_INDEX = [
   { label: "Goats under care", value: "130,000+", delta: "95% success" },
+  { label: "Active members", value: "18,000+", delta: "across all programmes" },
   { label: "Acres cultivated", value: "5,000+", delta: "maize programme" },
-  { label: "SACCO members", value: "1,000+", delta: "12 branches" },
   { label: "Avg. farmer return", value: "3.0×", delta: "contract farming", featured: true },
-  { label: "Operating since", value: "2014", delta: "URSB registered" },
+  { label: "Operating since", value: "2008", delta: "URSB registered" },
   { label: "Hidden fees", value: "0", delta: "by policy" },
 ];
 
@@ -761,6 +761,101 @@ const FieldIndex = () => {
     </section>
   );
 };
+
+// ============================================================
+// DRONE REEL — full-bleed moving footage, the site's "wow" beat.
+// Autoplay/muted/looped/inline so it plays on mobile without a tap.
+// Poster falls back to a real hosted photo until the actual drone
+// clip is dropped into the <source> below.
+// ============================================================
+const DroneReel = () => {
+  const [muted, setMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const toggleSound = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setMuted(videoRef.current.muted);
+    }
+  };
+
+  return (
+    <section className="relative overflow-hidden" style={{ background: VOID }}>
+      <div className="relative h-[62vh] sm:h-[75vh] md:h-[88vh]">
+        {/* TODO: swap the <source> below for the real aerial/drone MP4 of goats walking. 
+            The poster image keeps this section looking intentional until that lands. */}
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          poster="https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+        >
+          <source src="https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4" type="video/mp4" />
+        </video>
+
+        {/* duotone + depth, same grammar as the hero */}
+        <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.16 }} />
+        <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(10,10,11,0.35) 0%, rgba(10,10,11,0.15) 35%, rgba(10,10,11,0.75) 100%)` }} />
+        <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${VOID} 0%, transparent 25%, transparent 75%, ${VOID} 100%)`, opacity: 0.6 }} />
+
+        {/* gold hairline frame */}
+        <div className="absolute inset-x-4 md:inset-x-8 top-6 md:top-8 bottom-6 md:bottom-8 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.18)" }} />
+
+        {/* kicker + sound toggle row */}
+        <div className="absolute top-6 md:top-10 left-5 md:left-14 right-5 md:right-14 flex items-center justify-between z-10">
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
+            </span>
+            <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
+              Aerial Footage — Live Operations
+            </span>
+          </div>
+          <button
+            onClick={toggleSound}
+            aria-label={muted ? "Unmute video" : "Mute video"}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[9px] md:text-[10px] tracking-[0.1em] uppercase transition-colors"
+            style={{ borderColor: "rgba(240,180,41,0.35)", color: "#F5F6F7", background: "rgba(10,10,11,0.35)" }}
+          >
+            <span
+              className="inline-block h-1.5 w-1.5 rounded-full"
+              style={{ background: muted ? "rgba(245,246,247,0.4)" : GOLD }}
+            />
+            {muted ? "Sound off" : "Sound on"}
+          </button>
+        </div>
+
+        {/* headline — the copy that makes the site "speak" */}
+        <div className="relative z-10 h-full flex flex-col justify-end px-5 md:px-14 pb-10 md:pb-16">
+          <div className="max-w-3xl">
+            <h2
+              className={`${display.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium leading-[1.08] tracking-tight`}
+              style={{ color: "#F5F6F7" }}
+            >
+              We manage farms, build profitable agricultural projects, and{" "}
+              <span className={`${serif.className} italic`} style={{ color: YPA_BLUE_LIGHT }}>
+                empower individuals and communities
+              </span>{" "}
+              through modern agribusiness.
+            </h2>
+            <div className="mt-6 flex items-center gap-3">
+              <span className="h-px flex-1 max-w-[48px]" style={{ background: "rgba(240,180,41,0.4)" }} />
+              <span className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.2em] uppercase`} style={{ color: "rgba(245,246,247,0.45)" }}>
+                130,000+ Goats · 18,000+ Members · 12 Branches
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 
 
 // ============================================================
@@ -999,50 +1094,84 @@ const TheLineup = () => {
 };
 
 // ============================================================
-// TRUST BAR — Mobile Optimized
+// WHY CHOOSE YPA — stat ledger + arrow-list trust points
+// White background per brand direction; gold + blue accents only.
 // ============================================================
-const TRUST_POINTS = [
-  { icon: Award, label: "Founded", value: "2014", note: "over a decade in the field" },
-  { icon: Shield, label: "Registered", value: "URSB", note: "licensed to operate in Uganda" },
-  { icon: Handshake, label: "Transparency", value: "No hidden fees", note: "the rate you're quoted is the rate you pay" },
-  { icon: Building, label: "Reach", value: "12 branches", note: "across Uganda's growing regions" },
+const WHY_STATS = [
+  { label: "Goats Managed", value: "130,000+", icon: Sprout, accent: GOLD },
+  { label: "Active Members", value: "18,000+", icon: Users, accent: YPA_BLUE },
+  { label: "Branches", value: "12", note: "Local & international", icon: Building, accent: YPA_BLUE },
+  { label: "Countries", value: "3", note: "Uganda · Dubai · Zambia", icon: Globe, accent: GOLD },
+];
+
+const WHY_POINTS = [
+  "Founded since 2008 — over a decade in the field",
+  "Registered with URSB & the Uganda Investment Authority",
+  "Local and international branch network",
+  "Full transparency — the rate you're quoted is the rate you pay",
 ];
 
 const TrustBar = () => {
   return (
-    <section id="trust" className="px-5 md:px-14 py-12 md:py-20 bg-[#F6F8FA]">
+    <section id="trust" className="px-5 md:px-14 py-16 md:py-24 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
       <div className="max-w-7xl mx-auto">
-        <ScrollReveal>
-          <h2 className={`${display.className} text-xl md:text-2xl lg:text-3xl font-medium tracking-tight mb-6 md:mb-10 text-[#111111]`}>
-            Why farmers put their savings with us
+        <ScrollReveal className="mb-8 md:mb-12">
+          <div className="flex items-center gap-2.5">
+            <span className={`${mono.className} text-[10px]`} style={{ color: GOLD }}>05</span>
+            <span className="h-px w-5" style={{ background: "rgba(240,180,41,0.4)" }} />
+            <span className={`${mono.className} text-[10px] md:text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
+              Why Trust Us
+            </span>
+          </div>
+          <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight mt-3 max-w-xl text-[#111111]`}>
+            Why thousands are choosing YPA
           </h2>
         </ScrollReveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          {TRUST_POINTS.map((t, i) => {
-            const Icon = t.icon;
-            return (
-              <ScrollReveal key={i} delay={i * 0.06}>
-                <div className="rounded-xl md:rounded-2xl border border-[#E8ECF0] p-4 md:p-6 bg-white h-full">
-                  <div
-                    className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center mb-3 md:mb-4"
-                    style={{ background: `${YPA_BLUE}12` }}
-                  >
-                    <Icon className="h-4 w-4 md:h-5 md:w-5" style={{ color: YPA_BLUE }} />
+
+        {/* Stat ledger — ruled columns like the hero, on a light card */}
+        <ScrollReveal delay={0.05}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 border rounded-2xl overflow-hidden" style={{ borderColor: "#E8ECF0" }}>
+            {WHY_STATS.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={i}
+                  className="p-4 md:p-6"
+                  style={{
+                    borderLeft: i % 2 !== 0 ? "1px solid #E8ECF0" : undefined,
+                    borderTop: i >= 2 ? "1px solid #E8ECF0" : undefined,
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-2 md:mb-3">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg flex items-center justify-center" style={{ background: `${s.accent}12` }}>
+                      <Icon className="h-4 w-4" style={{ color: s.accent }} />
+                    </div>
+                    <span className={`${mono.className} text-[9px]`} style={{ color: "rgba(91,107,122,0.5)" }}>0{i + 1}</span>
                   </div>
-                  <div className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.15em] uppercase text-[#5B6B7A]`}>
-                    {t.label}
-                  </div>
-                  <div className="text-lg md:text-xl font-medium mt-0.5 text-[#111111]">
-                    {t.value}
-                  </div>
-                  <p className="text-xs md:text-sm mt-1 md:mt-2 font-light leading-relaxed text-[#5B6B7A]">
-                    {t.note}
-                  </p>
+                  <div className={`${display.className} text-xl md:text-2xl lg:text-3xl font-medium`} style={{ color: "#111111" }}>{s.value}</div>
+                  <div className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.1em] uppercase mt-1`} style={{ color: "#5B6B7A" }}>{s.label}</div>
+                  {s.note && <div className="text-[10px] md:text-[11px] font-light mt-1" style={{ color: "#5B6B7A" }}>{s.note}</div>}
                 </div>
-              </ScrollReveal>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </ScrollReveal>
+
+        {/* Arrow list — quick-scan trust points */}
+        <ScrollReveal delay={0.1} className="mt-6 md:mt-8">
+          <div className="grid sm:grid-cols-2 gap-2 md:gap-3">
+            {WHY_POINTS.map((point, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 rounded-xl border p-3.5 md:p-4"
+                style={{ borderColor: "#EEF1F3", background: "#F6F8FA" }}
+              >
+                <span className={`${mono.className} text-sm shrink-0`} style={{ color: GOLD }}>➔</span>
+                <span className="text-xs md:text-sm font-light" style={{ color: "#3E4C59" }}>{point}</span>
+              </div>
+            ))}
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );
@@ -1611,7 +1740,7 @@ const FinalCTA = () => {
           What would a decade in agribusiness do for your income?
         </h2>
         <p className="text-white/40 font-light mb-6 md:mb-10 max-w-md mx-auto text-xs md:text-sm">
-          Over 1,000 members are already finding out. Registered with URSB, built on transparency, running since 2014.
+          Over 18,000 members are already finding out. Registered with URSB, built on transparency, running since 2008.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
           <Link
@@ -1641,7 +1770,7 @@ const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
   
   const facts = [
     { icon: Target, title: "Our Mission", description: "Empowering Africa's youth through sustainable agribusiness and financial inclusion." },
-    { icon: Heart, title: "Our Impact", description: "130,000+ goats under care. 1,000+ SACCO members. 12 branches across Uganda." },
+    { icon: Heart, title: "Our Impact", description: "130,000+ goats under care. 18,000+ active members. 12 branches across Uganda." },
     { icon: Lightbulb, title: "Our Vision", description: "A prosperous Africa where every young farmer has the tools to succeed." },
     { icon: Shield, title: "Our Promise", description: "100% transparency. No hidden fees. Registered with URSB." },
   ];
@@ -1889,6 +2018,7 @@ export default function Home() {
       <SectionRail />
       <Hero />
       <FieldIndex />
+      <DroneReel />
       <ExploreRail />
       <TheLineup />
       <TrustBar />
