@@ -783,7 +783,7 @@ const DroneReel = () => {
           // Thumbnail with play button overlay - Mobile friendly
           <div className="relative w-full h-full cursor-pointer" onClick={handlePlayClick}>
             <img
-              src="https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp"
+              src="https://res.cloudinary.com/owwvyprb/image/upload/v1785148528/jossgoat_evsxxz.webp"
               alt="YPA Goats Programme - Click to play video"
               className="w-full h-full object-cover"
               loading="lazy"
