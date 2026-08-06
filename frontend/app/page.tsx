@@ -763,98 +763,204 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// DRONE REEL — YouTube Video Embed (Mobile Optimized)
+// DRONE REEL — Premium Video Section with Auto-Play & Glow Effects
 // ============================================================
 const DroneReel = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useRef<HTMLIFrameElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // YouTube embed URL - optimized for mobile
-  const videoSrc = `https://www.youtube.com/embed/ULOKzJezKc8?autoplay=0&mute=0&loop=0&controls=1&rel=0&modestbranding=1&playsinline=1`;
+  // Toggle play/pause
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
-  const handlePlayClick = () => {
-    setIsPlaying(true);
+  // Toggle mute
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(!isMuted);
+    }
   };
 
   return (
     <section className="relative overflow-hidden" style={{ background: VOID }}>
-      <div className="relative h-[50vh] sm:h-[62vh] md:h-[88vh]">
-        {!isPlaying ? (
-          // Thumbnail with play button overlay - Mobile friendly
-          <div className="relative w-full h-full cursor-pointer" onClick={handlePlayClick}>
-            <img
-              src="https://res.cloudinary.com/owwvyprb/image/upload/v1785148528/jossgoat_evsxxz.webp"
-              alt="YPA Goats Programme - Click to play video"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-            
-            {/* Duotone overlay */}
-            <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.16 }} />
-            <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(10,10,11,0.2) 0%, rgba(10,10,11,0.4) 50%, rgba(10,10,11,0.8) 100%)` }} />
-            
-            {/* Gold hairline frame */}
-            <div className="absolute inset-x-4 md:inset-x-8 top-6 md:top-8 bottom-6 md:bottom-8 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.18)" }} />
-
-            {/* Play button overlay */}
-            <div className="absolute inset-0 flex items-center justify-center hover:bg-black/10 transition-all duration-300">
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center bg-white/95 shadow-2xl border-2 border-white/20"
-              >
-                <Play className="w-8 h-8 sm:w-10 sm:h-10 text-[#0A0A0B] ml-1" />
-              </motion.div>
-            </div>
-
-            {/* Title overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 bg-gradient-to-t from-[#0A0A0B] via-[#0A0A0B]/60 to-transparent">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
-                </span>
-                <span className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
-                  YPA Breed Highlight
-                </span>
-              </div>
-              <h3 className="text-white text-sm sm:text-base md:text-xl font-medium">
-                Change your goat farm into a powerhouse
-              </h3>
-              <p className="text-white/40 text-xs sm:text-sm mt-0.5">
-                Click the play button to watch
-              </p>
-            </div>
-          </div>
-        ) : (
-          // YouTube iframe
-          <div className="relative w-full h-full">
-            <iframe
-              ref={videoRef}
-              className="w-full h-full"
-              src={videoSrc}
-              title="Change your goat farm into a powerhouse with this YPA breed"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="lazy"
-              sandbox="allow-scripts allow-same-origin allow-presentation"
-            />
-            
-            {/* Close button */}
-            <button
-              onClick={() => setIsPlaying(false)}
-              className="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-white/10"
-              aria-label="Close video"
-            >
-              <X className="w-4 h-4 md:w-5 md:h-5" />
-            </button>
-          </div>
-        )}
+      {/* Ambient glow - subtle blue/gold aurora behind the video */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-30%] left-[-20%] w-[60%] h-[60%] rounded-full blur-3xl opacity-30" style={{ background: YPA_BLUE }} />
+        <div className="absolute bottom-[-30%] right-[-20%] w-[50%] h-[50%] rounded-full blur-3xl opacity-20" style={{ background: GOLD }} />
       </div>
+
+      <div className="relative h-[55vh] sm:h-[70vh] md:h-[85vh] flex items-center justify-center px-4 md:px-8">
+        {/* Premium glass frame with gold/blue glow */}
+        <div className="relative w-full max-w-6xl h-full rounded-2xl md:rounded-3xl overflow-hidden">
+          {/* Glowing border effect - subtle gold + blue */}
+          <div className="absolute -inset-[2px] rounded-2xl md:rounded-3xl opacity-70 animate-pulse-slow" style={{
+            background: `linear-gradient(135deg, ${YPA_BLUE}40, ${GOLD}30, ${YPA_BLUE}30, ${GOLD}20)`,
+            backgroundSize: '300% 300%',
+          }} />
+          
+          {/* Inner dark border for depth */}
+          <div className="absolute -inset-[1px] rounded-2xl md:rounded-3xl" style={{ background: VOID }} />
+
+          {/* Video container */}
+          <div className="relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden bg-[#0A0A0B]">
+            {/* Video element */}
+            <video
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              poster="https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            >
+              <source src="https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4" type="video/mp4" />
+            </video>
+
+            {/* Subtle duotone overlay - very light */}
+            <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.08 }} />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(10,10,11,0.1) 0%, rgba(10,10,11,0.3) 50%, rgba(10,10,11,0.7) 100%)` }} />
+
+            {/* Gold corner accents - minimal */}
+            <div className="absolute top-4 left-4 w-8 h-8 md:w-12 md:h-12 pointer-events-none">
+              <div className="absolute top-0 left-0 w-4 h-4 md:w-6 md:h-6 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: `${GOLD}40` }} />
+            </div>
+            <div className="absolute top-4 right-4 w-8 h-8 md:w-12 md:h-12 pointer-events-none">
+              <div className="absolute top-0 right-0 w-4 h-4 md:w-6 md:h-6 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: `${GOLD}40` }} />
+            </div>
+            <div className="absolute bottom-4 left-4 w-8 h-8 md:w-12 md:h-12 pointer-events-none">
+              <div className="absolute bottom-0 left-0 w-4 h-4 md:w-6 md:h-6 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: `${GOLD}40` }} />
+            </div>
+            <div className="absolute bottom-4 right-4 w-8 h-8 md:w-12 md:h-12 pointer-events-none">
+              <div className="absolute bottom-0 right-0 w-4 h-4 md:w-6 md:h-6 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: `${GOLD}40` }} />
+            </div>
+
+            {/* Bottom gradient overlay for text */}
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#0A0A0B] via-[#0A0A0B]/60 to-transparent" />
+
+            {/* Content overlay - clean and minimal */}
+            <div className="absolute bottom-0 left-0 right-0 p-5 md:p-10">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div className="max-w-2xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
+                    </span>
+                    <span className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
+                      YPA Breed Highlight
+                    </span>
+                    <span className="h-px w-8 md:w-12" style={{ background: `linear-gradient(90deg, ${GOLD}40, transparent)` }} />
+                  </div>
+                  <h3 className={`${display.className} text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white leading-snug`}>
+                    Change your goat farm into a{" "}
+                    <span className={`${serif.className} italic`} style={{ color: YPA_BLUE_LIGHT }}>
+                      powerhouse
+                    </span>
+                  </h3>
+                </div>
+
+                {/* Controls - clean glass buttons */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={togglePlay}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-medium transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
+                    style={{
+                      borderColor: `${GOLD}30`,
+                      color: '#fff',
+                      background: 'rgba(10,10,11,0.4)',
+                    }}
+                    aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                  >
+                    {isPlaying ? (
+                      <>
+                        <span className="w-0.5 h-4 bg-white" />
+                        <span className="w-0.5 h-4 bg-white" />
+                      </>
+                    ) : (
+                      <Play className="w-3.5 h-3.5" />
+                    )}
+                    <span className="hidden sm:inline">{isPlaying ? 'Pause' : 'Play'}</span>
+                  </button>
+
+                  <button
+                    onClick={toggleMute}
+                    className="w-9 h-9 md:w-10 md:h-10 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
+                    style={{
+                      borderColor: `${YPA_BLUE}30`,
+                      color: '#fff',
+                      background: 'rgba(10,10,11,0.4)',
+                    }}
+                    aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                  >
+                    {isMuted ? (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                      </svg>
+                    )}
+                  </button>
+
+                  <a
+                    href="https://youtu.be/ULOKzJezKc8"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 md:w-10 md:h-10 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
+                    style={{
+                      borderColor: `${YPA_BLUE}30`,
+                      color: '#fff',
+                      background: 'rgba(10,10,11,0.4)',
+                    }}
+                    aria-label="Watch on YouTube"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress bar - subtle at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/5">
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${GOLD})` }}
+                initial={{ width: '0%' }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 30, ease: 'linear', repeat: Infinity }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CSS for animation */}
+      <style jsx>{`
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 0.9; }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+      `}</style>
     </section>
   );
 };
-
 // ============================================================
 // EXPLORE RAIL — ✅ FIXED: Using regular <img> tags
 // ============================================================
