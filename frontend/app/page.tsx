@@ -10,12 +10,14 @@ import {
   AnimatePresence,
   useScroll,
   useInView,
+  PanInfo,
 } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
   Play,
+  Pause,
   Sparkles,
   Shield,
   Users,
@@ -39,6 +41,10 @@ import {
   BookOpen,
   ChevronDown,
   X,
+  Volume2,
+  VolumeX,
+  Camera,
+  Film,
 } from "lucide-react";
 
 // ============================================================
@@ -87,7 +93,9 @@ const MUTE_ON_LIGHT = "#5B6B7A";
 const POSITIVE = "#34D399";
 const VOID = "#0A0A0B";
 
-// ✅ CORRECT: Define API_URL first
+// ============================================================
+// API BASE
+// ============================================================
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 
 // ============================================================
@@ -119,7 +127,6 @@ function useReducedMotion() {
     const checkMotion = () => {
       const isMobile = window.innerWidth < 768;
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      // Only reduce for very old phones or if user prefers reduced motion
       const isVeryOldPhone = isMobile && window.innerWidth < 320;
       setShouldReduce(prefersReduced || isVeryOldPhone);
     };
@@ -236,7 +243,7 @@ function getFallbackArticles() {
 const typeIcons = { tv: Tv, radio: Radio, print: Printer, online: Globe };
 
 // ============================================================
-// SCROLL PROGRESS - Optimized for Mobile
+// SCROLL PROGRESS
 // ============================================================
 const ScrollProgress = () => {
   const { scrollYProgress } = useScroll();
@@ -249,7 +256,7 @@ const ScrollProgress = () => {
 };
 
 // ============================================================
-// SECTION RAIL - Hidden on Mobile
+// SECTION RAIL
 // ============================================================
 const SECTIONS = [
   { id: "hero", label: "Home" },
@@ -289,7 +296,6 @@ const SectionRail = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Hide on mobile for better performance
   return (
     <div className="fixed left-3 md:left-5 top-1/2 -translate-y-1/2 z-40 hidden lg:block">
       <div
@@ -366,7 +372,7 @@ const SectionRail = () => {
 };
 
 // ============================================================
-// SCROLL REVEAL - Mobile Optimized
+// SCROLL REVEAL
 // ============================================================
 const ScrollReveal = ({ children, delay = 0, className = "" }: {
   children: React.ReactNode;
@@ -399,7 +405,7 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: {
 };
 
 // ============================================================
-// HERO — The Ledger: a manifest-style hero for three programmes
+// HERO — The Ledger
 // ============================================================
 const LINEUP = [
   {
@@ -448,8 +454,6 @@ const LINEUP = [
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-// A quiet grain texture so the backdrop image reads as atmosphere,
-// never as an obvious "photo card."
 const GrainOverlay = () => (
   <svg className="absolute inset-0 w-full h-full pointer-events-none mix-blend-overlay opacity-[0.35]" aria-hidden="true">
     <filter id="ypaGrain">
@@ -475,7 +479,6 @@ const Hero = () => {
   const titleParts = current.title.split(current.titleHighlight);
   const beforeHighlight = titleParts[0] || "";
   const afterHighlight = titleParts.slice(1).join("");
-  const today = new Date();
 
   return (
     <section
@@ -485,7 +488,6 @@ const Hero = () => {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Backdrop: full-bleed image, heavily duotoned into black+blue, felt rather than seen */}
       <div className="absolute inset-0">
         <AnimatePresence mode="sync">
           <motion.div
@@ -506,15 +508,12 @@ const Hero = () => {
             />
           </motion.div>
         </AnimatePresence>
-        {/* duotone grade */}
         <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.22 }} />
-        {/* black depth, strongest at edges so the image reads as ambience */}
         <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${VOID} 0%, rgba(10,10,11,0.55) 28%, rgba(10,10,11,0.72) 62%, ${VOID} 100%)` }} />
         <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${VOID} 0%, rgba(10,10,11,0.25) 38%, rgba(10,10,11,0.25) 62%, ${VOID} 100%)` }} />
         <GrainOverlay />
       </div>
 
-      {/* faint dot-grid, only in the upper field, like graph paper on a ledger */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -526,10 +525,8 @@ const Hero = () => {
         }}
       />
 
-      {/* gold hairline frame — the ledger's stitched border */}
       <div className="absolute inset-x-4 md:inset-x-8 top-20 md:top-24 bottom-24 md:bottom-28 border pointer-events-none hidden sm:block" style={{ borderColor: "rgba(240,180,41,0.16)" }} />
 
-      {/* Desktop: vertical ledger tabs down the right edge */}
       <div className="hidden lg:flex flex-col gap-3 absolute right-8 top-1/2 -translate-y-1/2 z-20">
         {LINEUP.map((item, idx) => {
           const isActive = idx === i;
@@ -571,7 +568,6 @@ const Hero = () => {
 
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 md:px-14 py-24">
         <div className="max-w-4xl">
-          {/* Manifest stamp — top eyebrow */}
           <motion.div
             initial={reduceMotion ? {} : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -614,7 +610,6 @@ const Hero = () => {
                 {current.line}
               </p>
 
-              {/* Ledger row — real ruled columns, not decorative pills */}
               <div className="mt-9 flex items-stretch gap-0 max-w-xl border-t border-b" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
                 {current.specs.map((s, idx) => (
                   <div
@@ -653,7 +648,6 @@ const Hero = () => {
             </motion.div>
           </AnimatePresence>
 
-          {/* Mobile / tablet programme switcher — horizontal pills, no vertical rail */}
           <div className="flex lg:hidden gap-2 mt-10">
             {LINEUP.map((item, idx) => (
               <button
@@ -673,14 +667,12 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* corner manifest label — bottom right */}
       <div className="hidden md:flex absolute bottom-8 right-8 z-10 items-center gap-2">
         <span className={`${mono.className} text-[9px] tracking-[0.2em] uppercase text-white/30`}>
           Est. 2014 — Kampala, UG
         </span>
       </div>
 
-      {/* scroll cue */}
       <div className="absolute bottom-8 left-5 md:left-14 z-10">
         <a href="#index" className="flex items-center gap-2 group">
           <motion.div
@@ -699,7 +691,7 @@ const Hero = () => {
 };
 
 // ============================================================
-// FIELD INDEX — black ticker tape: blue live data, gold highlight
+// FIELD INDEX
 // ============================================================
 const FIELD_INDEX = [
   { label: "Goats under care", value: "130,000+", delta: "95% success" },
@@ -763,206 +755,379 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// DRONE REEL — Premium Video Section with Auto-Play & Glow Effects
+// CINEMATIC DRONE CAROUSEL
 // ============================================================
-const DroneReel = () => {
+const DRONE_FOOTAGE = [
+  {
+    id: 1,
+    title: "The Herd in Motion",
+    subtitle: "Aerial perspective of 130,000+ goats",
+    src: "https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4",
+    poster: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
+    tag: "AERIAL",
+    color: "#00AEEF",
+    location: "Mubende, Uganda",
+  },
+  {
+    id: 2,
+    title: "Fields of Gold",
+    subtitle: "Maize contract farming from above",
+    src: "https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4",
+    poster: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
+    tag: "AERIAL",
+    color: "#F0B429",
+    location: "Masaka, Uganda",
+  },
+  {
+    id: 3,
+    title: "The SACCO Hub",
+    subtitle: "Where savings grow wings",
+    src: "https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4",
+    poster: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717198/508159ef-6c90-4578-b1fb-dff1534873f4.jpg",
+    tag: "AERIAL",
+    color: "#33C1F5",
+    location: "Kampala, Uganda",
+  },
+  {
+    id: 4,
+    title: "Community From Above",
+    subtitle: "The people behind the numbers",
+    src: "https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4",
+    poster: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg",
+    tag: "AERIAL",
+    color: "#F0B429",
+    location: "Various Locations",
+  },
+];
+
+const CinematicDroneCarousel = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
 
-  // Toggle play/pause
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
+  useEffect(() => {
+    const activeVideo = videoRefs.current[activeIndex];
+    if (activeVideo && isPlaying) {
+      activeVideo.play().catch(() => {});
+    }
+    DRONE_FOOTAGE.forEach((_, index) => {
+      if (index !== activeIndex && videoRefs.current[index]) {
+        videoRefs.current[index]?.pause();
       }
-      setIsPlaying(!isPlaying);
+    });
+  }, [activeIndex, isPlaying]);
+
+  const handleDragEnd = useCallback((event: MouseEvent | TouchEvent, info: PanInfo) => {
+    const container = document.getElementById('drone-carousel');
+    if (!container) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const centerX = containerRect.left + containerRect.width / 2;
+    const videoElements = container.querySelectorAll('.drone-item');
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    videoElements.forEach((el, index) => {
+      const rect = el.getBoundingClientRect();
+      const elCenterX = rect.left + rect.width / 2;
+      const distance = Math.abs(elCenterX - centerX);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    if (closestIndex !== activeIndex) {
+      setActiveIndex(closestIndex);
+    }
+  }, [activeIndex]);
+
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
+    const video = videoRefs.current[activeIndex];
+    if (video) {
+      isPlaying ? video.pause() : video.play().catch(() => {});
     }
   };
 
-  // Toggle mute
   const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(!isMuted);
-    }
+    setIsMuted(!isMuted);
+    const video = videoRefs.current[activeIndex];
+    if (video) video.muted = !isMuted;
   };
+
+  const activeVideo = DRONE_FOOTAGE[activeIndex];
 
   return (
-    <section className="relative overflow-hidden" style={{ background: VOID }}>
-      {/* Ambient glow - subtle blue/gold aurora behind the video */}
+    <section className="relative overflow-hidden py-16 md:py-24" style={{ background: VOID }}>
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-30%] left-[-20%] w-[60%] h-[60%] rounded-full blur-3xl opacity-30" style={{ background: YPA_BLUE }} />
-        <div className="absolute bottom-[-30%] right-[-20%] w-[50%] h-[50%] rounded-full blur-3xl opacity-20" style={{ background: GOLD }} />
+        <motion.div
+          className="absolute top-[-30%] left-[-20%] w-[60%] h-[60%] rounded-full blur-3xl"
+          style={{ background: YPA_BLUE }}
+          animate={{ 
+            scale: [1, 1.2, 0.8, 1],
+            x: [0, 40, -20, 0],
+            y: [0, -20, 30, 0],
+            opacity: [0.06, 0.12, 0.04, 0.06]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[-30%] right-[-20%] w-[50%] h-[50%] rounded-full blur-3xl"
+          style={{ background: GOLD }}
+          animate={{ 
+            scale: [1, 0.8, 1.2, 1],
+            x: [0, -30, 20, 0],
+            y: [0, 30, -20, 0],
+            opacity: [0.04, 0.1, 0.03, 0.04]
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
       </div>
 
-      <div className="relative h-[55vh] sm:h-[70vh] md:h-[85vh] flex items-center justify-center px-4 md:px-8">
-        {/* Premium glass frame with gold/blue glow */}
-        <div className="relative w-full max-w-6xl h-full rounded-2xl md:rounded-3xl overflow-hidden">
-          {/* Glowing border effect - subtle gold + blue */}
-          <div className="absolute -inset-[2px] rounded-2xl md:rounded-3xl opacity-70 animate-pulse-slow" style={{
-            background: `linear-gradient(135deg, ${YPA_BLUE}40, ${GOLD}30, ${YPA_BLUE}30, ${GOLD}20)`,
-            backgroundSize: '300% 300%',
-          }} />
-          
-          {/* Inner dark border for depth */}
-          <div className="absolute -inset-[1px] rounded-2xl md:rounded-3xl" style={{ background: VOID }} />
-
-          {/* Video container */}
-          <div className="relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden bg-[#0A0A0B]">
-            {/* Video element */}
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              poster="https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-            >
-              <source src="https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4" type="video/mp4" />
-            </video>
-
-            {/* Subtle duotone overlay - very light */}
-            <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.08 }} />
-            <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(10,10,11,0.1) 0%, rgba(10,10,11,0.3) 50%, rgba(10,10,11,0.7) 100%)` }} />
-
-            {/* Gold corner accents - minimal */}
-            <div className="absolute top-4 left-4 w-8 h-8 md:w-12 md:h-12 pointer-events-none">
-              <div className="absolute top-0 left-0 w-4 h-4 md:w-6 md:h-6 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: `${GOLD}40` }} />
-            </div>
-            <div className="absolute top-4 right-4 w-8 h-8 md:w-12 md:h-12 pointer-events-none">
-              <div className="absolute top-0 right-0 w-4 h-4 md:w-6 md:h-6 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: `${GOLD}40` }} />
-            </div>
-            <div className="absolute bottom-4 left-4 w-8 h-8 md:w-12 md:h-12 pointer-events-none">
-              <div className="absolute bottom-0 left-0 w-4 h-4 md:w-6 md:h-6 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: `${GOLD}40` }} />
-            </div>
-            <div className="absolute bottom-4 right-4 w-8 h-8 md:w-12 md:h-12 pointer-events-none">
-              <div className="absolute bottom-0 right-0 w-4 h-4 md:w-6 md:h-6 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: `${GOLD}40` }} />
-            </div>
-
-            {/* Bottom gradient overlay for text */}
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#0A0A0B] via-[#0A0A0B]/60 to-transparent" />
-
-            {/* Content overlay - clean and minimal */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 md:p-10">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div className="max-w-2xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
-                    </span>
-                    <span className={`${mono.className} text-[9px] sm:text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
-                      YPA Breed Highlight
-                    </span>
-                    <span className="h-px w-8 md:w-12" style={{ background: `linear-gradient(90deg, ${GOLD}40, transparent)` }} />
-                  </div>
-                  <h3 className={`${display.className} text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white leading-snug`}>
-                    Change your goat farm into a{" "}
-                    <span className={`${serif.className} italic`} style={{ color: YPA_BLUE_LIGHT }}>
-                      powerhouse
-                    </span>
-                  </h3>
-                </div>
-
-                {/* Controls - clean glass buttons */}
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={togglePlay}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-medium transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
-                    style={{
-                      borderColor: `${GOLD}30`,
-                      color: '#fff',
-                      background: 'rgba(10,10,11,0.4)',
-                    }}
-                    aria-label={isPlaying ? 'Pause video' : 'Play video'}
-                  >
-                    {isPlaying ? (
-                      <>
-                        <span className="w-0.5 h-4 bg-white" />
-                        <span className="w-0.5 h-4 bg-white" />
-                      </>
-                    ) : (
-                      <Play className="w-3.5 h-3.5" />
-                    )}
-                    <span className="hidden sm:inline">{isPlaying ? 'Pause' : 'Play'}</span>
-                  </button>
-
-                  <button
-                    onClick={toggleMute}
-                    className="w-9 h-9 md:w-10 md:h-10 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
-                    style={{
-                      borderColor: `${YPA_BLUE}30`,
-                      color: '#fff',
-                      background: 'rgba(10,10,11,0.4)',
-                    }}
-                    aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-                  >
-                    {isMuted ? (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                      </svg>
-                    )}
-                  </button>
-
-                  <a
-                    href="https://youtu.be/ULOKzJezKc8"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-9 h-9 md:w-10 md:h-10 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
-                    style={{
-                      borderColor: `${YPA_BLUE}30`,
-                      color: '#fff',
-                      background: 'rgba(10,10,11,0.4)',
-                    }}
-                    aria-label="Watch on YouTube"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Progress bar - subtle at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/5">
-              <motion.div
-                className="h-full rounded-full"
-                style={{ background: `linear-gradient(90deg, ${YPA_BLUE}, ${GOLD})` }}
-                initial={{ width: '0%' }}
-                animate={{ width: '100%' }}
-                transition={{ duration: 30, ease: 'linear', repeat: Infinity }}
-              />
-            </div>
+      <div className="relative z-10 px-5 md:px-14 mb-10 md:mb-16">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border" style={{ borderColor: `${YPA_BLUE}30` }}>
+            <Camera className="w-4 h-4 md:w-5 md:h-5" style={{ color: YPA_BLUE_LIGHT }} />
           </div>
+          <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
+            Aerial Drone
+          </span>
+          <motion.span 
+            className="h-px flex-1 max-w-[120px]"
+            animate={{
+              background: [
+                `linear-gradient(90deg, ${GOLD}40, transparent)`,
+                `linear-gradient(90deg, ${YPA_BLUE}40, transparent)`,
+                `linear-gradient(90deg, ${GOLD}40, transparent)`
+              ]
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          />
         </div>
+        <h2 className={`${display.className} text-3xl md:text-4xl lg:text-5xl font-medium text-white leading-tight`}>
+          Uganda from <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00AEEF] to-[#F0B429]">above</span>
+        </h2>
+        <p className="text-white/30 text-sm mt-2 max-w-2xl font-light leading-relaxed">
+          Drone footage capturing YPA's operations across Uganda. Swipe to explore our world from a new perspective.
+        </p>
       </div>
 
-      {/* CSS for animation */}
-      <style jsx>{`
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 0.9; }
-        }
-        .animate-pulse-slow {
-          animation: pulse-slow 4s ease-in-out infinite;
-        }
-      `}</style>
+      <div 
+        id="drone-carousel"
+        className="relative z-10 overflow-visible px-4 md:px-8"
+        style={{ touchAction: 'pan-y' }}
+      >
+        <motion.div 
+          className="flex items-center gap-6 md:gap-10"
+          drag="x"
+          dragConstraints={{ left: -((DRONE_FOOTAGE.length - 1) * 340), right: 0 }}
+          dragElastic={0.1}
+          dragMomentum={true}
+          onDragEnd={handleDragEnd}
+          style={{ cursor: 'grab' }}
+          whileDrag={{ cursor: 'grabbing' }}
+        >
+          {DRONE_FOOTAGE.map((footage, index) => {
+            const isActive = index === activeIndex;
+            const scale = isActive ? 1 : 0.8;
+            const blur = isActive ? 0 : 2;
+            const zIndex = isActive ? 10 : 1;
+
+            return (
+              <motion.div
+                key={footage.id}
+                className="drone-item relative flex-shrink-0 w-[280px] sm:w-[340px] md:w-[420px] lg:w-[500px] rounded-2xl overflow-hidden"
+                style={{
+                  border: `1px solid ${isActive ? `${footage.color}40` : 'rgba(255,255,255,0.06)'}`,
+                  boxShadow: isActive ? `0 0 60px ${footage.color}15, 0 0 120px ${footage.color}08` : 'none',
+                  zIndex,
+                  scale,
+                  filter: `blur(${blur}px)`,
+                  transition: 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
+                }}
+              >
+                <div className="relative aspect-[16/9] bg-[#0A0A0B]">
+                  <video
+                    ref={(el) => { videoRefs.current[index] = el; }}
+                    src={footage.src}
+                    poster={footage.poster}
+                    className="w-full h-full object-cover"
+                    muted={isMuted}
+                    loop
+                    playsInline
+                    preload="metadata"
+                    style={{ opacity: isActive ? 1 : 0.5 }}
+                  />
+
+                  <div className="absolute inset-0" style={{ 
+                    background: `linear-gradient(180deg, rgba(10,10,11,0.2) 0%, transparent 30%, transparent 70%, ${VOID} 100%)` 
+                  }} />
+
+                  <div className="absolute top-3 left-3">
+                    <span className={`${mono.className} text-[7px] md:text-[8px] tracking-[0.2em] uppercase px-2 py-1 rounded border backdrop-blur-sm`}
+                      style={{
+                        background: isActive ? `${footage.color}20` : 'rgba(10,10,11,0.5)',
+                        borderColor: isActive ? `${footage.color}30` : 'rgba(255,255,255,0.05)',
+                        color: isActive ? footage.color : 'rgba(255,255,255,0.3)',
+                      }}
+                    >
+                      {footage.tag}
+                    </span>
+                  </div>
+
+                  <div className="absolute top-3 right-3">
+                    <span className={`${mono.className} text-[7px] md:text-[8px] tracking-[0.15em] uppercase px-2 py-1 rounded backdrop-blur-sm text-white/30 border border-white/5`}
+                      style={{ background: 'rgba(10,10,11,0.4)' }}
+                    >
+                      {footage.location}
+                    </span>
+                  </div>
+
+                  {!isActive && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center bg-white/5 backdrop-blur-sm border border-white/10">
+                        <Play className="w-5 h-5 text-white/30" />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                    <div className={`${mono.className} text-[8px] md:text-[9px] tracking-[0.2em] uppercase flex items-center gap-2`} 
+                         style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.3)' }}>
+                      <span>{footage.subtitle}</span>
+                      {isActive && (
+                        <span className="w-1 h-1 rounded-full" style={{ background: footage.color }} />
+                      )}
+                    </div>
+                    <h3 className={`${display.className} text-base md:text-lg font-medium text-white leading-snug mt-1`}>
+                      {footage.title}
+                    </h3>
+                  </div>
+
+                  {isActive && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute bottom-20 right-4 flex items-center gap-2"
+                    >
+                      <button
+                        onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all hover:scale-105"
+                        style={{
+                          background: 'rgba(10,10,11,0.5)',
+                          borderColor: 'rgba(255,255,255,0.1)',
+                          color: '#fff',
+                        }}
+                      >
+                        {isPlaying ? (
+                          <span className="flex gap-0.5">
+                            <span className="w-0.5 h-3 bg-white" />
+                            <span className="w-0.5 h-3 bg-white" />
+                          </span>
+                        ) : (
+                          <Play className="w-3 h-3" />
+                        )}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleMute(); }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all hover:scale-105"
+                        style={{
+                          background: 'rgba(10,10,11,0.5)',
+                          borderColor: 'rgba(255,255,255,0.1)',
+                          color: '#fff',
+                        }}
+                      >
+                        {isMuted ? (
+                          <VolumeX className="w-3 h-3" />
+                        ) : (
+                          <Volume2 className="w-3 h-3" />
+                        )}
+                      </button>
+                    </motion.div>
+                  )}
+
+                  <div className="absolute bottom-0 right-0 p-3">
+                    <span className={`${mono.className} text-[8px] md:text-[9px]`} 
+                          style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.1)' }}>
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  </div>
+
+                  {isActive && (
+                    <motion.div
+                      className="absolute bottom-0 left-0 right-0 h-[2px]"
+                      style={{ background: `${footage.color}15` }}
+                    >
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: `linear-gradient(90deg, ${footage.color}, ${GOLD})` }}
+                        initial={{ width: '0%' }}
+                        animate={{ width: '100%' }}
+                        transition={{ duration: 30, ease: 'linear', repeat: Infinity }}
+                      />
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+
+      <div className="relative z-10 flex justify-center gap-3 mt-8 md:mt-10 px-4">
+        {DRONE_FOOTAGE.map((footage, index) => (
+          <button
+            key={footage.id}
+            onClick={() => setActiveIndex(index)}
+            className="transition-all duration-500 rounded-full"
+            style={{
+              width: index === activeIndex ? '40px' : '8px',
+              height: '3px',
+              background: index === activeIndex 
+                ? `linear-gradient(90deg, ${footage.color}, ${GOLD})` 
+                : 'rgba(255,255,255,0.1)',
+              boxShadow: index === activeIndex ? `0 0 20px ${footage.color}30` : 'none',
+            }}
+            aria-label={`Go to footage ${index + 1}`}
+          />
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5, duration: 0.6 }}
+        className="relative z-10 text-center mt-4"
+      >
+        <span className={`${mono.className} text-[8px] md:text-[9px] tracking-[0.2em] uppercase text-white/15 flex items-center justify-center gap-4`}>
+          <span>✦</span>
+          <span>Swipe to explore from above</span>
+          <span>✦</span>
+        </span>
+      </motion.div>
+
+      <div className="absolute bottom-8 right-8 hidden lg:block pointer-events-none opacity-20">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+          <rect x="2" y="2" width="56" height="56" rx="4" stroke={GOLD} strokeWidth="1" />
+          <line x1="2" y1="20" x2="10" y2="20" stroke={GOLD} strokeWidth="1" />
+          <line x1="50" y1="20" x2="58" y2="20" stroke={GOLD} strokeWidth="1" />
+          <line x1="2" y1="40" x2="10" y2="40" stroke={GOLD} strokeWidth="1" />
+          <line x1="50" y1="40" x2="58" y2="40" stroke={GOLD} strokeWidth="1" />
+          <line x1="20" y1="2" x2="20" y2="10" stroke={GOLD} strokeWidth="1" />
+          <line x1="40" y1="2" x2="40" y2="10" stroke={GOLD} strokeWidth="1" />
+          <line x1="20" y1="50" x2="20" y2="58" stroke={GOLD} strokeWidth="1" />
+          <line x1="40" y1="50" x2="40" y2="58" stroke={GOLD} strokeWidth="1" />
+        </svg>
+      </div>
     </section>
   );
 };
+
 // ============================================================
-// EXPLORE RAIL — ✅ FIXED: Using regular <img> tags
+// EXPLORE RAIL
 // ============================================================
 const EXPLORE = [
   {
@@ -1074,7 +1239,7 @@ const ExploreRail = () => {
 };
 
 // ============================================================
-// THE LINEUP — ✅ FIXED: Using regular <img> tags
+// THE LINEUP
 // ============================================================
 const CONFIG_CARDS = [
   {
@@ -1195,7 +1360,7 @@ const TheLineup = () => {
 };
 
 // ============================================================
-// WHY CHOOSE YPA — stat ledger + arrow-list trust points
+// WHY CHOOSE YPA
 // ============================================================
 const WHY_STATS = [
   { label: "Goats Managed", value: "130,000+", icon: Sprout, accent: GOLD },
@@ -1276,7 +1441,7 @@ const TrustBar = () => {
 };
 
 // ============================================================
-// SIGNAL — Mobile Optimized
+// SIGNAL
 // ============================================================
 const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
   if (!signalArticles || signalArticles.length === 0) return null;
@@ -1386,7 +1551,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
 };
 
 // ============================================================
-// MEMBER VOICES — Mobile Optimized
+// MEMBER VOICES
 // ============================================================
 const VOICES = [
   { quote: "I know exactly what my goats are worth before I ever sell one.", role: "Goats Programme member, Central Region" },
@@ -1430,7 +1595,7 @@ const MemberVoices = () => {
 };
 
 // ============================================================
-// RECENT BLOG SECTION - Beautiful Blog Showcase
+// RECENT BLOG SECTION
 // ============================================================
 const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
   if (!blogs || blogs.length === 0) return null;
@@ -1548,7 +1713,7 @@ const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
 };
 
 // ============================================================
-// EVENTS BANNER - Creative & Mobile-Friendly with Fixed Links
+// EVENTS BANNER
 // ============================================================
 const EventsBanner = ({ events }: { events: any[] }) => {
   if (!events || events.length === 0) return null;
@@ -1687,7 +1852,7 @@ const EventsBanner = ({ events }: { events: any[] }) => {
 };
 
 // ============================================================
-// SOCIAL MEDIA — Mobile Optimized
+// SOCIAL MEDIA
 // ============================================================
 const LinkedinIcon = ({ className = "h-5 w-5" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -1744,7 +1909,7 @@ const SocialMedia = () => {
 };
 
 // ============================================================
-// FINAL CTA — Mobile Optimized
+// FINAL CTA
 // ============================================================
 const FinalCTA = () => {
   return (
@@ -1787,7 +1952,7 @@ const FinalCTA = () => {
 };
 
 // ============================================================
-// LIVE PANEL — Hidden on Mobile, Visible on Large Screens
+// LIVE PANEL
 // ============================================================
 const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
   const GOLD = "#F0B429";
@@ -2042,7 +2207,7 @@ export default function Home() {
       <SectionRail />
       <Hero />
       <FieldIndex />
-      <DroneReel />
+      <CinematicDroneCarousel />
       <ExploreRail />
       <TheLineup />
       <TrustBar />
