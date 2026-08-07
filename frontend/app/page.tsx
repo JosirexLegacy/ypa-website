@@ -792,7 +792,7 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// AERIAL SHOWCASE — Cinematic Documentary Style
+// AERIAL SHOWCASE — Manual Navigation, Easy to Extend
 // ============================================================
 const DRONE_FOOTAGE = [
   {
@@ -825,54 +825,31 @@ const DRONE_FOOTAGE = [
     location: "Kampala, Uganda",
     stat: "12 branches nationwide",
   },
+  // 👇 Just add more videos here — that's it!
+  // {
+  //   id: 4,
+  //   videoId: "YOUR_VIDEO_ID",
+  //   title: "Your Title",
+  //   subtitle: "Your subtitle",
+  //   tag: "TAG",
+  //   color: YPA_BLUE,
+  //   location: "Location",
+  //   stat: "Your stat",
+  // },
 ];
 
 const CinematicDroneCarousel = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const resumeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const wake = useCallback(() => {
-    setPaused(true);
-    if (resumeTimeout.current) clearTimeout(resumeTimeout.current);
-    resumeTimeout.current = setTimeout(() => setPaused(false), 10000);
-  }, []);
-
-  // Progress tracking for active video
-  useEffect(() => {
-    if (paused) return;
-    setProgress(0);
-    if (progressInterval.current) clearInterval(progressInterval.current);
-    progressInterval.current = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) {
-          setActiveIndex((idx) => (idx + 1) % DRONE_FOOTAGE.length);
-          return 0;
-        }
-        return p + 0.5;
-      });
-    }, 35);
-    return () => {
-      if (progressInterval.current) clearInterval(progressInterval.current);
-    };
-  }, [activeIndex, paused]);
-
-  useEffect(() => () => {
-    if (resumeTimeout.current) clearTimeout(resumeTimeout.current);
-    if (progressInterval.current) clearInterval(progressInterval.current);
-  }, []);
-
   const goTo = useCallback((index: number) => {
-    setActiveIndex(index);
-    setProgress(0);
-    wake();
-  }, [wake]);
+    const total = DRONE_FOOTAGE.length;
+    setActiveIndex(((index % total) + total) % total);
+  }, []);
 
-  const next = () => goTo((activeIndex + 1) % DRONE_FOOTAGE.length);
-  const prev = () => goTo((activeIndex - 1 + DRONE_FOOTAGE.length) % DRONE_FOOTAGE.length);
+  const next = () => goTo(activeIndex + 1);
+  const prev = () => goTo(activeIndex - 1);
 
   const handleDragEnd = useCallback((_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const container = containerRef.current;
@@ -897,65 +874,60 @@ const CinematicDroneCarousel = () => {
     goTo(closestIndex);
   }, [goTo]);
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [prev, next]);
+
+  const totalVideos = DRONE_FOOTAGE.length;
+
   return (
     <section
-      className="relative overflow-hidden py-20 md:py-28"
+      className="relative overflow-hidden py-16 md:py-24"
       style={{ background: VOID }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
     >
       {/* Ambient Glow */}
       <div className="absolute inset-0 pointer-events-none">
-        <motion.div
+        <div
           className="absolute top-[-30%] left-[-20%] w-[60%] h-[60%] rounded-full blur-3xl"
-          style={{ background: YPA_BLUE }}
-          animate={{
-            scale: [1, 1.3, 0.8, 1],
-            x: [0, 50, -30, 0],
-            y: [0, -30, 40, 0],
-            opacity: [0.08, 0.15, 0.05, 0.08]
+          style={{ 
+            background: DRONE_FOOTAGE[activeIndex]?.color || YPA_BLUE,
+            opacity: 0.08,
           }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
-        <motion.div
+        <div
           className="absolute bottom-[-30%] right-[-20%] w-[50%] h-[50%] rounded-full blur-3xl"
-          style={{ background: GOLD }}
-          animate={{
-            scale: [1, 0.8, 1.3, 1],
-            x: [0, -40, 30, 0],
-            y: [0, 40, -30, 0],
-            opacity: [0.06, 0.12, 0.04, 0.06]
+          style={{ 
+            background: GOLD,
+            opacity: 0.05,
           }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
       </div>
 
       {/* Header */}
-      <div className="relative z-10 px-5 md:px-14 mb-12 md:mb-16">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center border" style={{ borderColor: `${YPA_BLUE}25` }}>
-            <Film className="w-5 h-5 md:w-6 md:h-6" style={{ color: YPA_BLUE_LIGHT }} />
+      <div className="relative z-10 px-5 md:px-14 mb-10 md:mb-14">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border" style={{ borderColor: `${YPA_BLUE}25` }}>
+            <Film className="w-4 h-4 md:w-5 md:h-5" style={{ color: YPA_BLUE_LIGHT }} />
           </div>
           <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
-            Aerial Footage — Field Verified
+            Aerial Footage
           </span>
-          <motion.span
-            className="h-px flex-1 max-w-[160px]"
-            animate={{
-              background: [
-                `linear-gradient(90deg, ${GOLD}40, transparent)`,
-                `linear-gradient(90deg, ${YPA_BLUE}40, transparent)`,
-                `linear-gradient(90deg, ${GOLD}40, transparent)`
-              ]
-            }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          />
+          <span className="h-px flex-1 max-w-[120px]" style={{ background: `linear-gradient(90deg, ${GOLD}30, transparent)` }} />
+          <span className={`${mono.className} text-[10px] text-white/20 hidden sm:block`}>
+            {String(activeIndex + 1).padStart(2, '0')} / {String(totalVideos).padStart(2, '0')}
+          </span>
         </div>
-        <h2 className={`${display.className} text-3xl md:text-4xl lg:text-5xl font-medium text-white leading-tight max-w-3xl`}>
+        <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-tight`}>
           The operation, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00AEEF] to-[#F0B429]">from above</span>
         </h2>
-        <p className="text-white/30 text-sm mt-3 max-w-2xl font-light leading-relaxed">
-          Real footage from real sites — the goats, the fields, the branches. Watch the operation unfold.
+        <p className="text-white/30 text-sm mt-2 max-w-2xl font-light">
+          {totalVideos} field-verified locations — navigate through the footage
         </p>
       </div>
 
@@ -966,9 +938,9 @@ const CinematicDroneCarousel = () => {
         style={{ touchAction: 'pan-y' }}
       >
         <motion.div
-          className="flex items-center gap-6 md:gap-10"
+          className="flex items-center gap-4 md:gap-8"
           drag="x"
-          dragConstraints={{ left: -((DRONE_FOOTAGE.length - 1) * 340), right: 0 }}
+          dragConstraints={{ left: -((totalVideos - 1) * 320), right: 0 }}
           dragElastic={0.1}
           dragMomentum={true}
           onDragEnd={handleDragEnd}
@@ -978,47 +950,47 @@ const CinematicDroneCarousel = () => {
           {DRONE_FOOTAGE.map((footage, index) => {
             const isActive = index === activeIndex;
             const distance = Math.abs(index - activeIndex);
-            const scale = isActive ? 1 : Math.max(0.78, 1 - distance * 0.08);
-            const blur = isActive ? 0 : Math.min(4, distance * 1.5);
+            const scale = isActive ? 1 : Math.max(0.75, 1 - distance * 0.1);
+            const blur = isActive ? 0 : Math.min(3, distance * 1.2);
 
             return (
               <motion.div
                 key={footage.id}
-                className="drone-item relative flex-shrink-0 w-[280px] sm:w-[340px] md:w-[440px] lg:w-[520px]"
+                className="drone-item relative flex-shrink-0 w-[260px] sm:w-[320px] md:w-[400px] lg:w-[460px]"
                 style={{
                   scale,
-                  filter: `blur(${blur}px) brightness(${isActive ? 1 : 0.65})`,
-                  opacity: isActive ? 1 : 0.4,
+                  filter: `blur(${blur}px) brightness(${isActive ? 1 : 0.5})`,
+                  opacity: isActive ? 1 : 0.35,
                   zIndex: isActive ? 10 : 1,
-                  transition: 'all 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+                  transition: 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               >
                 {/* Glow behind active video */}
                 {isActive && (
                   <motion.div
-                    className="absolute -inset-4 rounded-3xl blur-2xl pointer-events-none"
-                    style={{ background: `radial-gradient(circle at 50% 50%, ${footage.color}25, transparent 70%)` }}
+                    className="absolute -inset-3 rounded-2xl blur-2xl pointer-events-none"
+                    style={{ background: `radial-gradient(circle at 50% 50%, ${footage.color}20, transparent 70%)` }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8 }}
+                    transition={{ duration: 0.6 }}
                   />
                 )}
 
                 {/* Video Frame */}
                 <div
-                  className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-[#0A0A0B]"
+                  className="relative aspect-[16/9] rounded-xl overflow-hidden bg-[#0A0A0B]"
                   style={{
-                    border: `1px solid ${isActive ? `${footage.color}50` : 'rgba(255,255,255,0.06)'}`,
+                    border: `1px solid ${isActive ? `${footage.color}40` : 'rgba(255,255,255,0.06)'}`,
                     boxShadow: isActive
-                      ? `0 30px 80px -20px ${footage.color}40, 0 0 0 1px ${footage.color}15 inset`
-                      : `0 20px 50px -20px rgba(0,0,0,0.65)`,
+                      ? `0 20px 60px -20px ${footage.color}30, 0 0 0 1px ${footage.color}10 inset`
+                      : `0 15px 40px -15px rgba(0,0,0,0.6)`,
                   }}
                 >
                   {isActive ? (
                     <iframe
                       key={footage.videoId}
                       className="absolute inset-0 w-full h-full"
-                      src={`https://www.youtube-nocookie.com/embed/${footage.videoId}?autoplay=1&mute=1&loop=1&playlist=${footage.videoId}&controls=1&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3`}
+                      src={`https://www.youtube-nocookie.com/embed/${footage.videoId}?autoplay=1&mute=1&controls=1&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3`}
                       title={footage.title}
                       allow="autoplay; encrypted-media; picture-in-picture"
                       allowFullScreen
@@ -1035,17 +1007,16 @@ const CinematicDroneCarousel = () => {
                         src={`https://img.youtube.com/vi/${footage.videoId}/hqdefault.jpg`}
                         alt={footage.title}
                         className="w-full h-full object-cover"
-                        style={{ filter: "brightness(0.45) saturate(0.6)" }}
+                        style={{ filter: "brightness(0.4) saturate(0.5)" }}
                         loading="lazy"
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-14 h-14 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-white/20">
-                          <Play className="w-6 h-6 text-white/80 ml-1" />
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-white/20">
+                          <Play className="w-5 h-5 text-white/80 ml-0.5" />
                         </div>
                       </div>
-                      {/* Overlay text on inactive videos */}
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <span className={`${display.className} text-white/60 text-sm block`}>
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <span className={`${display.className} text-white/50 text-xs sm:text-sm block line-clamp-1`}>
                           {footage.title}
                         </span>
                       </div>
@@ -1055,77 +1026,51 @@ const CinematicDroneCarousel = () => {
                   {/* Tag Badge */}
                   <div className="absolute top-3 left-3 pointer-events-none">
                     <span
-                      className={`${mono.className} text-[7px] md:text-[8px] tracking-[0.2em] uppercase px-2.5 py-1 rounded border backdrop-blur-sm`}
+                      className={`${mono.className} text-[7px] tracking-[0.2em] uppercase px-2.5 py-1 rounded border backdrop-blur-sm`}
                       style={{
-                        background: isActive ? `${footage.color}25` : 'rgba(10,10,11,0.6)',
-                        borderColor: isActive ? `${footage.color}40` : 'rgba(255,255,255,0.06)',
-                        color: isActive ? footage.color : 'rgba(255,255,255,0.4)',
+                        background: isActive ? `${footage.color}20` : 'rgba(10,10,11,0.6)',
+                        borderColor: isActive ? `${footage.color}30` : 'rgba(255,255,255,0.06)',
+                        color: isActive ? footage.color : 'rgba(255,255,255,0.3)',
                       }}
                     >
                       {footage.tag}
                     </span>
                   </div>
-
-                  {/* Index Counter */}
-                  <div className="absolute top-3 right-3 pointer-events-none">
-                    <span
-                      className={`${mono.className} text-[8px] md:text-[9px]`}
-                      style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.15)' }}
-                    >
-                      {String(index + 1).padStart(2, '0')} / {String(DRONE_FOOTAGE.length).padStart(2, '0')}
-                    </span>
-                  </div>
-
-                  {/* Progress Bar - only on active video */}
-                  {isActive && (
-                    <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-0.5"
-                      style={{ background: 'rgba(255,255,255,0.1)' }}
-                    >
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: `linear-gradient(90deg, ${footage.color}, ${GOLD})` }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.1 }}
-                      />
-                    </motion.div>
-                  )}
                 </div>
 
                 {/* Caption */}
-                <div className="pt-4 md:pt-5">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`${mono.className} text-[7px] md:text-[8px] tracking-[0.2em] uppercase`}
-                      style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.2)' }}
+                <div className="pt-3 md:pt-4">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={`${mono.className} text-[7px] tracking-[0.2em] uppercase`}
+                      style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.15)' }}
                     >
                       {footage.subtitle}
-                    </div>
+                    </span>
                     {isActive && (
                       <>
-                        <span className="w-px h-3" style={{ background: `${footage.color}30` }} />
-                        <span className={`${mono.className} text-[7px] md:text-[8px]`} style={{ color: 'rgba(255,255,255,0.25)' }}>
+                        <span className="w-px h-3" style={{ background: `${footage.color}20` }} />
+                        <span className={`${mono.className} text-[7px]`} style={{ color: 'rgba(255,255,255,0.2)' }}>
                           {footage.location}
                         </span>
                       </>
                     )}
                   </div>
                   <h3
-                    className={`${display.className} text-base md:text-xl font-medium leading-snug mt-1 transition-all duration-500`}
+                    className={`${display.className} text-sm sm:text-base md:text-lg font-medium leading-snug mt-0.5 transition-all duration-500`}
                     style={{ 
-                      color: isActive ? '#F5F6F7' : 'rgba(255,255,255,0.25)',
-                      letterSpacing: isActive ? '0em' : '0.02em'
+                      color: isActive ? '#F5F6F7' : 'rgba(255,255,255,0.2)',
                     }}
                   >
                     {footage.title}
                   </h3>
-                  {isActive && (
+                  {isActive && footage.stat && (
                     <motion.p
-                      initial={{ opacity: 0, y: 8 }}
+                      initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.1 }}
-                      className={`${mono.className} text-[9px] md:text-[10px] mt-1`}
-                      style={{ color: 'rgba(255,255,255,0.3)' }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      className={`${mono.className} text-[8px] mt-0.5`}
+                      style={{ color: 'rgba(255,255,255,0.25)' }}
                     >
                       {footage.stat}
                     </motion.p>
@@ -1138,43 +1083,42 @@ const CinematicDroneCarousel = () => {
       </div>
 
       {/* Controls */}
-      <div className="relative z-10 flex items-center justify-center gap-6 md:gap-8 mt-10 md:mt-14 px-4">
+      <div className="relative z-10 flex items-center justify-center gap-4 md:gap-6 mt-8 md:mt-12 px-4">
         <button
           onClick={prev}
           aria-label="Previous footage"
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-x-0.5"
-          style={{ borderColor: "rgba(240,180,41,0.25)", color: "#F5F6F7" }}
+          className="w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-x-0.5 active:scale-95"
+          style={{ borderColor: "rgba(240,180,41,0.2)", color: "#F5F6F7" }}
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
         </button>
 
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-2 md:gap-2.5 items-center">
           {DRONE_FOOTAGE.map((footage, index) => {
             const isActive = index === activeIndex;
             return (
               <button
                 key={footage.id}
                 onClick={() => goTo(index)}
-                className="transition-all duration-500 rounded-full relative group"
+                className="transition-all duration-400 rounded-full relative group"
                 style={{
-                  width: isActive ? '44px' : '8px',
-                  height: '3px',
+                  width: isActive ? '32px' : '6px',
+                  height: '2.5px',
                   background: isActive
                     ? `linear-gradient(90deg, ${footage.color}, ${GOLD})`
-                    : 'rgba(255,255,255,0.12)',
-                  boxShadow: isActive ? `0 0 20px ${footage.color}30` : 'none',
+                    : 'rgba(255,255,255,0.1)',
+                  boxShadow: isActive ? `0 0 16px ${footage.color}25` : 'none',
                 }}
                 aria-label={`Go to footage ${index + 1}`}
               >
                 {isActive && (
                   <motion.div
-                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
+                    className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
                     style={{ background: GOLD }}
-                    animate={{ scale: [1, 1.6, 1] }}
+                    animate={{ scale: [1, 1.8, 1] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   />
                 )}
-                <span className="sr-only">Footage {index + 1}</span>
               </button>
             );
           })}
@@ -1183,58 +1127,45 @@ const CinematicDroneCarousel = () => {
         <button
           onClick={next}
           aria-label="Next footage"
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:translate-x-0.5"
-          style={{ borderColor: "rgba(240,180,41,0.25)", color: "#F5F6F7" }}
+          className="w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:translate-x-0.5 active:scale-95"
+          style={{ borderColor: "rgba(240,180,41,0.2)", color: "#F5F6F7" }}
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
         </button>
       </div>
 
-      {/* Bottom CTAs */}
-      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 md:gap-4 mt-12 md:mt-16 px-5">
+      {/* Keyboard hint */}
+      <div className="relative z-10 text-center mt-4">
+        <span className={`${mono.className} text-[8px] tracking-[0.2em] uppercase`} style={{ color: 'rgba(255,255,255,0.08)' }}>
+          ←  →  or drag to navigate
+        </span>
+      </div>
+
+      {/* CTAs */}
+      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 mt-8 md:mt-12 px-5">
         <Link
           href="/projects"
-          className="group inline-flex items-center gap-2 rounded-full px-7 md:px-9 py-3.5 md:py-4 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5 shadow-xl"
+          className="group inline-flex items-center gap-2 rounded-full px-6 md:px-8 py-3 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5"
           style={{ background: YPA_BLUE, color: VOID }}
         >
-          Explore All Projects
+          Explore Projects
           <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
         <Link
           href="/contact"
-          className="group inline-flex items-center gap-2 rounded-full px-7 md:px-9 py-3.5 md:py-4 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5 border backdrop-blur-sm"
-          style={{ 
-            borderColor: "rgba(240,180,41,0.25)", 
-            color: "#F5F6F7",
-            background: "rgba(255,255,255,0.03)"
-          }}
+          className="group inline-flex items-center gap-2 rounded-full px-6 md:px-8 py-3 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5 border"
+          style={{ borderColor: "rgba(240,180,41,0.2)", color: "#F5F6F7" }}
         >
           Become a Member
           <Users className="h-4 w-4" style={{ color: GOLD }} />
         </Link>
       </div>
 
-      {/* Decorative corner element */}
-      <div className="absolute bottom-12 right-12 hidden lg:block pointer-events-none opacity-10">
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-          <rect x="3" y="3" width="74" height="74" rx="4" stroke={GOLD} strokeWidth="1.5" />
-          <line x1="3" y1="28" x2="14" y2="28" stroke={GOLD} strokeWidth="1.5" />
-          <line x1="66" y1="28" x2="77" y2="28" stroke={GOLD} strokeWidth="1.5" />
-          <line x1="3" y1="52" x2="14" y2="52" stroke={GOLD} strokeWidth="1.5" />
-          <line x1="66" y1="52" x2="77" y2="52" stroke={GOLD} strokeWidth="1.5" />
-          <line x1="28" y1="3" x2="28" y2="14" stroke={GOLD} strokeWidth="1.5" />
-          <line x1="52" y1="3" x2="52" y2="14" stroke={GOLD} strokeWidth="1.5" />
-          <line x1="28" y1="66" x2="28" y2="77" stroke={GOLD} strokeWidth="1.5" />
-          <line x1="52" y1="66" x2="52" y2="77" stroke={GOLD} strokeWidth="1.5" />
-        </svg>
-      </div>
-
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none" style={{ background: `linear-gradient(to top, ${VOID}, transparent)` }} />
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={{ background: `linear-gradient(to top, ${VOID}, transparent)` }} />
     </section>
   );
 };
-
 // ============================================================
 // EXPLORE RAIL
 // ============================================================
