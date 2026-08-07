@@ -40,6 +40,8 @@ import {
   Heart,
   BookOpen,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   X,
   Volume2,
   VolumeX,
@@ -409,11 +411,11 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: {
 // ============================================================
 const LINEUP = [
   {
-    kicker: "Entry 01 — Livestock",
+    kicker: "Entry 01 — Livestock Infrastructure",
     tag: "Goats",
-    title: "The Goats Programme",
-    titleHighlight: "Goats",
-    line: "Mubende × Boer × Kalahari, raised for guaranteed off-take.",
+    title: "130,000 Goats. Managed Like Infrastructure.",
+    titleHighlight: "Infrastructure",
+    line: "Not a herd — a tracked, insured, revenue-bearing asset class bred for guaranteed off-take.",
     specs: [
       { label: "Under care", value: "130,000+" },
       { label: "Success rate", value: "95%" },
@@ -423,11 +425,11 @@ const LINEUP = [
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg",
   },
   {
-    kicker: "Entry 02 — Cropping",
+    kicker: "Entry 02 — Contract Farming",
     tag: "Maize",
-    title: "Maize Contract Farming",
-    titleHighlight: "Maize",
-    line: "Modern inputs, guaranteed buyers, a return you can plan around.",
+    title: "Every Acre, Under Contract.",
+    titleHighlight: "Contract",
+    line: "Guaranteed buyers, modern inputs, and a yield you can bank on before planting even starts.",
     specs: [
       { label: "Cultivated", value: "5,000+ acres" },
       { label: "Avg. return", value: "3.0×" },
@@ -437,11 +439,11 @@ const LINEUP = [
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
   },
   {
-    kicker: "Entry 03 — Finance",
+    kicker: "Entry 03 — Financial Services",
     tag: "SACCO",
-    title: "YPA SACCO",
-    titleHighlight: "SACCO",
-    line: "Savings and credit built around the rhythm of a harvest, not a payslip.",
+    title: "Savings Built for Harvest Season.",
+    titleHighlight: "Harvest",
+    line: "Credit and savings that move with your income, not against it.",
     specs: [
       { label: "Members", value: "1,000+" },
       { label: "Branches", value: "12" },
@@ -453,6 +455,7 @@ const LINEUP = [
 ];
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+const SPRING = { type: "spring", stiffness: 300, damping: 32, mass: 0.8 } as const;
 
 const GrainOverlay = () => (
   <svg className="absolute inset-0 w-full h-full pointer-events-none mix-blend-overlay opacity-[0.35]" aria-hidden="true">
@@ -464,6 +467,20 @@ const GrainOverlay = () => (
   </svg>
 );
 
+// Staggered content variants — title, line, ledger row and CTAs each settle
+// in on their own beat instead of one flat block-fade. This is the bulk of
+// the "smoother morph" ask: motion reads as choreographed, not toggled.
+const heroStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+  exit: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: EASE } },
+  exit: { opacity: 0, y: -12, filter: "blur(4px)", transition: { duration: 0.35, ease: EASE } },
+};
+
 const Hero = () => {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -471,7 +488,7 @@ const Hero = () => {
 
   useEffect(() => {
     if (paused || reduceMotion) return;
-    const t = setInterval(() => setI((p) => (p + 1) % LINEUP.length), 7000);
+    const t = setInterval(() => setI((p) => (p + 1) % LINEUP.length), 6800);
     return () => clearInterval(t);
   }, [paused, reduceMotion]);
 
@@ -492,17 +509,20 @@ const Hero = () => {
         <AnimatePresence mode="sync">
           <motion.div
             key={current.image}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.4, ease: EASE }}
+            initial={{ opacity: 0, scale: 1.14 }}
+            animate={{ opacity: 1, scale: 1.05 }}
+            exit={{ opacity: 0, scale: 1.08 }}
+            transition={{
+              opacity: { duration: 1.6, ease: EASE },
+              scale: { duration: 7, ease: "linear" },
+            }}
             className="absolute inset-0"
           >
             <img
               src={current.image}
               alt=""
               aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover scale-105"
+              className="absolute inset-0 w-full h-full object-cover"
               style={{ filter: "grayscale(0.55) brightness(0.55) contrast(1.05)" }}
               onError={(e) => { e.currentTarget.style.display = "none"; }}
             />
@@ -547,13 +567,14 @@ const Hero = () => {
               >
                 {item.tag}
               </span>
-              <span
-                className="relative flex items-center justify-center rounded-full transition-all duration-300"
-                style={{
-                  width: isActive ? "34px" : "22px",
-                  height: "2px",
-                  background: isActive ? GOLD : "rgba(255,255,255,0.25)",
+              <motion.span
+                className="relative flex items-center justify-center rounded-full"
+                animate={{
+                  width: isActive ? 34 : 22,
+                  backgroundColor: isActive ? GOLD : "rgba(255,255,255,0.25)",
                 }}
+                transition={SPRING}
+                style={{ height: "2px" }}
               />
               <span
                 className={`${mono.className} text-[10px] w-4 text-right transition-colors duration-300`}
@@ -578,9 +599,19 @@ const Hero = () => {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: YPA_BLUE }} />
             </span>
-            <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
-              {current.kicker}
-            </span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={current.kicker}
+                initial={reduceMotion ? {} : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduceMotion ? {} : { opacity: 0, y: -4 }}
+                transition={{ duration: 0.35, ease: EASE }}
+                className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`}
+                style={{ color: YPA_BLUE_LIGHT }}
+              >
+                {current.kicker}
+              </motion.span>
+            </AnimatePresence>
             <span className="h-px flex-1 max-w-[64px]" style={{ background: "rgba(240,180,41,0.35)" }} />
             <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/30 hidden sm:inline`}>
               #1 in Africa
@@ -590,12 +621,13 @@ const Hero = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={i}
-              initial={reduceMotion ? {} : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduceMotion ? {} : { opacity: 0, y: -16 }}
-              transition={{ duration: reduceMotion ? 0 : 0.55, ease: EASE }}
+              variants={heroStagger}
+              initial="hidden"
+              animate="show"
+              exit="exit"
             >
-              <h1
+              <motion.h1
+                variants={heroItem}
                 className={`${display.className} text-4xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-medium leading-[0.98] tracking-tight max-w-3xl`}
                 style={{ color: "#F5F6F7" }}
               >
@@ -604,13 +636,13 @@ const Hero = () => {
                   {current.titleHighlight}
                 </span>
                 {afterHighlight}
-              </h1>
+              </motion.h1>
 
-              <p className={`${inter.className} mt-5 text-base md:text-lg font-light max-w-lg leading-relaxed`} style={{ color: "rgba(245,246,247,0.55)" }}>
+              <motion.p variants={heroItem} className={`${inter.className} mt-5 text-base md:text-lg font-light max-w-lg leading-relaxed`} style={{ color: "rgba(245,246,247,0.55)" }}>
                 {current.line}
-              </p>
+              </motion.p>
 
-              <div className="mt-9 flex items-stretch gap-0 max-w-xl border-t border-b" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+              <motion.div variants={heroItem} className="mt-9 flex items-stretch gap-0 max-w-xl border-t border-b" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
                 {current.specs.map((s, idx) => (
                   <div
                     key={idx}
@@ -625,9 +657,9 @@ const Hero = () => {
                     </div>
                   </div>
                 ))}
-              </div>
+              </motion.div>
 
-              <div className="mt-9 flex flex-wrap gap-3">
+              <motion.div variants={heroItem} className="mt-9 flex flex-wrap gap-3">
                 <Link
                   href={current.href}
                   className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-0.5"
@@ -644,32 +676,37 @@ const Hero = () => {
                   <Play className="h-4 w-4" style={{ color: GOLD }} />
                   See how YPA works
                 </Link>
-              </div>
+              </motion.div>
             </motion.div>
           </AnimatePresence>
 
           <div className="flex lg:hidden gap-2 mt-10">
-            {LINEUP.map((item, idx) => (
-              <button
-                key={item.tag}
-                onClick={() => setI(idx)}
-                className={`${mono.className} flex-1 rounded-full py-2 text-[10px] tracking-[0.12em] uppercase transition-all duration-300 border`}
-                style={{
-                  borderColor: idx === i ? GOLD : "rgba(255,255,255,0.15)",
-                  color: idx === i ? GOLD : "rgba(245,246,247,0.4)",
-                  background: idx === i ? "rgba(240,180,41,0.08)" : "transparent",
-                }}
-              >
-                {item.tag}
-              </button>
-            ))}
+            {LINEUP.map((item, idx) => {
+              const isActive = idx === i;
+              return (
+                <motion.button
+                  key={item.tag}
+                  onClick={() => setI(idx)}
+                  whileTap={{ scale: 0.96 }}
+                  animate={{
+                    borderColor: isActive ? GOLD : "rgba(255,255,255,0.15)",
+                    color: isActive ? GOLD : "rgba(245,246,247,0.4)",
+                    backgroundColor: isActive ? "rgba(240,180,41,0.08)" : "rgba(255,255,255,0)",
+                  }}
+                  transition={SPRING}
+                  className={`${mono.className} flex-1 rounded-full py-2 text-[10px] tracking-[0.12em] uppercase border`}
+                >
+                  {item.tag}
+                </motion.button>
+              );
+            })}
           </div>
         </div>
       </div>
 
       <div className="hidden md:flex absolute bottom-8 right-8 z-10 items-center gap-2">
         <span className={`${mono.className} text-[9px] tracking-[0.2em] uppercase text-white/30`}>
-          Est. 2014 — Kampala, UG
+          Est. 2008 — Kampala, UG
         </span>
       </div>
 
@@ -755,80 +792,79 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// CINEMATIC DRONE CAROUSEL
+// AERIAL SHOWCASE — real YouTube footage, one live + others blurred
+// Manual (arrows / dots / drag) + automatic (paced interval, cools
+// down after any manual interaction) navigation.
 // ============================================================
 const DRONE_FOOTAGE = [
   {
     id: 1,
+    videoId: "ULOKzJezKc8",
     title: "The Herd in Motion",
-    subtitle: "Aerial perspective of 130,000+ goats",
-    src: "https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4",
-    poster: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
-    tag: "AERIAL",
-    color: "#00AEEF",
-    location: "Mubende, Uganda",
+    subtitle: "Aerial view — the Goats Programme",
+    tag: "LIVESTOCK",
+    color: YPA_BLUE,
   },
   {
     id: 2,
-    title: "Fields of Gold",
-    subtitle: "Maize contract farming from above",
-    src: "https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4",
-    poster: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
-    tag: "AERIAL",
-    color: "#F0B429",
-    location: "Masaka, Uganda",
+    videoId: "lKkeDNTbtho",
+    title: "Fields Under Contract",
+    subtitle: "Aerial view — Maize & Contract Farming",
+    tag: "CROPPING",
+    color: GOLD,
   },
   {
     id: 3,
-    title: "The SACCO Hub",
-    subtitle: "Where savings grow wings",
-    src: "https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4",
-    poster: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717198/508159ef-6c90-4578-b1fb-dff1534873f4.jpg",
-    tag: "AERIAL",
-    color: "#33C1F5",
-    location: "Kampala, Uganda",
-  },
-  {
-    id: 4,
-    title: "Community From Above",
-    subtitle: "The people behind the numbers",
-    src: "https://res.cloudinary.com/owwvyprb/video/upload/ypa-drone-goats.mp4",
-    poster: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg",
-    tag: "AERIAL",
-    color: "#F0B429",
-    location: "Various Locations",
+    videoId: "_iT3kN3sEgk",
+    title: "Twelve Branches, One Ledger",
+    subtitle: "Aerial view — YPA SACCO",
+    tag: "FINANCE",
+    color: YPA_BLUE_LIGHT,
   },
 ];
 
 const CinematicDroneCarousel = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
-  const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const [paused, setPaused] = useState(false);
+  const resumeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const wake = useCallback(() => {
+    setPaused(true);
+    if (resumeTimeout.current) clearTimeout(resumeTimeout.current);
+    resumeTimeout.current = setTimeout(() => setPaused(false), 9000);
+  }, []);
 
   useEffect(() => {
-    const activeVideo = videoRefs.current[activeIndex];
-    if (activeVideo && isPlaying) {
-      activeVideo.play().catch(() => {});
-    }
-    DRONE_FOOTAGE.forEach((_, index) => {
-      if (index !== activeIndex && videoRefs.current[index]) {
-        videoRefs.current[index]?.pause();
-      }
-    });
-  }, [activeIndex, isPlaying]);
+    if (paused) return;
+    const t = setInterval(() => {
+      setActiveIndex((p) => (p + 1) % DRONE_FOOTAGE.length);
+    }, 7000);
+    return () => clearInterval(t);
+  }, [paused]);
 
-  const handleDragEnd = useCallback((event: MouseEvent | TouchEvent, info: PanInfo) => {
+  useEffect(() => () => {
+    if (resumeTimeout.current) clearTimeout(resumeTimeout.current);
+  }, []);
+
+  const goTo = useCallback((index: number) => {
+    setActiveIndex(index);
+    wake();
+  }, [wake]);
+
+  const next = () => goTo((activeIndex + 1) % DRONE_FOOTAGE.length);
+  const prev = () => goTo((activeIndex - 1 + DRONE_FOOTAGE.length) % DRONE_FOOTAGE.length);
+
+  const handleDragEnd = useCallback((_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const container = document.getElementById('drone-carousel');
     if (!container) return;
 
     const containerRect = container.getBoundingClientRect();
     const centerX = containerRect.left + containerRect.width / 2;
-    const videoElements = container.querySelectorAll('.drone-item');
+    const items = container.querySelectorAll('.drone-item');
     let closestIndex = 0;
     let closestDistance = Infinity;
 
-    videoElements.forEach((el, index) => {
+    items.forEach((el, index) => {
       const rect = el.getBoundingClientRect();
       const elCenterX = rect.left + rect.width / 2;
       const distance = Math.abs(elCenterX - centerX);
@@ -838,34 +874,21 @@ const CinematicDroneCarousel = () => {
       }
     });
 
-    if (closestIndex !== activeIndex) {
-      setActiveIndex(closestIndex);
-    }
-  }, [activeIndex]);
-
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    const video = videoRefs.current[activeIndex];
-    if (video) {
-      isPlaying ? video.pause() : video.play().catch(() => {});
-    }
-  };
-
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    const video = videoRefs.current[activeIndex];
-    if (video) video.muted = !isMuted;
-  };
-
-  const activeVideo = DRONE_FOOTAGE[activeIndex];
+    goTo(closestIndex);
+  }, [goTo]);
 
   return (
-    <section className="relative overflow-hidden py-16 md:py-24" style={{ background: VOID }}>
+    <section
+      className="relative overflow-hidden py-16 md:py-24"
+      style={{ background: VOID }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
           className="absolute top-[-30%] left-[-20%] w-[60%] h-[60%] rounded-full blur-3xl"
           style={{ background: YPA_BLUE }}
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 0.8, 1],
             x: [0, 40, -20, 0],
             y: [0, -20, 30, 0],
@@ -876,7 +899,7 @@ const CinematicDroneCarousel = () => {
         <motion.div
           className="absolute bottom-[-30%] right-[-20%] w-[50%] h-[50%] rounded-full blur-3xl"
           style={{ background: GOLD }}
-          animate={{ 
+          animate={{
             scale: [1, 0.8, 1.2, 1],
             x: [0, -30, 20, 0],
             y: [0, 30, -20, 0],
@@ -892,9 +915,9 @@ const CinematicDroneCarousel = () => {
             <Camera className="w-4 h-4 md:w-5 md:h-5" style={{ color: YPA_BLUE_LIGHT }} />
           </div>
           <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE_LIGHT }}>
-            Aerial Drone
+            Aerial Footage — Field Verified
           </span>
-          <motion.span 
+          <motion.span
             className="h-px flex-1 max-w-[120px]"
             animate={{
               background: [
@@ -907,20 +930,20 @@ const CinematicDroneCarousel = () => {
           />
         </div>
         <h2 className={`${display.className} text-3xl md:text-4xl lg:text-5xl font-medium text-white leading-tight`}>
-          Uganda from <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00AEEF] to-[#F0B429]">above</span>
+          The operation, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00AEEF] to-[#F0B429]">from above</span>
         </h2>
         <p className="text-white/30 text-sm mt-2 max-w-2xl font-light leading-relaxed">
-          Drone footage capturing YPA's operations across Uganda. Swipe to explore our world from a new perspective.
+          Real footage from real sites — the goats, the fields, the branches. Judge us by what the drone sees.
         </p>
       </div>
 
-      <div 
+      <div
         id="drone-carousel"
         className="relative z-10 overflow-visible px-4 md:px-8"
         style={{ touchAction: 'pan-y' }}
       >
-        <motion.div 
-          className="flex items-center gap-6 md:gap-10"
+        <motion.div
+          className="flex items-start gap-6 md:gap-10"
           drag="x"
           dragConstraints={{ left: -((DRONE_FOOTAGE.length - 1) * 340), right: 0 }}
           dragElastic={0.1}
@@ -931,145 +954,99 @@ const CinematicDroneCarousel = () => {
         >
           {DRONE_FOOTAGE.map((footage, index) => {
             const isActive = index === activeIndex;
-            const scale = isActive ? 1 : 0.8;
-            const blur = isActive ? 0 : 2;
-            const zIndex = isActive ? 10 : 1;
+            const scale = isActive ? 1 : 0.86;
+            const blur = isActive ? 0 : 2.5;
 
             return (
               <motion.div
                 key={footage.id}
-                className="drone-item relative flex-shrink-0 w-[280px] sm:w-[340px] md:w-[420px] lg:w-[500px] rounded-2xl overflow-hidden"
+                className="drone-item relative flex-shrink-0 w-[280px] sm:w-[340px] md:w-[420px] lg:w-[480px]"
                 style={{
-                  border: `1px solid ${isActive ? `${footage.color}40` : 'rgba(255,255,255,0.06)'}`,
-                  boxShadow: isActive ? `0 0 60px ${footage.color}15, 0 0 120px ${footage.color}08` : 'none',
-                  zIndex,
                   scale,
                   filter: `blur(${blur}px)`,
+                  opacity: isActive ? 1 : 0.55,
+                  zIndex: isActive ? 10 : 1,
                   transition: 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               >
-                <div className="relative aspect-[16/9] bg-[#0A0A0B]">
-                  <video
-                    ref={(el) => { videoRefs.current[index] = el; }}
-                    src={footage.src}
-                    poster={footage.poster}
-                    className="w-full h-full object-cover"
-                    muted={isMuted}
-                    loop
-                    playsInline
-                    preload="metadata"
-                    style={{ opacity: isActive ? 1 : 0.5 }}
-                  />
+                <div
+                  className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-[#0A0A0B]"
+                  style={{
+                    border: `1px solid ${isActive ? `${footage.color}45` : 'rgba(255,255,255,0.08)'}`,
+                    boxShadow: isActive
+                      ? `0 25px 60px -20px ${footage.color}30, 0 0 0 1px ${footage.color}10 inset`
+                      : `0 18px 40px -18px rgba(0,0,0,0.65)`,
+                  }}
+                >
+                  {isActive ? (
+                    <iframe
+                      key={footage.videoId}
+                      className="absolute inset-0 w-full h-full"
+                      src={`https://www.youtube-nocookie.com/embed/${footage.videoId}?autoplay=1&mute=1&loop=1&playlist=${footage.videoId}&controls=1&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3`}
+                      title={footage.title}
+                      allow="autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                      frameBorder={0}
+                      loading="eager"
+                    />
+                  ) : (
+                    <button
+                      onClick={() => goTo(index)}
+                      className="absolute inset-0 w-full h-full group"
+                      aria-label={`Show ${footage.title}`}
+                    >
+                      <img
+                        src={`https://img.youtube.com/vi/${footage.videoId}/hqdefault.jpg`}
+                        alt={footage.title}
+                        className="w-full h-full object-cover"
+                        style={{ filter: "brightness(0.55)" }}
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-11 h-11 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/15 transition-transform duration-300 group-hover:scale-110">
+                          <Play className="w-4 h-4 text-white/70 ml-0.5" />
+                        </div>
+                      </div>
+                    </button>
+                  )}
 
-                  <div className="absolute inset-0" style={{ 
-                    background: `linear-gradient(180deg, rgba(10,10,11,0.2) 0%, transparent 30%, transparent 70%, ${VOID} 100%)` 
-                  }} />
-
-                  <div className="absolute top-3 left-3">
-                    <span className={`${mono.className} text-[7px] md:text-[8px] tracking-[0.2em] uppercase px-2 py-1 rounded border backdrop-blur-sm`}
+                  <div className="absolute top-3 left-3 pointer-events-none">
+                    <span
+                      className={`${mono.className} text-[7px] md:text-[8px] tracking-[0.2em] uppercase px-2 py-1 rounded border backdrop-blur-sm`}
                       style={{
                         background: isActive ? `${footage.color}20` : 'rgba(10,10,11,0.5)',
-                        borderColor: isActive ? `${footage.color}30` : 'rgba(255,255,255,0.05)',
-                        color: isActive ? footage.color : 'rgba(255,255,255,0.3)',
+                        borderColor: isActive ? `${footage.color}30` : 'rgba(255,255,255,0.08)',
+                        color: isActive ? footage.color : 'rgba(255,255,255,0.4)',
                       }}
                     >
                       {footage.tag}
                     </span>
                   </div>
 
-                  <div className="absolute top-3 right-3">
-                    <span className={`${mono.className} text-[7px] md:text-[8px] tracking-[0.15em] uppercase px-2 py-1 rounded backdrop-blur-sm text-white/30 border border-white/5`}
-                      style={{ background: 'rgba(10,10,11,0.4)' }}
+                  <div className="absolute top-3 right-3 pointer-events-none">
+                    <span
+                      className={`${mono.className} text-[8px] md:text-[9px]`}
+                      style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.2)' }}
                     >
-                      {footage.location}
-                    </span>
-                  </div>
-
-                  {!isActive && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center bg-white/5 backdrop-blur-sm border border-white/10">
-                        <Play className="w-5 h-5 text-white/30" />
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-                    <div className={`${mono.className} text-[8px] md:text-[9px] tracking-[0.2em] uppercase flex items-center gap-2`} 
-                         style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.3)' }}>
-                      <span>{footage.subtitle}</span>
-                      {isActive && (
-                        <span className="w-1 h-1 rounded-full" style={{ background: footage.color }} />
-                      )}
-                    </div>
-                    <h3 className={`${display.className} text-base md:text-lg font-medium text-white leading-snug mt-1`}>
-                      {footage.title}
-                    </h3>
-                  </div>
-
-                  {isActive && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute bottom-20 right-4 flex items-center gap-2"
-                    >
-                      <button
-                        onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                        className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all hover:scale-105"
-                        style={{
-                          background: 'rgba(10,10,11,0.5)',
-                          borderColor: 'rgba(255,255,255,0.1)',
-                          color: '#fff',
-                        }}
-                      >
-                        {isPlaying ? (
-                          <span className="flex gap-0.5">
-                            <span className="w-0.5 h-3 bg-white" />
-                            <span className="w-0.5 h-3 bg-white" />
-                          </span>
-                        ) : (
-                          <Play className="w-3 h-3" />
-                        )}
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); toggleMute(); }}
-                        className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all hover:scale-105"
-                        style={{
-                          background: 'rgba(10,10,11,0.5)',
-                          borderColor: 'rgba(255,255,255,0.1)',
-                          color: '#fff',
-                        }}
-                      >
-                        {isMuted ? (
-                          <VolumeX className="w-3 h-3" />
-                        ) : (
-                          <Volume2 className="w-3 h-3" />
-                        )}
-                      </button>
-                    </motion.div>
-                  )}
-
-                  <div className="absolute bottom-0 right-0 p-3">
-                    <span className={`${mono.className} text-[8px] md:text-[9px]`} 
-                          style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.1)' }}>
                       {String(index + 1).padStart(2, '0')}
                     </span>
                   </div>
+                </div>
 
-                  {isActive && (
-                    <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-[2px]"
-                      style={{ background: `${footage.color}15` }}
-                    >
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: `linear-gradient(90deg, ${footage.color}, ${GOLD})` }}
-                        initial={{ width: '0%' }}
-                        animate={{ width: '100%' }}
-                        transition={{ duration: 30, ease: 'linear', repeat: Infinity }}
-                      />
-                    </motion.div>
-                  )}
+                {/* caption footer — sits below the frame so it never fights YouTube's own controls */}
+                <div className="pt-3 md:pt-4">
+                  <div
+                    className={`${mono.className} text-[8px] md:text-[9px] tracking-[0.2em] uppercase`}
+                    style={{ color: isActive ? footage.color : 'rgba(255,255,255,0.25)' }}
+                  >
+                    {footage.subtitle}
+                  </div>
+                  <h3
+                    className={`${display.className} text-base md:text-lg font-medium leading-snug mt-1`}
+                    style={{ color: isActive ? '#F5F6F7' : 'rgba(255,255,255,0.35)' }}
+                  >
+                    {footage.title}
+                  </h3>
                 </div>
               </motion.div>
             );
@@ -1077,37 +1054,65 @@ const CinematicDroneCarousel = () => {
         </motion.div>
       </div>
 
-      <div className="relative z-10 flex justify-center gap-3 mt-8 md:mt-10 px-4">
-        {DRONE_FOOTAGE.map((footage, index) => (
-          <button
-            key={footage.id}
-            onClick={() => setActiveIndex(index)}
-            className="transition-all duration-500 rounded-full"
-            style={{
-              width: index === activeIndex ? '40px' : '8px',
-              height: '3px',
-              background: index === activeIndex 
-                ? `linear-gradient(90deg, ${footage.color}, ${GOLD})` 
-                : 'rgba(255,255,255,0.1)',
-              boxShadow: index === activeIndex ? `0 0 20px ${footage.color}30` : 'none',
-            }}
-            aria-label={`Go to footage ${index + 1}`}
-          />
-        ))}
+      {/* manual controls — arrows + dots, always visible and independent of drag */}
+      <div className="relative z-10 flex items-center justify-center gap-4 md:gap-6 mt-8 md:mt-10 px-4">
+        <button
+          onClick={prev}
+          aria-label="Previous footage"
+          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-105"
+          style={{ borderColor: "rgba(240,180,41,0.3)", color: "#F5F6F7" }}
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        <div className="flex gap-3">
+          {DRONE_FOOTAGE.map((footage, index) => (
+            <button
+              key={footage.id}
+              onClick={() => goTo(index)}
+              className="transition-all duration-500 rounded-full"
+              style={{
+                width: index === activeIndex ? '36px' : '8px',
+                height: '3px',
+                background: index === activeIndex
+                  ? `linear-gradient(90deg, ${footage.color}, ${GOLD})`
+                  : 'rgba(255,255,255,0.15)',
+                boxShadow: index === activeIndex ? `0 0 16px ${footage.color}35` : 'none',
+              }}
+              aria-label={`Go to footage ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={next}
+          aria-label="Next footage"
+          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-105"
+          style={{ borderColor: "rgba(240,180,41,0.3)", color: "#F5F6F7" }}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5, duration: 0.6 }}
-        className="relative z-10 text-center mt-4"
-      >
-        <span className={`${mono.className} text-[8px] md:text-[9px] tracking-[0.2em] uppercase text-white/15 flex items-center justify-center gap-4`}>
-          <span>✦</span>
-          <span>Swipe to explore from above</span>
-          <span>✦</span>
-        </span>
-      </motion.div>
+      {/* CTAs */}
+      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 mt-10 md:mt-12 px-5">
+        <Link
+          href="/projects"
+          className="group inline-flex items-center gap-2 rounded-full px-6 md:px-7 py-3 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5"
+          style={{ background: YPA_BLUE, color: VOID }}
+        >
+          Explore Projects
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </Link>
+        <Link
+          href="/contact"
+          className="group inline-flex items-center gap-2 rounded-full px-6 md:px-7 py-3 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5 border"
+          style={{ borderColor: "rgba(240,180,41,0.35)", color: "#F5F6F7" }}
+        >
+          Become a Member
+          <Users className="h-4 w-4" style={{ color: GOLD }} />
+        </Link>
+      </div>
 
       <div className="absolute bottom-8 right-8 hidden lg:block pointer-events-none opacity-20">
         <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
@@ -2207,10 +2212,10 @@ export default function Home() {
       <SectionRail />
       <Hero />
       <FieldIndex />
-      <CinematicDroneCarousel />
       <ExploreRail />
       <TheLineup />
       <TrustBar />
+      <CinematicDroneCarousel />
       <Signal signalArticles={signalArticles} />
       <MemberVoices />
       <RecentBlogs blogs={blogs} />
