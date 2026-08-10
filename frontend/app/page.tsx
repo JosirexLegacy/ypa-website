@@ -670,7 +670,7 @@ const Hero = () => {
               key={item.tag}
               onClick={() => setI(idx)}
               className="group flex items-center gap-3 justify-end"
-              aria-label={`Show ${item.title}`}
+              aria-label={`Show ${item.tag}`}
             >
               <span
                 className={`${inter.className} text-[11px] tracking-[0.15em] uppercase transition-all duration-300 whitespace-nowrap`}
