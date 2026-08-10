@@ -1407,7 +1407,7 @@ const ExploreRail = () => {
 };
 
 // ============================================================
-// THE LINEUP - Updated as Agribusiness Projects
+// THE LINEUP - Original smooth style with 4 projects
 // ============================================================
 const CONFIG_CARDS = [
   {
@@ -1415,7 +1415,7 @@ const CONFIG_CARDS = [
     name: "Mighty YPA Goats",
     tag: "Livestock",
     stat: "130K+",
-    statLabel: "goats under care",
+    statLabel: "under care",
     specs: ["Mubende × Boer × Kalahari", "95% member success rate", "Guaranteed market access"],
     href: "/projects/goats",
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg",
@@ -1433,15 +1433,10 @@ const CONFIG_CARDS = [
   {
     icon: Building,
     name: "CDC",
-    tag: "Community Development",
+    tag: "Community",
     stat: "95%",
-    statLabel: "profit reinvestment",
-    specs: [
-      "Profits reinvested in contracts",
-      "Community-driven development",
-      "Sustainable growth model",
-      "Member-owned benefits"
-    ],
+    statLabel: "reinvested",
+    specs: ["Profits reinvested in contracts", "Community-driven development", "Sustainable growth model"],
     href: "/cdc",
     image: "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80",
   },
@@ -1451,12 +1446,7 @@ const CONFIG_CARDS = [
     tag: "Housing",
     stat: "500+",
     statLabel: "families housed",
-    specs: [
-      "Affordable housing solutions",
-      "Quality construction standards",
-      "Community-based development",
-      "Sustainable living environments"
-    ],
+    specs: ["Affordable housing solutions", "Quality construction standards", "Community-based development"],
     href: "/dream-homes",
     image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80",
   },
@@ -1469,27 +1459,12 @@ const TheLineup = () => {
     <section id="lineup" className="px-5 md:px-14 py-16 md:py-24 bg-[#111111]">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
-          <div className="flex items-end justify-between flex-wrap gap-3">
-            <div>
-              <div className={`${display.className} text-[11px] md:text-[13px] text-white/40 mb-2`}>
-                Four programmes, one platform
-              </div>
-              <h2 className={`${display.className} text-2xl md:text-3xl lg:text-5xl font-medium tracking-tight text-white max-w-2xl`}>
-                Agribusiness <span style={{ color: YPA_BLUE }}>Projects</span>
-              </h2>
-              <p className="text-white/40 text-sm mt-2 max-w-lg">
-                From livestock to housing, building sustainable futures for communities
-              </p>
-            </div>
-            
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-2 text-sm font-medium text-white/60 hover:text-white transition-colors group"
-            >
-              View all projects
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+          <div className={`${display.className} text-[11px] md:text-[13px] text-white/40 mb-2`}>
+            Four programmes, one platform
           </div>
+          <h2 className={`${display.className} text-2xl md:text-3xl lg:text-5xl font-medium tracking-tight text-white max-w-2xl`}>
+            Agribusiness <span style={{ color: YPA_BLUE }}>Projects</span>
+          </h2>
         </ScrollReveal>
 
         <div className="mt-8 md:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
