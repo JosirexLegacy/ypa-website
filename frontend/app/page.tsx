@@ -773,7 +773,7 @@ const Hero = () => {
               className={`${display.className} text-4xl sm:text-5xl md:text-6xl lg:text-[5.25rem] font-medium leading-[0.98] tracking-tight max-w-3xl`}
               style={{ color: "#F5F6F7" }}
             >
-              Africa's{"GREATEST"}
+              Africa's {"GREATEST"}
               <span
                 className={`${serif.className} italic relative inline-block`}
                 style={{
