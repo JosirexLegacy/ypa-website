@@ -260,7 +260,7 @@ const LINEUP = [
   {
     kicker: "Programme 01 — Goats & Livestock",
     tag: "Goats",
-    line: "Africa's leading goat farmers, managing over 130,000 goats with professional herders, vets, and insurance so members farm without the guesswork.",
+    line: "Africa's leading goat farmers, managing over 130,000 goats with professional herders, vets, and insurance — so members farm without the guesswork.",
     specs: [
       { label: "Goats managed", value: "130,000+" },
       { label: "Member success", value: "95%" },
@@ -272,7 +272,7 @@ const LINEUP = [
   {
     kicker: "Programme 02 — Maize & Cropping",
     tag: "Maize",
-    line: "Thousands of acres farmed under structured agreements quality inputs, trained agronomists, and buyers lined up before planting even starts.",
+    line: "Thousands of acres farmed under structured agreements — quality inputs, trained agronomists, and buyers lined up before planting even starts.",
     specs: [
       { label: "Land farmed", value: "5,000+ acres" },
       { label: "Support", value: "Agronomist-led" },
@@ -419,7 +419,7 @@ const SECTIONS = [
   { id: "hero", label: "Home" },
   { id: "index", label: "Field Index" },
   { id: "explore", label: "Ecosystem" },
-   { id: "lineup", label: "Agribusiness" },
+  { id: "lineup", label: "The Lineup" },
   { id: "trust", label: "Why Trust Us" },
   { id: "signal", label: "Inside YPA" },
   { id: "voices", label: "Member Voices" },
@@ -1241,7 +1241,7 @@ const ECOSYSTEM = [
   {
     q: "The complete YPA ecosystem — how everything connects",
     label: "The YPA Ecosystem",
-    href: "projects",
+    href: "/ecosystem",
     tall: true,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
     color: YPA_BLUE,
@@ -1261,7 +1261,7 @@ const ECOSYSTEM = [
   {
     q: "Save, invest, and grow with YPA Wealth Depot",
     label: "YPA Wealth Depot",
-    href: "https://ypa-wealth-depot.vercel.app/",
+    href: "/sacco",
     tall: false,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784727031/54b61dc1-469f-4363-8a52-4de7e285fa1b.jpg",
     color: YPA_BLUE_LIGHT,
@@ -1291,7 +1291,7 @@ const ECOSYSTEM = [
   {
     q: "Experience farm-to-table at Mbuzi Choma Restaurant",
     label: "Mbuzi Choma Restaurant",
-    href: "/sister-companies/mbuzi-choma",
+    href: "/mbuzi-choma",
     tall: false,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726488/2d86272b-4d19-41b6-b35e-7431ca4d7b7f.jpg",
     color: "#EF4444",
@@ -1407,22 +1407,22 @@ const ExploreRail = () => {
 };
 
 // ============================================================
-// THE LINEUP - Original smooth style with 4 projects
+// THE LINEUP
 // ============================================================
 const CONFIG_CARDS = [
   {
     icon: Sprout,
-    name: "Mighty YPA Goats",
+    name: "Goats",
     tag: "Livestock",
     stat: "130K+",
     statLabel: "under care",
     specs: ["Mubende × Boer × Kalahari", "95% member success rate", "Guaranteed market access"],
     href: "/projects/goats",
-    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
   },
   {
     icon: Leaf,
-    name: "Maize Farming",
+    name: "Maize",
     tag: "Cropping",
     stat: "5K+",
     statLabel: "acres cultivated",
@@ -1431,24 +1431,14 @@ const CONFIG_CARDS = [
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
   },
   {
-    icon: Building,
-    name: "CDC",
-    tag: "Community",
-    stat: "95%",
-    statLabel: "reinvested",
-    specs: ["Profits reinvested in contracts", "Community-driven development", "Sustainable growth model"],
-    href: "/cdc",
-    image: "https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=800&q=80",
-  },
-  {
-    icon: Home,
-    name: "YPA Dream Homes",
-    tag: "Housing",
-    stat: "500+",
-    statLabel: "families housed",
-    specs: ["Affordable housing solutions", "Quality construction standards", "Community-based development"],
-    href: "/dream-homes",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80",
+    icon: Users,
+    name: "SACCO",
+    tag: "Finance",
+    stat: "18K+",
+    statLabel: "members",
+    specs: ["12 branches nationwide", "Loans built for farmers", "Member-owned since 2014"],
+    href: "/sacco",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717198/508159ef-6c90-4578-b1fb-dff1534873f4.jpg",
   },
 ];
 
@@ -1460,14 +1450,14 @@ const TheLineup = () => {
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
           <div className={`${display.className} text-[11px] md:text-[13px] text-white/40 mb-2`}>
-            Four programmes, one platform
+            Three programmes, one platform
           </div>
           <h2 className={`${display.className} text-2xl md:text-3xl lg:text-5xl font-medium tracking-tight text-white max-w-2xl`}>
-            Agribusiness <span style={{ color: YPA_BLUE }}>Projects</span>
+            The Lineup
           </h2>
         </ScrollReveal>
 
-        <div className="mt-8 md:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="mt-8 md:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {CONFIG_CARDS.map((c, i) => {
             const Icon = c.icon;
             const isHover = hover === i;
@@ -1536,6 +1526,7 @@ const TheLineup = () => {
     </section>
   );
 };
+
 // ============================================================
 // WHY CHOOSE YPA
 // ============================================================
