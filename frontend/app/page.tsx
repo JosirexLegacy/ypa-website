@@ -419,7 +419,7 @@ const SECTIONS = [
   { id: "hero", label: "Home" },
   { id: "index", label: "Field Index" },
   { id: "explore", label: "Ecosystem" },
-  { id: "lineup", label: "The Lineup" },
+  { id: "lineup", label: "The Agribusiness Projects" },
   { id: "trust", label: "Why Trust Us" },
   { id: "signal", label: "Inside YPA" },
   { id: "voices", label: "Member Voices" },
@@ -1243,7 +1243,7 @@ const ECOSYSTEM = [
     label: "The YPA Ecosystem",
     href: "/ecosystem",
     tall: true,
-    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1786356172/BZ6A9825_hkymyx.jpg",
     color: YPA_BLUE,
     tag: "Overview",
     icon: Layers,
@@ -1412,13 +1412,13 @@ const ExploreRail = () => {
 const CONFIG_CARDS = [
   {
     icon: Sprout,
-    name: "Goats",
+    name: "The Goats Project",
     tag: "Livestock",
     stat: "130K+",
     statLabel: "under care",
     specs: ["Mubende × Boer × Kalahari", "95% member success rate", "Guaranteed market access"],
     href: "/projects/goats",
-    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1786356172/DJI_0017_g53jgu.jpg",
   },
   {
     icon: Leaf,
@@ -1432,13 +1432,13 @@ const CONFIG_CARDS = [
   },
   {
     icon: Users,
-    name: "SACCO",
-    tag: "Finance",
-    stat: "18K+",
+    name: "CDC",
+    tag: "",
+    stat: "",
     statLabel: "members",
     specs: ["12 branches nationwide", "Loans built for farmers", "Member-owned since 2014"],
-    href: "/sacco",
-    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717198/508159ef-6c90-4578-b1fb-dff1534873f4.jpg",
+    href: "",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1786357366/3P0D7976_fkxetu.jpg",
   },
 ];
 
