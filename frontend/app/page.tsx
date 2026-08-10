@@ -46,6 +46,10 @@ import {
   VolumeX,
   Camera,
   Film,
+  GraduationCap,
+  Tractor,
+  Utensils,
+  Layers,
 } from "lucide-react";
 
 // ============================================================
@@ -325,17 +329,6 @@ const DRONE_FOOTAGE = [
     location: "Kampala, Uganda",
     stat: "12 branches nationwide",
   },
-  // 👇 Just add more videos here — that's it!
-  // {
-  //   id: 4,
-  //   videoId: "YOUR_VIDEO_ID",
-  //   title: "Your Title",
-  //   subtitle: "Your subtitle",
-  //   tag: "TAG",
-  //   color: YPA_BLUE,
-  //   location: "Location, Uganda",
-  //   stat: "Your stat here",
-  // },
 ];
 
 // ============================================================
@@ -425,7 +418,7 @@ const ScrollProgress = () => {
 const SECTIONS = [
   { id: "hero", label: "Home" },
   { id: "index", label: "Field Index" },
-  { id: "explore", label: "Explore" },
+  { id: "explore", label: "Ecosystem" },
   { id: "lineup", label: "The Lineup" },
   { id: "trust", label: "Why Trust Us" },
   { id: "signal", label: "Inside YPA" },
@@ -569,7 +562,7 @@ const ScrollReveal = ({ children, delay = 0, className = "" }: {
 };
 
 // ============================================================
-// HERO — refined with GlowSeal
+// HERO — Polished with better geometry and mobile responsiveness
 // ============================================================
 const Hero = () => {
   const [i, setI] = useState(0);
@@ -618,7 +611,15 @@ const Hero = () => {
             />
           </motion.div>
         </AnimatePresence>
-        <div className="absolute inset-0" style={{ background: YPA_BLUE, mixBlendMode: "color", opacity: 0.22 }} />
+        
+        {/* Multiple gradient layers for depth */}
+        <div 
+          className="absolute inset-0" 
+          style={{ 
+            background: `radial-gradient(ellipse at 30% 40%, ${YPA_BLUE}15, transparent 70%)`,
+            mixBlendMode: "color",
+          }} 
+        />
         <div
           className="absolute inset-0"
           style={{
@@ -634,34 +635,53 @@ const Hero = () => {
         <GrainOverlay />
       </div>
 
-      {/* Dot-grid texture */}
+      {/* Geometric grid pattern for depth */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(${YPA_BLUE} 1px, transparent 1px)`,
-          backgroundSize: "28px 28px",
-          opacity: 0.06,
-          WebkitMaskImage: "linear-gradient(180deg, #000 0%, transparent 55%)",
-          maskImage: "linear-gradient(180deg, #000 0%, transparent 55%)",
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+          `,
+          backgroundSize: "48px 48px",
+          maskImage: "linear-gradient(180deg, #000 0%, transparent 70%)",
+          WebkitMaskImage: "linear-gradient(180deg, #000 0%, transparent 70%)",
         }}
       />
 
-      {/* Framing rule */}
-      <div
-        className="absolute inset-x-4 md:inset-x-8 top-20 md:top-24 bottom-24 md:bottom-28 border pointer-events-none hidden sm:block"
-        style={{ borderColor: "rgba(240,180,41,0.16)" }}
-      />
-
-      {/* Ambient glow — the signature breathing light behind the copy */}
+      {/* Ambient glow — the signature breathing light */}
       <motion.div
         aria-hidden="true"
         className="pointer-events-none absolute -left-24 top-1/3 w-[520px] h-[520px] rounded-full blur-[120px]"
         style={{ background: `radial-gradient(circle, ${YPA_BLUE}30 0%, ${GOLD}14 45%, transparent 70%)` }}
-        animate={reduceMotion ? {} : { opacity: [0.5, 0.85, 0.5], scale: [1, 1.08, 1] }}
+        animate={reduceMotion ? {} : { opacity: [0.4, 0.8, 0.4], scale: [1, 1.1, 1] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Desktop lineup selector, right rail */}
+      {/* Secondary ambient glow for symmetry */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-24 bottom-1/3 w-[400px] h-[400px] rounded-full blur-[100px]"
+        style={{ background: `radial-gradient(circle, ${GOLD}20 0%, transparent 70%)` }}
+        animate={reduceMotion ? {} : { opacity: [0.3, 0.6, 0.3], scale: [1, 1.05, 1] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      />
+
+      {/* Corner accents for geometry */}
+      <div className="absolute top-8 right-8 w-12 h-12 pointer-events-none hidden md:block">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M48 0V48H0" stroke="rgba(240,180,41,0.15)" strokeWidth="1" />
+          <path d="M48 8V48H8" stroke="rgba(240,180,41,0.08)" strokeWidth="0.5" />
+        </svg>
+      </div>
+      <div className="absolute bottom-8 left-8 w-12 h-12 pointer-events-none hidden md:block">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M0 48V0H48" stroke="rgba(240,180,41,0.15)" strokeWidth="1" />
+          <path d="M0 40V0H40" stroke="rgba(240,180,41,0.08)" strokeWidth="0.5" />
+        </svg>
+      </div>
+
+      {/* Desktop lineup selector, right rail - Symmetrical positioning */}
       <div className="hidden lg:flex flex-col gap-3 absolute right-8 top-1/2 -translate-y-1/2 z-20">
         {LINEUP.map((item, idx) => {
           const isActive = idx === i;
@@ -703,7 +723,7 @@ const Hero = () => {
         })}
       </div>
 
-      {/* Main content */}
+      {/* Main content - Improved spacing and symmetry */}
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 md:px-14 py-24">
         <div className="max-w-4xl">
           <GlowSeal />
@@ -742,11 +762,12 @@ const Hero = () => {
             </span>
           </motion.div>
 
-          {/* Fixed brand headline — always on, regardless of which programme is cycling below */}
+          {/* Brand headline - Refined typography */}
           <motion.div
             initial={reduceMotion ? {} : { opacity: 0, y: 18, filter: "blur(6px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 0.7, ease: EASE, delay: 0.05 }}
+            className="relative"
           >
             <h1
               className={`${display.className} text-4xl sm:text-5xl md:text-6xl lg:text-[5.25rem] font-medium leading-[0.98] tracking-tight max-w-3xl`}
@@ -754,19 +775,26 @@ const Hero = () => {
             >
               Africa's{" "}
               <span
-                className={`${serif.className} italic`}
+                className={`${serif.className} italic relative inline-block`}
                 style={{
                   color: YPA_BLUE_LIGHT,
                   textShadow: `0 0 24px ${YPA_BLUE}70, 0 0 54px ${YPA_BLUE}35`,
                 }}
               >
                 Farm Management
+                <span 
+                  className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full"
+                  style={{ 
+                    background: `linear-gradient(90deg, ${YPA_BLUE}80, ${YPA_BLUE_LIGHT}40, transparent)`,
+                    width: "80%",
+                  }}
+                />
               </span>{" "}
               Company.
             </h1>
 
             <p
-              className={`${inter.className} mt-5 text-base md:text-lg font-light max-w-lg leading-relaxed`}
+              className={`${inter.className} mt-5 text-sm sm:text-base md:text-lg font-light max-w-lg leading-relaxed`}
               style={{ color: "rgba(245,246,247,0.62)" }}
             >
               We manage farms, build profitable agricultural projects, and empower individuals and communities through modern agribusiness — real land, real livestock, real people, run with operational discipline.
@@ -816,6 +844,7 @@ const Hero = () => {
             </motion.div>
           </AnimatePresence>
 
+          {/* CTA Buttons - Improved styling */}
           <motion.div
             initial={reduceMotion ? {} : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -824,39 +853,44 @@ const Hero = () => {
           >
             <Link
               href="/projects"
-              className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_0_28px_rgba(0,174,239,0.5)]"
+              className="group relative inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-0.5 overflow-hidden"
               style={{ background: YPA_BLUE, color: VOID }}
             >
-              Explore Our Projects
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+              <span className="relative flex items-center gap-2">
+                Explore Our Projects
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </span>
             </Link>
             <Link
               href="/about"
               className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-0.5 border hover:bg-white/5"
               style={{ borderColor: "rgba(240,180,41,0.35)", color: "#F5F6F7" }}
             >
-              <Play className="h-4 w-4" style={{ color: GOLD }} />
-              See How YPA Works
+              <span className="relative flex items-center gap-2">
+                <Play className="h-4 w-4" style={{ color: GOLD }} />
+                See How YPA Works
+              </span>
             </Link>
           </motion.div>
 
-          {/* Mobile lineup selector */}
-          <div className="flex lg:hidden gap-2 mt-10">
+          {/* Mobile lineup selector - Improved touch targets */}
+          <div className="flex lg:hidden gap-2 mt-10 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden">
             {LINEUP.map((item, idx) => {
               const isActive = idx === i;
               return (
                 <motion.button
                   key={item.tag}
                   onClick={() => setI(idx)}
-                  whileTap={{ scale: 0.96 }}
+                  whileTap={{ scale: 0.95 }}
                   animate={{
                     borderColor: isActive ? GOLD : "rgba(255,255,255,0.15)",
                     color: isActive ? GOLD : "rgba(245,246,247,0.4)",
                     backgroundColor: isActive ? "rgba(240,180,41,0.08)" : "rgba(255,255,255,0)",
-                    boxShadow: isActive ? `0 0 16px rgba(240,180,41,0.18)` : "0 0 0px transparent",
+                    boxShadow: isActive ? `0 0 20px rgba(240,180,41,0.15)` : "0 0 0px transparent",
                   }}
                   transition={SPRING}
-                  className={`${mono.className} flex-1 rounded-full py-2 text-[10px] tracking-[0.12em] uppercase border`}
+                  className={`${mono.className} flex-1 min-w-[80px] rounded-full py-2.5 text-[10px] tracking-[0.12em] uppercase border transition-all duration-300`}
                 >
                   {item.tag}
                 </motion.button>
@@ -866,7 +900,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Bottom-right locale tag */}
+      {/* Bottom-right locale tag - Refined */}
       <div className="hidden md:flex absolute bottom-8 right-8 z-10 items-center gap-2">
         <span className="relative flex h-1 w-1">
           <span className="relative inline-flex h-1 w-1 rounded-full" style={{ background: GOLD }} />
@@ -876,21 +910,22 @@ const Hero = () => {
         </span>
       </div>
 
-      {/* Scroll cue */}
+      {/* Scroll cue - Better animation */}
       <div className="absolute bottom-8 left-5 md:left-14 z-10">
         <a href="#index" className="flex items-center gap-2 group">
           <motion.div
-            animate={reduceMotion ? {} : { y: [0, 5, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            animate={reduceMotion ? {} : { y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="flex items-center gap-2"
           >
             <ChevronDown className="h-4 w-4" style={{ color: "rgba(245,246,247,0.4)" }} />
+            <span
+              className={`${inter.className} text-[9px] tracking-[0.3em] uppercase group-hover:text-white/60 transition-colors`}
+              style={{ color: "rgba(245,246,247,0.4)" }}
+            >
+              Explore
+            </span>
           </motion.div>
-          <span
-            className={`${inter.className} text-[9px] tracking-[0.3em] uppercase`}
-            style={{ color: "rgba(245,246,247,0.4)" }}
-          >
-            Explore
-          </span>
         </a>
       </div>
     </section>
@@ -1200,50 +1235,68 @@ const AerialShowcase = () => {
 };
 
 // ============================================================
-// EXPLORE RAIL
+// EXPLORE ECOSYSTEM - Updated with full ecosystem navigation
 // ============================================================
-const EXPLORE = [
+const ECOSYSTEM = [
   {
-    q: "What does it actually take to raise 130,000 goats?",
-    label: "The Goats Programme",
-    href: "/projects/goats",
+    q: "The complete YPA ecosystem — how everything connects",
+    label: "The YPA Ecosystem",
+    href: "/ecosystem",
     tall: true,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
+    color: YPA_BLUE,
+    tag: "Overview",
+    icon: Layers,
   },
   {
-    q: "What does professionally managed maize farming look like?",
-    label: "Maize & Contract Farming",
-    href: "/projects/maize",
+    q: "From farm to market — our core agricultural projects",
+    label: "YPA Projects",
+    href: "/projects",
     tall: false,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
+    color: GOLD,
+    tag: "Projects",
+    icon: Sprout,
   },
   {
-    q: "What if your savings account understood harvest season?",
-    label: "YPA SACCO",
+    q: "Save, invest, and grow with YPA Wealth Depot",
+    label: "YPA Wealth Depot",
     href: "/sacco",
     tall: false,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784727031/54b61dc1-469f-4363-8a52-4de7e285fa1b.jpg",
+    color: YPA_BLUE_LIGHT,
+    tag: "Finance",
+    icon: Building,
   },
   {
-    q: "Who's actually behind the numbers?",
-    label: "Our Story",
-    href: "/about",
+    q: "Learn modern agribusiness at YPA Agribusiness School",
+    label: "Agribusiness School",
+    href: "/agribusiness-school",
     tall: true,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg",
+    color: "#34D399",
+    tag: "Education",
+    icon: GraduationCap,
   },
   {
-    q: "What does a decade of fieldwork look like?",
-    label: "Gallery",
-    href: "/gallery",
+    q: "Access quality machinery and equipment for your farm",
+    label: "YPA Machinery Hub",
+    href: "/machinery-hub",
     tall: false,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803864/1233_kcholp.jpg",
+    color: "#F59E0B",
+    tag: "Equipment",
+    icon: Tractor,
   },
   {
-    q: "Ready to ask us directly?",
-    label: "Talk to Us",
-    href: "/contact",
+    q: "Experience farm-to-table at Mbuzi Choma Restaurant",
+    label: "Mbuzi Choma Restaurant",
+    href: "/mbuzi-choma",
     tall: false,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726488/2d86272b-4d19-41b6-b35e-7431ca4d7b7f.jpg",
+    color: "#EF4444",
+    tag: "Dining",
+    icon: Utensils,
   },
 ];
 
@@ -1252,60 +1305,102 @@ const ExploreRail = () => {
     <section id="explore" className="px-5 md:px-14 py-16 md:py-24 max-w-7xl mx-auto">
       <ScrollReveal>
         <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
-          <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-[#111111]`}>
-            Start wherever the question is
-          </h2>
-          <span className={`${display.className} text-[11px] md:text-[13px] text-[#5B6B7A]`}>
-            Six ways in
+          <div>
+            <div className="flex items-center gap-2.5 mb-2">
+              <span className={`${mono.className} text-[10px]`} style={{ color: GOLD }}>06</span>
+              <span className="h-px w-5" style={{ background: "rgba(240,180,41,0.4)" }} />
+              <span className={`${mono.className} text-[10px] md:text-[11px] font-medium tracking-[0.25em] uppercase`} style={{ color: YPA_BLUE }}>
+                Explore
+              </span>
+            </div>
+            <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-[#111111]`}>
+              The YPA <span style={{ color: YPA_BLUE }}>Ecosystem</span>
+            </h2>
+            <p className="text-[#5B6B7A] text-sm mt-2 max-w-lg">
+              Six interconnected pillars driving agricultural transformation in Africa
+            </p>
+          </div>
+          <span className={`${display.className} text-[11px] md:text-[13px] text-[#5B6B7A] flex items-center gap-2`}>
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: YPA_BLUE }} />
+            {ECOSYSTEM.length} pillars
           </span>
         </div>
       </ScrollReveal>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
-        {EXPLORE.map((item, i) => (
-          <ScrollReveal key={i} delay={i * 0.04} className={item.tall ? "sm:row-span-2" : ""}>
-            <Link href={item.href} className="group block h-full">
-              <div
-                className={`relative h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] ${
-                  item.tall ? "min-h-[280px] sm:min-h-[320px]" : "min-h-[200px] sm:min-h-[220px]"
-                }`}
-              >
-                <img
-                  src={item.image}
-                  alt={item.label}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  onError={(e) => {
-                    e.currentTarget.src = FALLBACK_IMAGES.default;
-                  }}
-                />
+        {ECOSYSTEM.map((item, i) => {
+          const Icon = item.icon;
+          return (
+            <ScrollReveal key={i} delay={i * 0.04} className={item.tall ? "sm:row-span-2" : ""}>
+              <Link href={item.href} className="group block h-full">
                 <div
-                  className="absolute inset-0"
-                  style={{ background: "linear-gradient(to top, #060B14 18%, rgba(6,11,20,0.45) 55%, rgba(6,11,20,0.2))" }}
-                />
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `linear-gradient(135deg, ${YPA_BLUE}22, transparent 60%)` }}
-                />
+                  className={`relative h-full rounded-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl ${
+                    item.tall ? "min-h-[280px] sm:min-h-[320px]" : "min-h-[200px] sm:min-h-[220px]"
+                  }`}
+                  style={{ boxShadow: `0 4px 20px ${item.color}15` }}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.label}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    onError={(e) => {
+                      e.currentTarget.src = FALLBACK_IMAGES.default;
+                    }}
+                  />
+                  
+                  {/* Gradient overlay with subtle color tint */}
+                  <div
+                    className="absolute inset-0"
+                    style={{ 
+                      background: `linear-gradient(to top, #060B14 18%, rgba(6,11,20,0.45) 55%, rgba(6,11,20,0.2))`,
+                    }}
+                  />
+                  
+                  {/* Color accent overlay on hover */}
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-60 transition-opacity duration-500"
+                    style={{ background: `linear-gradient(135deg, ${item.color}33, transparent 70%)` }}
+                  />
 
-                <div className="relative h-full flex flex-col justify-end p-4 md:p-6">
-                  <p className={`${display.className} text-base md:text-lg font-medium leading-snug text-white line-clamp-2`}>
-                    {item.q}
-                  </p>
-                  <div className="flex items-center justify-between mt-3 md:mt-5">
-                    <span className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.12em] uppercase text-white/60`}>
-                      {item.label}
-                    </span>
+                  {/* Category tag */}
+                  <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5">
                     <span
-                      className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 shrink-0 bg-[#00AEEF]"
+                      className={`${mono.className} text-[8px] md:text-[9px] tracking-[0.15em] uppercase px-2.5 py-1 rounded-full backdrop-blur-sm border flex items-center gap-1.5`}
+                      style={{ 
+                        background: `${item.color}22`, 
+                        borderColor: `${item.color}40`,
+                        color: item.color 
+                      }}
                     >
-                      <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4 text-white" />
+                      <Icon className="h-3 w-3" />
+                      {item.tag}
                     </span>
                   </div>
+
+                  {/* Content */}
+                  <div className="relative h-full flex flex-col justify-end p-4 md:p-6">
+                    <p className={`${display.className} text-base md:text-lg font-medium leading-snug text-white line-clamp-2`}>
+                      {item.q}
+                    </p>
+                    <div className="flex items-center justify-between mt-3 md:mt-5">
+                      <span className={`${mono.className} text-[9px] md:text-[10px] tracking-[0.12em] uppercase text-white/70 group-hover:text-white transition-colors`}>
+                        {item.label}
+                      </span>
+                      <motion.span
+                        className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full transition-all duration-300 shrink-0"
+                        style={{ background: item.color }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4 text-white" />
+                      </motion.span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          </ScrollReveal>
-        ))}
+              </Link>
+            </ScrollReveal>
+          );
+        })}
       </div>
     </section>
   );
@@ -1339,7 +1434,7 @@ const CONFIG_CARDS = [
     icon: Users,
     name: "SACCO",
     tag: "Finance",
-    stat: "1K+",
+    stat: "18K+",
     statLabel: "members",
     specs: ["12 branches nationwide", "Loans built for farmers", "Member-owned since 2014"],
     href: "/sacco",
