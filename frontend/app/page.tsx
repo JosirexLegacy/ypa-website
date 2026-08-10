@@ -260,7 +260,7 @@ const LINEUP = [
   {
     kicker: "Programme 01 — Goats & Livestock",
     tag: "Goats",
-    line: "Africa's leading goat farmers, managing over 130,000 goats with professional herders, vets, and insurance — so members farm without the guesswork.",
+    line: "Africa's leading goat farmers, managing over 130,000 goats with professional herders, vets, and insurance so members farm without the guesswork.",
     specs: [
       { label: "Goats managed", value: "130,000+" },
       { label: "Member success", value: "95%" },
@@ -272,7 +272,7 @@ const LINEUP = [
   {
     kicker: "Programme 02 — Maize & Cropping",
     tag: "Maize",
-    line: "Thousands of acres farmed under structured agreements — quality inputs, trained agronomists, and buyers lined up before planting even starts.",
+    line: "Thousands of acres farmed under structured agreements quality inputs, trained agronomists, and buyers lined up before planting even starts.",
     specs: [
       { label: "Land farmed", value: "5,000+ acres" },
       { label: "Support", value: "Agronomist-led" },
@@ -773,7 +773,7 @@ const Hero = () => {
               className={`${display.className} text-4xl sm:text-5xl md:text-6xl lg:text-[5.25rem] font-medium leading-[0.98] tracking-tight max-w-3xl`}
               style={{ color: "#F5F6F7" }}
             >
-              Africa's{" "}
+              Africa's{"GREATEST"}
               <span
                 className={`${serif.className} italic relative inline-block`}
                 style={{
@@ -797,7 +797,7 @@ const Hero = () => {
               className={`${inter.className} mt-5 text-sm sm:text-base md:text-lg font-light max-w-lg leading-relaxed`}
               style={{ color: "rgba(245,246,247,0.62)" }}
             >
-              We manage farms, build profitable agricultural projects, and empower individuals and communities through modern agribusiness — real land, real livestock, real people, run with operational discipline.
+              We manage farms, build profitable agricultural projects, and empower individuals and communities through modern agribusiness real land, real livestock, real people, run with operational discipline.
             </p>
           </motion.div>
 
