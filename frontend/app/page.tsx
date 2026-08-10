@@ -260,7 +260,7 @@ const LINEUP = [
   {
     kicker: "Programme 01 — Goats & Livestock",
     tag: "Goats",
-    line: "Africa's leading goat farmers, managing over 130,000 goats with professional herders, vets, and insurance — so members farm without the guesswork.",
+    line: "Africa's leading goat farmers, managing over 130,000 goats with professional herders, vets, and insurance so members farm without the guesswork.",
     specs: [
       { label: "Goats managed", value: "130,000+" },
       { label: "Member success", value: "95%" },
@@ -272,7 +272,7 @@ const LINEUP = [
   {
     kicker: "Programme 02 — Maize & Cropping",
     tag: "Maize",
-    line: "Thousands of acres farmed under structured agreements — quality inputs, trained agronomists, and buyers lined up before planting even starts.",
+    line: "Thousands of acres farmed under structured agreements quality inputs, trained agronomists, and buyers lined up before planting even starts.",
     specs: [
       { label: "Land farmed", value: "5,000+ acres" },
       { label: "Support", value: "Agronomist-led" },
@@ -1241,7 +1241,7 @@ const ECOSYSTEM = [
   {
     q: "The complete YPA ecosystem — how everything connects",
     label: "The YPA Ecosystem",
-    href: "/ecosystem",
+    href: "projects",
     tall: true,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
     color: YPA_BLUE,
@@ -1261,7 +1261,7 @@ const ECOSYSTEM = [
   {
     q: "Save, invest, and grow with YPA Wealth Depot",
     label: "YPA Wealth Depot",
-    href: "/sacco",
+    href: "https://ypa-wealth-depot.vercel.app/",
     tall: false,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784727031/54b61dc1-469f-4363-8a52-4de7e285fa1b.jpg",
     color: YPA_BLUE_LIGHT,
@@ -1291,7 +1291,7 @@ const ECOSYSTEM = [
   {
     q: "Experience farm-to-table at Mbuzi Choma Restaurant",
     label: "Mbuzi Choma Restaurant",
-    href: "/mbuzi-choma",
+    href: "/sister-companies/mbuzi-choma",
     tall: false,
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726488/2d86272b-4d19-41b6-b35e-7431ca4d7b7f.jpg",
     color: "#EF4444",
@@ -1407,22 +1407,37 @@ const ExploreRail = () => {
 };
 
 // ============================================================
-// THE LINEUP
+// THE LINEUP - Updated with all projects
 // ============================================================
 const CONFIG_CARDS = [
   {
     icon: Sprout,
-    name: "Goats",
-    tag: "Livestock",
-    stat: "130K+",
-    statLabel: "under care",
-    specs: ["Mubende × Boer × Kalahari", "95% member success rate", "Guaranteed market access"],
-    href: "/projects/goats",
+    name: "Agribusiness Projects",
+    tag: "Overview",
+    stat: "4",
+    statLabel: "projects",
+    specs: [
+      "Comprehensive agricultural solutions",
+      "End-to-end project management",
+      "Sustainable farming practices",
+      "Community-driven development"
+    ],
+    href: "/projects",
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803485/farrrrm_jgvw4n.webp",
   },
   {
+    icon: Sprout,
+    name: "Mighty YPA Goats",
+    tag: "Livestock",
+    stat: "130K+",
+    statLabel: "goats under care",
+    specs: ["Mubende × Boer × Kalahari", "95% member success rate", "Guaranteed market access"],
+    href: "/projects/goats",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717058/45fe9ef5-891c-40ff-87b1-d0eda8eb6a73.jpg",
+  },
+  {
     icon: Leaf,
-    name: "Maize",
+    name: "Maize Farming",
     tag: "Cropping",
     stat: "5K+",
     statLabel: "acres cultivated",
@@ -1431,11 +1446,41 @@ const CONFIG_CARDS = [
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
   },
   {
+    icon: Building,
+    name: "CDC",
+    tag: "Development",
+    stat: "12",
+    statLabel: "community projects",
+    specs: [
+      "Community Development Centers",
+      "Skills training programs",
+      "Local economic empowerment",
+      "Youth capacity building"
+    ],
+    href: "/cdc",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg",
+  },
+  {
+    icon: Home,
+    name: "YPA Dream Homes",
+    tag: "Housing",
+    stat: "500+",
+    statLabel: "families housed",
+    specs: [
+      "Affordable housing solutions",
+      "Quality construction standards",
+      "Community-based development",
+      "Sustainable living environments"
+    ],
+    href: "/dream-homes",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726488/2d86272b-4d19-41b6-b35e-7431ca4d7b7f.jpg",
+  },
+  {
     icon: Users,
-    name: "SACCO",
+    name: "YPA SACCO",
     tag: "Finance",
     stat: "18K+",
-    statLabel: "members",
+    statLabel: "active members",
     specs: ["12 branches nationwide", "Loans built for farmers", "Member-owned since 2014"],
     href: "/sacco",
     image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784717198/508159ef-6c90-4578-b1fb-dff1534873f4.jpg",
@@ -1444,89 +1489,162 @@ const CONFIG_CARDS = [
 
 const TheLineup = () => {
   const [hover, setHover] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const cardsPerPage = 3;
+  const totalPages = Math.ceil(CONFIG_CARDS.length / cardsPerPage);
+
+  const nextPage = () => {
+    setCurrentPage((prev) => (prev + 1) % totalPages);
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+  };
+
+  const currentCards = CONFIG_CARDS.slice(
+    currentPage * cardsPerPage,
+    (currentPage + 1) * cardsPerPage
+  );
 
   return (
     <section id="lineup" className="px-5 md:px-14 py-16 md:py-24 bg-[#111111]">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
-          <div className={`${display.className} text-[11px] md:text-[13px] text-white/40 mb-2`}>
-            Three programmes, one platform
+          <div className="flex items-end justify-between flex-wrap gap-3">
+            <div>
+              <div className={`${display.className} text-[11px] md:text-[13px] text-white/40 mb-2`}>
+                Six programmes, one platform
+              </div>
+              <h2 className={`${display.className} text-2xl md:text-3xl lg:text-5xl font-medium tracking-tight text-white max-w-2xl`}>
+                The Lineup
+              </h2>
+              <p className="text-white/40 text-sm mt-2 max-w-lg">
+                Explore our comprehensive agricultural and development projects
+              </p>
+            </div>
+            
+            {/* Navigation Controls */}
+            <div className="flex items-center gap-2">
+              <span className={`${mono.className} text-[11px] text-white/30`}>
+                {String(currentPage + 1).padStart(2, "0")} / {String(totalPages).padStart(2, "0")}
+              </span>
+              <div className="flex gap-1">
+                <button
+                  onClick={prevPage}
+                  className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center transition-colors hover:bg-white/10 hover:border-white/20"
+                  aria-label="Previous"
+                >
+                  <ChevronLeft className="w-4 h-4 text-white/60" />
+                </button>
+                <button
+                  onClick={nextPage}
+                  className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center transition-colors hover:bg-white/10 hover:border-white/20"
+                  aria-label="Next"
+                >
+                  <ChevronRight className="w-4 h-4 text-white/60" />
+                </button>
+              </div>
+            </div>
           </div>
-          <h2 className={`${display.className} text-2xl md:text-3xl lg:text-5xl font-medium tracking-tight text-white max-w-2xl`}>
-            The Lineup
-          </h2>
         </ScrollReveal>
 
-        <div className="mt-8 md:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {CONFIG_CARDS.map((c, i) => {
-            const Icon = c.icon;
-            const isHover = hover === i;
-            return (
-              <ScrollReveal key={i} delay={i * 0.08}>
-                <Link
-                  href={c.href}
-                  onMouseEnter={() => setHover(i)}
-                  onMouseLeave={() => setHover(null)}
-                  className="group block relative rounded-2xl overflow-hidden border border-[#1F3B57] h-[340px] sm:h-[380px] lg:h-[420px]"
-                >
-                  <img
-                    src={c.image}
-                    alt={c.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      e.currentTarget.src = FALLBACK_IMAGES.goats;
-                    }}
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{ background: "linear-gradient(to top, #060B14 15%, rgba(6,11,20,0.35) 55%, rgba(6,11,20,0.55))" }}
-                  />
+        <div className="mt-8 md:mt-12">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentPage}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
+            >
+              {currentCards.map((c, i) => {
+                const Icon = c.icon;
+                const isHover = hover === (currentPage * cardsPerPage + i);
+                return (
+                  <ScrollReveal key={i} delay={i * 0.08}>
+                    <Link
+                      href={c.href}
+                      onMouseEnter={() => setHover(currentPage * cardsPerPage + i)}
+                      onMouseLeave={() => setHover(null)}
+                      className="group block relative rounded-2xl overflow-hidden border border-[#1F3B57] h-[340px] sm:h-[380px] lg:h-[420px]"
+                    >
+                      <img
+                        src={c.image}
+                        alt={c.name}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.src = FALLBACK_IMAGES.goats;
+                        }}
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: "linear-gradient(to top, #060B14 15%, rgba(6,11,20,0.35) 55%, rgba(6,11,20,0.55))" }}
+                      />
 
-                  <div className="relative h-full flex flex-col justify-between p-4 md:p-6">
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`${mono.className} inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase text-white/80 bg-white/10 backdrop-blur-sm`}
-                      >
-                        <Icon className="h-3 w-3" />
-                        {c.tag}
-                      </span>
-                      <ArrowUpRight className="h-4 w-4 md:h-5 md:w-5 text-white/60 transition-all group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </div>
+                      <div className="relative h-full flex flex-col justify-between p-4 md:p-6">
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`${mono.className} inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[8px] md:text-[10px] tracking-[0.1em] uppercase text-white/80 bg-white/10 backdrop-blur-sm`}
+                          >
+                            <Icon className="h-3 w-3" />
+                            {c.tag}
+                          </span>
+                          <ArrowUpRight className="h-4 w-4 md:h-5 md:w-5 text-white/60 transition-all group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        </div>
 
-                    <div>
-                      <div className={`${mono.className} text-2xl md:text-3xl text-white font-medium`}>
-                        {c.stat}
-                        <span className="text-xs md:text-sm text-white/50 ml-1 md:ml-2 font-normal">{c.statLabel}</span>
+                        <div>
+                          <div className={`${mono.className} text-2xl md:text-3xl text-white font-medium`}>
+                            {c.stat}
+                            <span className="text-xs md:text-sm text-white/50 ml-1 md:ml-2 font-normal">{c.statLabel}</span>
+                          </div>
+                          <h3 className={`${display.className} text-xl md:text-2xl text-white font-medium mt-0.5`}>{c.name}</h3>
+
+                          <motion.div
+                            initial={false}
+                            animate={{ height: isHover ? "auto" : 0, opacity: isHover ? 1 : 0 }}
+                            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <ul className="mt-3 space-y-1 pt-3 border-t border-white/10">
+                              {c.specs.map((s, si) => (
+                                <li key={si} className="flex items-center gap-2 text-xs text-white/65">
+                                  <span className="h-1 w-1 rounded-full bg-[#00AEEF]" />
+                                  {s}
+                                </li>
+                              ))}
+                            </ul>
+                          </motion.div>
+                        </div>
                       </div>
-                      <h3 className={`${display.className} text-xl md:text-2xl text-white font-medium mt-0.5`}>{c.name}</h3>
+                    </Link>
+                  </ScrollReveal>
+                );
+              })}
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-                      <motion.div
-                        initial={false}
-                        animate={{ height: isHover ? "auto" : 0, opacity: isHover ? 1 : 0 }}
-                        transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <ul className="mt-3 space-y-1 pt-3 border-t border-white/10">
-                          {c.specs.map((s, si) => (
-                            <li key={si} className="flex items-center gap-2 text-xs text-white/65">
-                              <span className="h-1 w-1 rounded-full bg-[#00AEEF]" />
-                              {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </motion.div>
-                    </div>
-                  </div>
-                </Link>
-              </ScrollReveal>
-            );
-          })}
+        {/* Pagination Dots */}
+        <div className="flex justify-center gap-2 mt-8">
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentPage(index)}
+              className="transition-all duration-300 rounded-full"
+              style={{
+                width: index === currentPage ? "24px" : "8px",
+                height: "8px",
+                background: index === currentPage ? GOLD : "rgba(255,255,255,0.15)",
+              }}
+              aria-label={`Go to page ${index + 1}`}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 };
-
 // ============================================================
 // WHY CHOOSE YPA
 // ============================================================
