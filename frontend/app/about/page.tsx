@@ -6,26 +6,26 @@ import { Footer } from "@/components/Footer";
 import { Space_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
 import { motion, useInView, useScroll, useTransform, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
-import { ArrowUpRight, ChevronDown, ChevronRight, Target, Globe, Users, Clock, Heart, Handshake, MapPin, ShieldCheck, Plus, Radio, Satellite } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronRight, Target, Globe, Users, Clock, Heart, Handshake, MapPin, ShieldCheck, Plus, Quote } from "lucide-react";
 
 // ============================================================
-// FONTS — display + mono carry the whole identity. No serif.
+// FONTS
 // ============================================================
 const display = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display" });
 const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono" });
 const inter = Inter({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-inter" });
 
 // ============================================================
-// TOKENS — same brand identity, executed as live telemetry
+// TOKENS — same brand colors, softer execution
 // ============================================================
-const SIGNAL = "#00AEEF";   // YPA blue — the "live" color
-const HARVEST = "#F0B429";  // YPA gold — the "value" color
-const VOID = "#050608";     // base canvas
-const PANEL = "#0A0D12";    // raised panel
-const PANEL_2 = "#0D1219";  // alt panel
-const LINE = "rgba(0,174,239,0.16)";
+const SIGNAL = "#00AEEF";
+const HARVEST = "#F0B429";
+const VOID = "#07080B";
+const PANEL = "#0B0E13";
 const LINE_SOFT = "rgba(255,255,255,0.08)";
-const FOG = "rgba(245,246,247,0.56)";
+const GLOW_BLUE = "rgba(0,174,239,0.14)";
+const GLOW_GOLD = "rgba(240,180,41,0.12)";
+const FOG = "rgba(245,246,247,0.6)";
 const WHITE = "#F5F6F7";
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -47,7 +47,7 @@ async function getFAQs() {
 }
 
 // ============================================================
-// REAL PHOTOGRAPHY
+// PHOTOGRAPHY
 // ============================================================
 const PHOTOS = {
   hero: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg",
@@ -70,70 +70,47 @@ const PHOTOS = {
 // ============================================================
 function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, margin: "-60px" });
   const reduce = useReducedMotion();
   return (
-    <motion.div ref={ref} initial={reduce ? {} : { opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 20 }} transition={{ duration: reduce ? 0 : 0.6, delay: reduce ? 0 : delay, ease: EASE }} className={className}>
+    <motion.div ref={ref} initial={reduce ? {} : { opacity: 0, y: 18 }} animate={inView ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 18 }} transition={{ duration: reduce ? 0 : 0.7, delay: reduce ? 0 : delay, ease: EASE }} className={className}>
       {children}
     </motion.div>
   );
 }
 
-// Section eyebrow — reads like a telemetry channel tag, not a magazine kicker
-function Kicker({ tag, children }: { tag?: string; children: React.ReactNode }) {
+function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2.5">
-      <span className="relative flex h-1.5 w-1.5 shrink-0">
-        <span className="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping" style={{ background: SIGNAL }} />
-        <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: SIGNAL }} />
-      </span>
-      {tag && <span className={`${mono.className} text-[10px] tracking-[0.18em]`} style={{ color: SIGNAL }}>{tag}</span>}
-      <span className={`${mono.className} text-[10px] md:text-[11px] font-medium uppercase tracking-[0.22em]`} style={{ color: FOG }}>{children}</span>
+    <div className="flex items-center gap-2">
+      <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: SIGNAL, boxShadow: `0 0 8px ${SIGNAL}` }} />
+      <span className={`${mono.className} text-[10px] md:text-[11px] font-medium uppercase tracking-[0.2em]`} style={{ color: FOG }}>{children}</span>
     </div>
   );
 }
 
-// Ambient dot-grid field for dark panels — the telemetry "map" texture
-function GridField({ opacity = 1 }: { opacity?: number }) {
+// Soft ambient glow field — replaces the dot-grid; reads as depth, not tech
+function GlowField({ variant = "blue" }: { variant?: "blue" | "gold" | "mixed" }) {
   return (
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        opacity,
-        backgroundImage: `radial-gradient(${LINE} 1px, transparent 1px)`,
-        backgroundSize: "28px 28px",
-        maskImage: "radial-gradient(ellipse 90% 70% at 50% 30%, black 30%, transparent 85%)",
-        WebkitMaskImage: "radial-gradient(ellipse 90% 70% at 50% 30%, black 30%, transparent 85%)",
-      }}
-    />
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {(variant === "blue" || variant === "mixed") && (
+        <div className="absolute -top-1/4 left-[10%] w-[50%] h-[60%] rounded-full blur-[110px]" style={{ background: GLOW_BLUE }} />
+      )}
+      {(variant === "gold" || variant === "mixed") && (
+        <div className="absolute -bottom-1/4 right-[8%] w-[45%] h-[55%] rounded-full blur-[110px]" style={{ background: GLOW_GOLD }} />
+      )}
+    </div>
   );
 }
 
-// Horizontal scan sweep — the signature motion motif, used sparingly
-function ScanSweep({ className = "" }: { className?: string }) {
-  const reduce = useReducedMotion();
-  if (reduce) return null;
-  return (
-    <motion.div
-      aria-hidden
-      className={`absolute left-0 right-0 h-px pointer-events-none ${className}`}
-      style={{ background: `linear-gradient(90deg, transparent, ${SIGNAL}, transparent)`, boxShadow: `0 0 12px 1px ${SIGNAL}80` }}
-      initial={{ top: "0%" }}
-      animate={{ top: ["0%", "100%"] }}
-      transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-    />
-  );
-}
-
-// Corner-bracket frame — the signature photo treatment (drone-feed reticle)
-function TelemetryFrame({
+// Photo treatment — rounded, soft-bordered, gentle caption. No brackets, no scanlines.
+function Frame({
   src,
   alt,
   caption,
   className = "",
   imgClassName = "w-full h-full object-cover",
-  grayscale = 0.25,
-  sweep = false,
+  grayscale = 0.15,
+  rounded = "rounded-2xl md:rounded-3xl",
 }: {
   src: string;
   alt: string;
@@ -141,37 +118,31 @@ function TelemetryFrame({
   className?: string;
   imgClassName?: string;
   grayscale?: number;
-  sweep?: boolean;
+  rounded?: string;
 }) {
-  const corner = "absolute w-4 h-4 border-current";
   return (
-    <div className={`relative overflow-hidden ${className}`} style={{ background: PANEL }}>
-      <img src={src} alt={alt} className={imgClassName} style={{ filter: `grayscale(${grayscale}) contrast(1.05) saturate(1.05)` }} />
-      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(5,6,8,0) 55%, rgba(5,6,8,0.55) 100%)` }} />
-      {sweep && <ScanSweep />}
-      <span className={`${corner} top-2 left-2 border-t border-l`} style={{ color: SIGNAL }} />
-      <span className={`${corner} top-2 right-2 border-t border-r`} style={{ color: SIGNAL }} />
-      <span className={`${corner} bottom-2 left-2 border-b border-l`} style={{ color: SIGNAL }} />
-      <span className={`${corner} bottom-2 right-2 border-b border-r`} style={{ color: SIGNAL }} />
+    <div className={`relative overflow-hidden ${rounded} ${className}`} style={{ background: PANEL, border: `1px solid ${LINE_SOFT}` }}>
+      <img src={src} alt={alt} className={imgClassName} style={{ filter: `grayscale(${grayscale}) contrast(1.03)` }} loading="lazy" />
       {caption && (
-        <span className={`${mono.className} absolute bottom-2.5 left-3 right-3 text-[9px] tracking-[0.14em] uppercase truncate`} style={{ color: "rgba(245,246,247,0.75)" }}>
-          {caption}
-        </span>
+        <>
+          <div className="absolute inset-x-0 bottom-0 h-16" style={{ background: "linear-gradient(180deg, transparent, rgba(5,6,8,0.75))" }} />
+          <span className={`${mono.className} absolute bottom-3 left-4 right-4 text-[9px] tracking-[0.12em] uppercase truncate`} style={{ color: "rgba(245,246,247,0.8)" }}>
+            {caption}
+          </span>
+        </>
       )}
     </div>
   );
 }
 
-function HudBadge({ label = "YPA // EST. 2008" }: { label?: string }) {
+function HudBadge({ label = "Youth Platform Africa · Est. 2008" }: { label?: string }) {
   const reduce = useReducedMotion();
   return (
-    <motion.div initial={reduce ? {} : { opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }} className="relative inline-flex items-center gap-2.5 pl-3 pr-4 py-1.5 w-fit" style={{ background: "rgba(0,174,239,0.06)", border: `1px solid ${LINE}` }}>
-      <span className="absolute -top-px -left-px w-2 h-2 border-t border-l" style={{ borderColor: SIGNAL }} />
-      <span className="absolute -bottom-px -right-px w-2 h-2 border-b border-r" style={{ borderColor: SIGNAL }} />
-      <motion.span animate={reduce ? {} : { opacity: [1, 0.35, 1] }} transition={{ duration: 1.8, repeat: Infinity }}>
-        <Satellite className="h-3.5 w-3.5" style={{ color: SIGNAL }} strokeWidth={1.75} />
-      </motion.span>
-      <span className={`${mono.className} text-[10px] sm:text-[11px] tracking-[0.16em] uppercase font-medium whitespace-nowrap`} style={{ color: SIGNAL }}>{label}</span>
+    <motion.div initial={reduce ? {} : { opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE }} className="inline-flex items-center gap-2.5 rounded-full pl-2.5 pr-4 py-1.5 w-fit" style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${LINE_SOFT}`, backdropFilter: "blur(8px)" }}>
+      <span className="relative flex h-5 w-5 items-center justify-center rounded-full shrink-0" style={{ background: SIGNAL }}>
+        <motion.span className="absolute inset-0 rounded-full" style={{ background: SIGNAL }} animate={reduce ? {} : { scale: [1, 1.7], opacity: [0.5, 0] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut" }} />
+      </span>
+      <span className={`${inter.className} text-[11px] sm:text-xs tracking-wide font-medium whitespace-nowrap`} style={{ color: WHITE }}>{label}</span>
     </motion.div>
   );
 }
@@ -182,37 +153,38 @@ function MorphButton({ href, idleText, revealText, variant = "solid", icon: Icon
   return (
     <Link href={href} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onFocus={() => setHover(true)} onBlur={() => setHover(false)}>
       <motion.div
-        className={`${mono.className} relative overflow-hidden inline-flex items-center h-12 text-xs uppercase tracking-[0.1em] font-medium cursor-pointer select-none`}
-        style={solid ? { background: SIGNAL, color: VOID, clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)" } : { border: `1px solid rgba(240,180,41,0.5)`, color: WHITE, clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)" }}
-        animate={{ paddingLeft: 22, paddingRight: hover ? 18 : 22, boxShadow: solid && hover ? `0 0 26px ${SIGNAL}60` : "0 0 0px transparent" }}
+        className={`${inter.className} relative overflow-hidden inline-flex items-center h-12 rounded-full text-sm font-medium cursor-pointer select-none`}
+        style={solid ? { background: SIGNAL, color: VOID } : { border: `1px solid rgba(240,180,41,0.45)`, color: WHITE }}
+        animate={{ paddingLeft: 24, paddingRight: hover ? 20 : 24, boxShadow: solid && hover ? `0 0 28px ${SIGNAL}55` : "0 0 0px transparent" }}
         transition={{ duration: 0.4, ease: EASE }}
       >
-        <span className="relative h-4 overflow-hidden">
-          <motion.span className="block" animate={{ y: hover ? -18 : 0 }} transition={{ duration: 0.32, ease: EASE }}>{idleText}</motion.span>
-          <motion.span className="block absolute top-0 left-0 whitespace-nowrap" animate={{ y: hover ? 0 : 18 }} transition={{ duration: 0.32, ease: EASE }}>{revealText}</motion.span>
+        <span className="relative h-5 overflow-hidden">
+          <motion.span className="block" animate={{ y: hover ? -20 : 0 }} transition={{ duration: 0.35, ease: EASE }}>{idleText}</motion.span>
+          <motion.span className="block absolute top-0 left-0 whitespace-nowrap" animate={{ y: hover ? 0 : 20 }} transition={{ duration: 0.35, ease: EASE }}>{revealText}</motion.span>
         </span>
-        <motion.span className="ml-2 flex items-center" animate={{ rotate: hover ? 45 : 0 }} transition={{ duration: 0.32 }}><Icon className="h-3.5 w-3.5" style={!solid ? { color: HARVEST } : {}} /></motion.span>
+        <motion.span className="ml-2 flex items-center" animate={{ rotate: hover ? 45 : 0 }} transition={{ duration: 0.35 }}><Icon className="h-4 w-4" style={!solid ? { color: HARVEST } : {}} /></motion.span>
       </motion.div>
     </Link>
   );
 }
 
 // ============================================================
-// SectionNav — HUD channel selector
+// SectionNav
 // ============================================================
 const SECTIONS = [
-  { id: "quote", label: "Log" },
-  { id: "story", label: "Origin" },
-  { id: "people", label: "Crew" },
+  { id: "story", label: "Story" },
+  { id: "welcome", label: "Welcome" },
+  { id: "people", label: "People" },
   { id: "purpose", label: "Purpose" },
-  { id: "values", label: "Protocol" },
+  { id: "values", label: "Values" },
   { id: "timeline", label: "Timeline" },
-  { id: "trust", label: "Records" },
+  { id: "voices", label: "Voices" },
+  { id: "trust", label: "Trust" },
   { id: "faq", label: "FAQ" },
 ];
 
 function SectionNav() {
-  const [active, setActive] = useState("quote");
+  const [active, setActive] = useState("story");
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const hero = document.getElementById("hero");
@@ -231,11 +203,11 @@ function SectionNav() {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3 }} className="hidden md:flex fixed top-20 left-1/2 -translate-x-1/2 z-40 items-center gap-0.5 p-1" style={{ background: "rgba(5,6,8,0.9)", backdropFilter: "blur(14px)", border: `1px solid ${LINE}`, boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 24px rgba(0,174,239,0.08)` }}>
-          {SECTIONS.map((s, i) => (
-            <button key={s.id} onClick={() => jump(s.id)} className={`${mono.className} relative px-3.5 py-2 text-[10px] tracking-[0.08em] uppercase font-medium transition-colors`} style={{ color: active === s.id ? VOID : "rgba(255,255,255,0.5)" }}>
-              {active === s.id && <motion.span layoutId="navpill" className="absolute inset-0" style={{ background: SIGNAL, boxShadow: `0 0 16px ${SIGNAL}80` }} transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
-              <span className="relative z-10">{String(i + 1).padStart(2, "0")}·{s.label}</span>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3 }} className="hidden lg:flex fixed top-20 left-1/2 -translate-x-1/2 z-40 items-center gap-0.5 p-1 rounded-full" style={{ background: "rgba(7,8,11,0.85)", backdropFilter: "blur(16px)", border: `1px solid ${LINE_SOFT}`, boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}>
+          {SECTIONS.map((s) => (
+            <button key={s.id} onClick={() => jump(s.id)} className={`${inter.className} relative px-3.5 py-2 text-[11px] font-medium rounded-full transition-colors`} style={{ color: active === s.id ? VOID : "rgba(255,255,255,0.55)" }}>
+              {active === s.id && <motion.span layoutId="navpill" className="absolute inset-0 rounded-full" style={{ background: SIGNAL }} transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
+              <span className="relative z-10">{s.label}</span>
             </button>
           ))}
         </motion.div>
@@ -245,50 +217,38 @@ function SectionNav() {
 }
 
 // ============================================================
-// HERO — live feed framing, cyan signal duotone
+// HERO
 // ============================================================
 function Hero() {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "16%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.9], [1, 0]);
   const reduce = useReducedMotion();
   return (
-    <section id="hero" ref={ref} className="relative h-[96vh] min-h-[640px] overflow-hidden" style={{ background: VOID }}>
+    <section id="hero" ref={ref} className="relative h-[92vh] min-h-[560px] overflow-hidden" style={{ background: VOID }}>
       <motion.div style={reduce ? {} : { y }} className="absolute inset-0">
-        <img src={PHOTOS.hero} alt="" className="w-full h-full object-cover scale-110" style={{ filter: "grayscale(0.75) brightness(0.38) contrast(1.15)" }} />
+        <img src={PHOTOS.hero} alt="" className="w-full h-full object-cover scale-110" style={{ filter: "brightness(0.5) contrast(1.05)" }} />
       </motion.div>
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 25% 35%, rgba(0,174,239,0.22), transparent 65%)`, mixBlendMode: "screen" }} />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(5,6,8,0.2) 0%, rgba(5,6,8,0.92) 100%)" }} />
-      <GridField opacity={0.5} />
-      <ScanSweep />
-
-      {/* frame border */}
-      <div className="absolute inset-4 md:inset-6 border pointer-events-none" style={{ borderColor: LINE }} />
-      <span className="absolute top-4 left-4 md:top-6 md:left-6 w-5 h-5 border-t-2 border-l-2" style={{ borderColor: SIGNAL }} />
-      <span className="absolute top-4 right-4 md:top-6 md:right-6 w-5 h-5 border-t-2 border-r-2" style={{ borderColor: SIGNAL }} />
-      <span className="absolute bottom-4 left-4 md:bottom-6 md:left-6 w-5 h-5 border-b-2 border-l-2" style={{ borderColor: HARVEST }} />
-      <span className="absolute bottom-4 right-4 md:bottom-6 md:right-6 w-5 h-5 border-b-2 border-r-2" style={{ borderColor: HARVEST }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 25% 30%, rgba(0,174,239,0.16), transparent 60%)` }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(7,8,11,0.25) 0%, rgba(7,8,11,0.92) 100%)" }} />
 
       <div className="relative z-10 h-full flex flex-col">
-        <div className="flex-1 flex items-start justify-between px-8 md:px-20 pt-28 md:pt-32">
+        <div className="pt-24 md:pt-32 px-5 sm:px-8 md:px-16">
           <Reveal><HudBadge /></Reveal>
-          <Reveal delay={0.1} className="hidden sm:block text-right">
-            <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: FOG }}>Feed 01 — Central Region, UG</span>
-          </Reveal>
         </div>
-        <motion.div style={reduce ? {} : { opacity }} className="px-8 md:px-20 pb-16 md:pb-24">
+        <motion.div style={reduce ? {} : { opacity }} className="flex-1 flex flex-col justify-end px-5 sm:px-8 md:px-16 pb-14 md:pb-24">
           <Reveal>
-            <h1 className={`${display.className} text-white font-medium leading-[0.94] tracking-tight text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl max-w-4xl`}>
+            <h1 className={`${display.className} text-white font-medium leading-[0.98] tracking-tight text-[12vw] sm:text-6xl md:text-7xl lg:text-[5.5rem] max-w-4xl`}>
               21 people.
               <br />
-              <span style={{ color: SIGNAL }}>One signal that scaled.</span>
+              <span style={{ color: SIGNAL }}>One idea that grew.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.15}>
-            <div className="mt-8 flex flex-wrap items-end gap-6">
-              <MorphButton href="#story" idleText="Read the log" revealText="Scroll down" icon={ChevronDown} />
-              <span className={`${mono.className} text-[11px] tracking-[0.05em] font-light max-w-xs leading-relaxed`} style={{ color: FOG }}>A Pan-African agribusiness platform — tracked from a village group to 12 branches, in real coordinates.</span>
+            <div className="mt-7 md:mt-8 flex flex-wrap items-end gap-5 md:gap-6">
+              <MorphButton href="#story" idleText="Read our story" revealText="Scroll down" icon={ChevronDown} />
+              <span className={`${inter.className} text-sm font-light max-w-xs leading-relaxed`} style={{ color: FOG }}>A Pan-African agribusiness platform, from a village group to 12 branches and counting.</span>
             </div>
           </Reveal>
         </motion.div>
@@ -298,51 +258,22 @@ function Hero() {
 }
 
 // ============================================================
-// FOUNDING QUOTE — a transmitted log entry, not a magazine spread
-// ============================================================
-function FoundingQuote() {
-  return (
-    <section id="quote" className="relative py-24 md:py-32 px-6 md:px-16 overflow-hidden scroll-mt-24" style={{ background: PANEL }}>
-      <GridField opacity={0.4} />
-      <div className="relative max-w-4xl mx-auto">
-        <Reveal>
-          <div className="flex items-center gap-3 mb-8">
-            <Radio className="h-4 w-4" style={{ color: HARVEST }} strokeWidth={1.75} />
-            <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase`} style={{ color: HARVEST }}>Transmission log — 2008</span>
-          </div>
-        </Reveal>
-        <Reveal delay={0.08}>
-          <p className={`${display.className} text-white text-2xl sm:text-3xl md:text-5xl leading-[1.2] tracking-tight max-w-3xl`}>
-            "We didn't set out to build a company. We set out to solve a problem for the people around us."
-          </p>
-        </Reveal>
-        <Reveal delay={0.16}>
-          <div className="mt-8 flex items-center gap-3">
-            <span className="h-px w-8" style={{ background: LINE }} />
-            <span className={`${mono.className} text-[10px] tracking-[0.18em] uppercase`} style={{ color: FOG }}>YPA — founding group</span>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================
-// STORY — telemetry-framed photo, stat readouts
+// STORY
 // ============================================================
 function Story({ content }: { content: any }) {
   return (
-    <section id="story" className="py-24 md:py-36 px-6 md:px-16 scroll-mt-24 relative" style={{ background: VOID }}>
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_0.85fr] gap-12 lg:gap-16 items-start">
+    <section id="story" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24 relative" style={{ background: VOID }}>
+      <GlowField variant="blue" />
+      <div className="relative max-w-6xl mx-auto grid lg:grid-cols-[1fr_0.85fr] gap-10 lg:gap-16 items-center">
         <div>
-          <Reveal><Kicker tag="00.01">Origin — founded 2008</Kicker></Reveal>
+          <Reveal><Kicker>Founded 2008</Kicker></Reveal>
           <Reveal delay={0.05}>
-            <h2 className={`${display.className} text-3xl md:text-5xl font-medium leading-[1.05] tracking-tight mt-5`} style={{ color: WHITE }}>
+            <h2 className={`${display.className} text-2xl sm:text-3xl md:text-5xl font-medium leading-[1.1] tracking-tight mt-4`} style={{ color: WHITE }}>
               From a village group to a Pan-African platform.
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <div className={`${inter.className} mt-6 text-base md:text-lg font-light leading-relaxed`} style={{ color: FOG }}>
+            <div className={`${inter.className} mt-5 text-[15px] md:text-lg font-light leading-relaxed`} style={{ color: FOG }}>
               {content?.story ? (
                 <div dangerouslySetInnerHTML={{ __html: content.story }} />
               ) : (
@@ -353,12 +284,12 @@ function Story({ content }: { content: any }) {
               )}
             </div>
           </Reveal>
-          <Reveal delay={0.18}>
-            <div className="mt-10 grid grid-cols-3 gap-6 pt-8" style={{ borderTop: `1px solid ${LINE_SOFT}` }}>
-              {[["2008", "Founded"], ["12", "Branches"], ["03", "Countries"]].map(([v, l]) => (
+          <Reveal delay={0.16}>
+            <div className="mt-8 grid grid-cols-3 gap-4 md:gap-6 pt-6" style={{ borderTop: `1px solid ${LINE_SOFT}` }}>
+              {[["2008", "Founded"], ["12", "Branches"], ["3", "Countries"]].map(([v, l]) => (
                 <div key={l}>
-                  <div className={`${mono.className} text-2xl md:text-3xl font-medium`} style={{ color: SIGNAL }}>{v}</div>
-                  <div className={`${mono.className} text-[10px] mt-1.5 uppercase tracking-[0.14em]`} style={{ color: FOG }}>{l}</div>
+                  <div className={`${display.className} text-xl md:text-3xl font-medium`} style={{ color: WHITE }}>{v}</div>
+                  <div className={`${inter.className} text-xs mt-1 font-medium`} style={{ color: FOG }}>{l}</div>
                 </div>
               ))}
             </div>
@@ -366,9 +297,9 @@ function Story({ content }: { content: any }) {
         </div>
 
         <Reveal delay={0.1} className="relative">
-          <TelemetryFrame src={PHOTOS.farm} alt="A YPA farm in Uganda" caption="Feed 02 — Farm Ops, Central Region" className="aspect-[3/4]" grayscale={0.35} />
-          <div className="absolute -bottom-6 -left-6 md:-left-10 w-32 md:w-40">
-            <TelemetryFrame src={PHOTOS.goats} alt="Goats under YPA's care" className="aspect-square shadow-2xl" grayscale={0.35} />
+          <Frame src={PHOTOS.farm} alt="A YPA farm in Uganda" className="aspect-[4/5] md:aspect-[3/4]" grayscale={0.1} />
+          <div className="absolute -bottom-5 -left-5 md:-left-8 w-28 md:w-36">
+            <Frame src={PHOTOS.goats} alt="Goats under YPA's care" className="aspect-square shadow-2xl" grayscale={0.1} />
           </div>
         </Reveal>
       </div>
@@ -377,32 +308,44 @@ function Story({ content }: { content: any }) {
 }
 
 // ============================================================
-// PHOTO INTERLUDE — the actual aerial/drone shot, full HUD treatment
+// WELCOME — a personal note, the human "about us" moment
 // ============================================================
-function PhotoInterlude() {
+function Welcome() {
   return (
-    <section className="relative h-[46vh] min-h-[300px] overflow-hidden" style={{ background: VOID }}>
-      <img src={PHOTOS.aerial} alt="Aerial view of a YPA goat farm" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.2) contrast(1.05)" }} />
-      <div className="absolute inset-0" style={{ background: `linear-gradient(0deg, rgba(5,6,8,0.75) 0%, rgba(5,6,8,0.1) 45%, rgba(5,6,8,0.35) 100%)` }} />
-      <GridField opacity={0.35} />
-      <ScanSweep />
-      <span className="absolute top-5 left-5 w-5 h-5 border-t-2 border-l-2" style={{ borderColor: SIGNAL }} />
-      <span className="absolute top-5 right-5 w-5 h-5 border-t-2 border-r-2" style={{ borderColor: SIGNAL }} />
-      <span className="absolute bottom-5 left-5 w-5 h-5 border-b-2 border-l-2" style={{ borderColor: SIGNAL }} />
-      <span className="absolute bottom-5 right-5 w-5 h-5 border-b-2 border-r-2" style={{ borderColor: SIGNAL }} />
-      <div className="absolute bottom-6 left-8 md:left-16 flex items-center gap-2">
-        <span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full rounded-full opacity-70 animate-ping" style={{ background: HARVEST }} /><span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: HARVEST }} /></span>
-        <span className={`${mono.className} text-[10px] tracking-[0.16em] uppercase`} style={{ color: WHITE }}>Aerial — Mubende District · Goats Programme</span>
+    <section id="welcome" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24" style={{ background: PANEL }}>
+      <div className="max-w-5xl mx-auto grid md:grid-cols-[0.85fr_1.15fr] gap-8 md:gap-14 items-center">
+        <Reveal>
+          <div className="relative max-w-xs mx-auto md:mx-0">
+            <Frame src={PHOTOS.leader1} alt="Obed Ben, Managing Director" className="aspect-[4/5]" grayscale={0.1} />
+            <div className="absolute -bottom-4 -right-4 rounded-full px-4 py-2" style={{ background: SIGNAL }}>
+              <span className={`${inter.className} text-xs font-semibold`} style={{ color: VOID }}>Managing Director</span>
+            </div>
+          </div>
+        </Reveal>
+        <div>
+          <Reveal><Kicker>A note from our founders</Kicker></Reveal>
+          <Reveal delay={0.06}>
+            <Quote className="h-7 w-7 mt-4 mb-3" style={{ color: HARVEST }} strokeWidth={1.5} />
+            <p className={`${display.className} text-xl sm:text-2xl md:text-3xl font-medium leading-[1.35] tracking-tight`} style={{ color: WHITE }}>
+              "We've watched twenty-one people become a movement. Every branch we open, every member who joins, carries the same reason we started — dignity, through honest work."
+            </p>
+          </Reveal>
+          <Reveal delay={0.12}>
+            <div className="mt-6">
+              <div className={`${inter.className} text-sm font-semibold`} style={{ color: WHITE }}>Obed Ben</div>
+              <div className={`${inter.className} text-xs mt-0.5`} style={{ color: FOG }}>Managing Director, Youth Platform Africa</div>
+            </div>
+          </Reveal>
+        </div>
       </div>
-      <span className={`${mono.className} absolute top-6 right-8 md:right-16 text-[9px] tracking-[0.16em] uppercase hidden sm:block`} style={{ color: "rgba(245,246,247,0.55)" }}>ALT 120M · DRONE-04</span>
     </section>
   );
 }
 
 // ============================================================
-// SCALE — HUD readouts against the maize field
+// SCALE
 // ============================================================
-function useCountUp(target: number, active: boolean, duration = 1600) {
+function useCountUp(target: number, active: boolean, duration = 1500) {
   const [n, setN] = useState(0);
   const reduce = useReducedMotion();
   useEffect(() => {
@@ -421,41 +364,40 @@ function useCountUp(target: number, active: boolean, duration = 1600) {
   return n;
 }
 
-function ScaleNumber({ target, suffix, label, code }: { target: number; suffix: string; label: string; code: string }) {
+function ScaleNumber({ target, suffix, label }: { target: number; suffix: string; label: string }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.6 });
   const n = useCountUp(target, inView);
   return (
-    <div ref={ref} className="relative text-center px-6 py-8" style={{ border: `1px solid ${LINE_SOFT}` }}>
-      <span className={`${mono.className} absolute top-3 left-4 text-[9px] tracking-[0.12em]`} style={{ color: "rgba(245,246,247,0.35)" }}>{code}</span>
-      <div className={`${display.className} font-medium tracking-tight text-white text-[14vw] sm:text-6xl md:text-7xl`}>
+    <div ref={ref} className="text-center px-4 py-6">
+      <div className={`${display.className} font-medium tracking-tight text-white text-[13vw] sm:text-6xl md:text-7xl`}>
         {n.toLocaleString()}<span style={{ color: HARVEST }}>{suffix}</span>
       </div>
-      <div className={`${mono.className} mt-3 text-[11px] uppercase tracking-[0.16em]`} style={{ color: FOG }}>{label}</div>
+      <div className={`${inter.className} mt-2.5 text-sm md:text-base font-light`} style={{ color: FOG }}>{label}</div>
     </div>
   );
 }
 
 function Scale() {
   return (
-    <section className="relative py-28 md:py-40 px-6 md:px-16 overflow-hidden" style={{ background: PANEL }}>
-      <img src={PHOTOS.maize} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.85) brightness(0.16) contrast(1.1)" }} />
-      <GridField opacity={0.6} />
-      <div className="relative max-w-5xl mx-auto text-center mb-16 md:mb-24">
-        <Reveal className="flex justify-center"><Kicker tag="00.02">What we've built</Kicker></Reveal>
-        <Reveal delay={0.08}><h2 className={`${display.className} text-white text-3xl md:text-5xl font-medium tracking-tight mt-4`}>The numbers, live.</h2></Reveal>
+    <section className="relative py-20 md:py-32 px-5 sm:px-8 md:px-16 overflow-hidden" style={{ background: VOID }}>
+      <img src={PHOTOS.maize} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "brightness(0.2) contrast(1.05)" }} />
+      <GlowField variant="mixed" />
+      <div className="relative max-w-5xl mx-auto text-center mb-10 md:mb-16">
+        <Reveal className="flex justify-center"><Kicker>What we've built</Kicker></Reveal>
+        <Reveal delay={0.08}><h2 className={`${display.className} text-white text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight mt-3`}>The numbers, plainly.</h2></Reveal>
       </div>
-      <div className="relative max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3">
-        <ScaleNumber target={130000} suffix="+" label="Goats under care" code="TAG-A1" />
-        <ScaleNumber target={12} suffix="" label="Branches, nationwide" code="TAG-B2" />
-        <ScaleNumber target={1000} suffix="+" label="Members empowered" code="TAG-C3" />
+      <div className="relative max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 divide-y sm:divide-y-0 sm:divide-x" style={{ borderColor: LINE_SOFT }}>
+        <ScaleNumber target={130000} suffix="+" label="Goats under care" />
+        <ScaleNumber target={12} suffix="" label="Branches, nationwide" />
+        <ScaleNumber target={1000} suffix="+" label="Members empowered" />
       </div>
     </section>
   );
 }
 
 // ============================================================
-// LEADERSHIP — crew manifest
+// LEADERSHIP
 // ============================================================
 interface Leader { role: string; name: string; bio: string; image: string }
 const LEADERSHIP_PREVIEW: Leader[] = [
@@ -465,63 +407,52 @@ const LEADERSHIP_PREVIEW: Leader[] = [
   { role: "Founding Member", name: "Name pending", bio: "Role summary and credentials to be added.", image: PHOTOS.leader4 },
 ];
 
-function LeaderRow({ leader, index }: { leader: Leader; index: number }) {
-  const flip = index % 2 === 1;
-  const pending = leader.name === "Name pending";
-  return (
-    <Reveal delay={index * 0.06}>
-      <div className={`grid md:grid-cols-[0.7fr_1fr] gap-6 md:gap-10 items-center py-10 md:py-14 ${flip ? "md:[direction:rtl]" : ""}`} style={{ borderTop: index === 0 ? `1px solid ${LINE_SOFT}` : "none", borderBottom: `1px solid ${LINE_SOFT}` }}>
-        <div style={{ direction: "ltr" }}>
-          <TelemetryFrame src={leader.image} alt={leader.name} className="aspect-[4/5]" imgClassName="w-full h-full object-cover" grayscale={pending ? 0.9 : 0.4} caption={`Crew ${String(index + 1).padStart(2, "0")}`} />
-        </div>
-        <div style={{ direction: "ltr" }}>
-          <span className={`${mono.className} text-[10px] tracking-[0.14em]`} style={{ color: HARVEST }}>OP-{String(index + 1).padStart(2, "0")}</span>
-          <h3 className={`${display.className} text-2xl md:text-3xl font-medium mt-2`} style={{ color: pending ? FOG : WHITE }}>{leader.name}</h3>
-          <div className={`${mono.className} text-[11px] mt-1.5 uppercase tracking-[0.1em]`} style={{ color: SIGNAL }}>{leader.role}</div>
-          <p className={`${inter.className} mt-4 text-base font-light leading-relaxed max-w-md`} style={{ color: FOG }}>{leader.bio}</p>
-        </div>
-      </div>
-    </Reveal>
-  );
-}
-
 function Leadership() {
   return (
-    <section id="people" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: VOID }}>
-      <div className="max-w-5xl mx-auto">
-        <Reveal className="flex flex-wrap items-end justify-between gap-4 mb-4">
+    <section id="people" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24" style={{ background: PANEL }}>
+      <div className="max-w-6xl mx-auto">
+        <Reveal className="flex flex-wrap items-end justify-between gap-4 mb-8 md:mb-12">
           <div>
-            <Kicker tag="00.03">Governance</Kicker>
-            <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-4`} style={{ color: WHITE }}>The crew, on record.</h2>
+            <Kicker>Governance</Kicker>
+            <h2 className={`${display.className} text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: WHITE }}>Led by real people.</h2>
           </div>
-          <MorphButton href="/team" idleText="Full manifest" revealText="View all →" variant="outline" />
+          <MorphButton href="/team" idleText="Meet the full team" revealText="View all →" variant="outline" />
         </Reveal>
-        <div>{LEADERSHIP_PREVIEW.map((l, i) => <LeaderRow key={l.name} leader={l} index={i} />)}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {LEADERSHIP_PREVIEW.map((l, i) => (
+            <Reveal key={l.name} delay={i * 0.06}>
+              <div className="group">
+                <Frame src={l.image} alt={l.name} className="aspect-[4/5]" grayscale={l.name === "Name pending" ? 0.8 : 0.1} />
+                <h3 className={`${inter.className} text-sm md:text-base font-semibold mt-3`} style={{ color: l.name === "Name pending" ? FOG : WHITE }}>{l.name}</h3>
+                <div className={`${inter.className} text-xs mt-0.5`} style={{ color: SIGNAL }}>{l.role}</div>
+                <p className={`${inter.className} text-xs md:text-sm mt-2 font-light leading-relaxed hidden sm:block`} style={{ color: FOG }}>{l.bio}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
 // ============================================================
-// PURPOSE — two glass telemetry cards
+// PURPOSE
 // ============================================================
-function PurposeCard({ image, icon: Icon, tag, front, back }: { image: string; icon: any; tag: string; front: string; back: string }) {
+function PurposeCard({ image, icon: Icon, label, front, back }: { image: string; icon: any; label: string; front: string; back: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="relative aspect-[4/5] overflow-hidden cursor-pointer group" onClick={() => setOpen((o) => !o)} style={{ border: `1px solid ${LINE_SOFT}` }}>
-      <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style={{ filter: "grayscale(0.55) brightness(0.35) contrast(1.1)" }} />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(5,6,8,0.25) 0%, rgba(5,6,8,0.92) 100%)" }} />
-      <span className="absolute top-3 left-3 w-4 h-4 border-t border-l" style={{ borderColor: SIGNAL }} />
-      <span className="absolute top-3 right-3 w-4 h-4 border-t border-r" style={{ borderColor: SIGNAL }} />
-      <div className="relative h-full flex flex-col justify-end p-6 md:p-8">
-        <Icon className="h-6 w-6 mb-4" style={{ color: HARVEST }} strokeWidth={1.5} />
-        <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase`} style={{ color: FOG }}>{tag}</span>
-        <p className={`${display.className} text-white text-xl md:text-2xl font-medium leading-[1.2] mt-2`}>{front}</p>
+    <div className="relative aspect-[5/4] sm:aspect-[4/5] rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer group" onClick={() => setOpen((o) => !o)} style={{ border: `1px solid ${LINE_SOFT}` }}>
+      <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style={{ filter: "brightness(0.45) contrast(1.05)" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(7,8,11,0.1) 0%, rgba(7,8,11,0.88) 100%)" }} />
+      <div className="relative h-full flex flex-col justify-end p-5 md:p-8">
+        <Icon className="h-6 w-6 mb-3 md:mb-4" style={{ color: HARVEST }} strokeWidth={1.5} />
+        <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase`} style={{ color: FOG }}>{label}</span>
+        <p className={`${display.className} text-white text-lg md:text-2xl font-medium leading-[1.25] mt-2`}>{front}</p>
         <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.4, ease: EASE }} className="overflow-hidden">
           <p className={`${inter.className} text-sm font-light text-white/75 leading-relaxed pt-4`} dangerouslySetInnerHTML={{ __html: back }} />
         </motion.div>
-        <span className={`${mono.className} inline-flex items-center gap-1.5 mt-4 text-[10px] uppercase tracking-[0.1em]`} style={{ color: FOG }}>
-          {open ? "Collapse" : "Expand"} <motion.span animate={{ rotate: open ? 180 : 0 }}><ChevronDown className="h-3 w-3" /></motion.span>
+        <span className={`${inter.className} inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-white/55`}>
+          {open ? "Show less" : "Read more"} <motion.span animate={{ rotate: open ? 180 : 0 }}><ChevronDown className="h-3.5 w-3.5" /></motion.span>
         </span>
       </div>
     </div>
@@ -530,22 +461,21 @@ function PurposeCard({ image, icon: Icon, tag, front, back }: { image: string; i
 
 function Purpose({ content }: { content: any }) {
   return (
-    <section id="purpose" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24 relative" style={{ background: PANEL }}>
-      <GridField opacity={0.35} />
-      <Reveal className="relative max-w-5xl mx-auto mb-12 md:mb-16">
-        <Kicker tag="00.04">Why we exist</Kicker>
-        <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-4`} style={{ color: WHITE }}>Mission and vision, plainly stated.</h2>
+    <section id="purpose" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24" style={{ background: VOID }}>
+      <Reveal className="max-w-5xl mx-auto mb-8 md:mb-14">
+        <Kicker>Why we exist</Kicker>
+        <h2 className={`${display.className} text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: WHITE }}>Mission and vision, plainly stated.</h2>
       </Reveal>
-      <div className="relative max-w-5xl mx-auto grid md:grid-cols-2 gap-4 md:gap-6">
-        <Reveal><PurposeCard image={PHOTOS.goats} icon={Target} tag="Mission" front="Economic empowerment, through agribusiness." back={content?.mission || "To economically empower individuals through agribusiness that competes internationally."} /></Reveal>
-        <Reveal delay={0.08}><PurposeCard image={PHOTOS.hq} icon={Globe} tag="Vision" front="The greatest empowerment platform in Africa." back={content?.vision || "To be the greatest empowerment platform in Africa, and push back poverty with it."} /></Reveal>
+      <div className="max-w-5xl mx-auto grid sm:grid-cols-2 gap-4 md:gap-6">
+        <Reveal><PurposeCard image={PHOTOS.goats} icon={Target} label="Mission" front="Economic empowerment, through agribusiness." back={content?.mission || "To economically empower individuals through agribusiness that competes internationally."} /></Reveal>
+        <Reveal delay={0.08}><PurposeCard image={PHOTOS.hq} icon={Globe} label="Vision" front="The greatest empowerment platform in Africa." back={content?.vision || "To be the greatest empowerment platform in Africa, and push back poverty with it."} /></Reveal>
       </div>
     </section>
   );
 }
 
 // ============================================================
-// VALUES — protocol list
+// VALUES
 // ============================================================
 const VALUES = [
   { text: "We walk in faith, guided by kindness, compassion and service.", detail: "Every branch decision starts from how it treats the people it touches, not just the numbers behind it.", icon: Heart },
@@ -560,13 +490,12 @@ function ValueRow({ v, i }: { v: (typeof VALUES)[number]; i: number }) {
   const Icon = v.icon;
   return (
     <Reveal delay={i * 0.05}>
-      <button onClick={() => setOpen((o) => !o)} className="w-full text-left flex items-start gap-5 md:gap-8 py-7 md:py-9" style={{ borderTop: i === 0 ? `1px solid ${LINE_SOFT}` : "none", borderBottom: `1px solid ${LINE_SOFT}` }}>
-        <span className={`${mono.className} text-[10px] pt-1.5 shrink-0 w-10`} style={{ color: HARVEST }}>{String(i + 1).padStart(2, "0")}</span>
-        <div className="shrink-0 w-10 h-10 flex items-center justify-center" style={{ border: `1px solid ${LINE}`, background: "rgba(0,174,239,0.05)" }}>
-          <Icon className="h-4.5 w-4.5" style={{ color: SIGNAL }} strokeWidth={1.5} />
+      <button onClick={() => setOpen((o) => !o)} className="w-full text-left flex items-start gap-4 md:gap-6 py-6 md:py-8" style={{ borderTop: i === 0 ? `1px solid ${LINE_SOFT}` : "none", borderBottom: `1px solid ${LINE_SOFT}` }}>
+        <div className="shrink-0 w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center" style={{ background: "rgba(0,174,239,0.08)" }}>
+          <Icon className="h-4.5 w-4.5 md:h-5 md:w-5" style={{ color: SIGNAL }} strokeWidth={1.5} />
         </div>
         <div className="flex-1">
-          <p className={`${display.className} text-lg md:text-2xl font-medium leading-snug`} style={{ color: WHITE }}>{v.text}</p>
+          <p className={`${display.className} text-base sm:text-lg md:text-2xl font-medium leading-snug`} style={{ color: WHITE }}>{v.text}</p>
           <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.35, ease: EASE }} className="overflow-hidden">
             <p className={`${inter.className} text-sm md:text-base font-light pt-3`} style={{ color: FOG }}>{v.detail}</p>
           </motion.div>
@@ -579,11 +508,11 @@ function ValueRow({ v, i }: { v: (typeof VALUES)[number]; i: number }) {
 
 function Values() {
   return (
-    <section id="values" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: VOID }}>
+    <section id="values" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24" style={{ background: PANEL }}>
       <div className="max-w-4xl mx-auto">
         <Reveal className="mb-4">
-          <Kicker tag="00.05">What we believe</Kicker>
-          <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-4`} style={{ color: WHITE }}>Five protocols we don't break.</h2>
+          <Kicker>What we believe</Kicker>
+          <h2 className={`${display.className} text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: WHITE }}>Five things we don't compromise on.</h2>
         </Reveal>
         <div>{VALUES.map((v, i) => <ValueRow key={i} v={v} i={i} />)}</div>
       </div>
@@ -592,56 +521,88 @@ function Values() {
 }
 
 // ============================================================
-// TIMELINE — vertical signal trace
+// TIMELINE
 // ============================================================
 const MILESTONES = [
-  { year: "2008", label: "Founded as a village group", desc: "21 members started the journey that would become YPA.", image: PHOTOS.community },
-  { year: "2010", label: "Registered as a CBO", desc: "60 members formed the Board of Governors and management structure.", image: PHOTOS.members },
-  { year: "2015", label: "Expanded to 5 branches", desc: "Growth from a single office into a regional presence across Uganda.", image: PHOTOS.hq },
-  { year: "2020", label: "Launched YPA SACCO", desc: "Formal savings and credit services became available to members.", image: PHOTOS.sacco },
-  { year: "2023", label: "Reached 100,000 goats", desc: "A major milestone for the organisation's agribusiness projects.", image: PHOTOS.goats },
-  { year: "2025", label: "Opened Dubai & Zambia offices", desc: "The first step toward a genuinely Pan-African footprint.", image: PHOTOS.aerial },
+  { year: "2008", label: "Founded as a village group", desc: "21 members started the journey that would become YPA." },
+  { year: "2010", label: "Registered as a CBO", desc: "60 members formed the Board of Governors and management structure." },
+  { year: "2015", label: "Expanded to 5 branches", desc: "Growth from a single office into a regional presence across Uganda." },
+  { year: "2020", label: "Launched YPA SACCO", desc: "Formal savings and credit services became available to members." },
+  { year: "2023", label: "Reached 100,000 goats", desc: "A major milestone for the organisation's agribusiness projects." },
+  { year: "2025", label: "Opened Dubai & Zambia offices", desc: "The first step toward a genuinely Pan-African footprint." },
 ];
-
-function TimelineRow({ m, i }: { m: (typeof MILESTONES)[number]; i: number }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Reveal delay={i * 0.05}>
-      <div className="relative pl-10 md:pl-14 pb-14 md:pb-16 last:pb-0">
-        {i < MILESTONES.length - 1 && <span className="absolute left-[7px] md:left-[9px] top-4 bottom-0 w-px" style={{ background: LINE_SOFT }} />}
-        <span className="absolute left-0 top-1.5 w-4 h-4 md:w-5 md:h-5 flex items-center justify-center" style={{ border: `1px solid ${SIGNAL}`, background: VOID }}>
-          <span className="w-1.5 h-1.5 rounded-full" style={{ background: SIGNAL, boxShadow: `0 0 8px ${SIGNAL}` }} />
-        </span>
-        <button onClick={() => setOpen((o) => !o)} className="text-left w-full grid md:grid-cols-[0.9fr_1.3fr] gap-5 md:gap-10 items-start">
-          <div>
-            <div className={`${mono.className} text-3xl md:text-4xl font-medium`} style={{ color: HARVEST }}>{m.year}</div>
-            <p className={`${display.className} text-lg md:text-2xl font-medium leading-snug mt-2`} style={{ color: WHITE }}>{m.label}</p>
-            <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
-              <p className={`${inter.className} text-sm md:text-base font-light pt-3`} style={{ color: FOG }}>{m.desc}</p>
-            </motion.div>
-          </div>
-          <TelemetryFrame src={m.image} alt="" className="aspect-[16/9] md:aspect-[4/3]" grayscale={0.5} />
-        </button>
-      </div>
-    </Reveal>
-  );
-}
 
 function Timeline() {
   return (
-    <section id="timeline" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24 relative" style={{ background: PANEL }}>
-      <GridField opacity={0.3} />
-      <Reveal className="relative max-w-5xl mx-auto mb-14">
-        <Kicker tag="00.06">Timeline</Kicker>
-        <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-4`} style={{ color: WHITE }}>Year by year.</h2>
+    <section id="timeline" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24" style={{ background: VOID }}>
+      <Reveal className="max-w-4xl mx-auto mb-10 md:mb-14">
+        <Kicker>Timeline</Kicker>
+        <h2 className={`${display.className} text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: WHITE }}>Year by year.</h2>
       </Reveal>
-      <div className="relative max-w-5xl mx-auto">{MILESTONES.map((m, i) => <TimelineRow key={i} m={m} i={i} />)}</div>
+      <div className="max-w-4xl mx-auto">
+        {MILESTONES.map((m, i) => (
+          <Reveal key={i} delay={i * 0.04}>
+            <div className="relative pl-8 md:pl-12 pb-10 md:pb-12 last:pb-0">
+              {i < MILESTONES.length - 1 && <span className="absolute left-[5px] md:left-[7px] top-4 bottom-0 w-px" style={{ background: LINE_SOFT }} />}
+              <span className="absolute left-0 top-1.5 w-3 h-3 md:w-3.5 md:h-3.5 rounded-full" style={{ background: SIGNAL, boxShadow: `0 0 10px ${SIGNAL}` }} />
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <span className={`${display.className} text-xl md:text-2xl font-medium`} style={{ color: HARVEST }}>{m.year}</span>
+                <p className={`${display.className} text-base sm:text-lg md:text-xl font-medium leading-snug`} style={{ color: WHITE }}>{m.label}</p>
+              </div>
+              <p className={`${inter.className} text-sm md:text-base font-light mt-2 max-w-lg`} style={{ color: FOG }}>{m.desc}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
     </section>
   );
 }
 
 // ============================================================
-// TRUST — terminal-style records readout
+// VOICES — testimonials, the trust-building "why believe us" layer
+// ============================================================
+const VOICES = [
+  { quote: "YPA didn't just lend me goats, they walked with me until I understood the business. Three years later I run my own herd.", name: "A YPA member", role: "Goat Rearing Programme, Central Region", image: PHOTOS.community },
+  { quote: "The SACCO gave my savings group a place to grow money safely for the first time. That trust is everything out here.", name: "A YPA member", role: "SACCO Savings Group", image: PHOTOS.members },
+  { quote: "What struck me was how organised the branch was — records, receipts, real accountability. It didn't feel like charity.", name: "A community partner", role: "Central Region", image: PHOTOS.sacco },
+];
+
+function VoiceCard({ v, i }: { v: (typeof VOICES)[number]; i: number }) {
+  return (
+    <Reveal delay={i * 0.08}>
+      <div className="rounded-2xl md:rounded-3xl p-6 md:p-8 h-full flex flex-col" style={{ background: PANEL, border: `1px solid ${LINE_SOFT}` }}>
+        <Quote className="h-6 w-6 mb-4" style={{ color: HARVEST }} strokeWidth={1.5} />
+        <p className={`${inter.className} text-sm md:text-base font-light leading-relaxed flex-1`} style={{ color: "rgba(245,246,247,0.85)" }}>"{v.quote}"</p>
+        <div className="flex items-center gap-3 mt-6">
+          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0" style={{ border: `1px solid ${LINE_SOFT}` }}>
+            <img src={v.image} alt="" className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <div className={`${inter.className} text-xs font-semibold`} style={{ color: WHITE }}>{v.name}</div>
+            <div className={`${inter.className} text-[11px] mt-0.5`} style={{ color: FOG }}>{v.role}</div>
+          </div>
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
+function Voices() {
+  return (
+    <section id="voices" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24" style={{ background: PANEL }}>
+      <Reveal className="max-w-5xl mx-auto mb-8 md:mb-14 text-center">
+        <div className="flex justify-center"><Kicker>In their words</Kicker></div>
+        <h2 className={`${display.className} text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: WHITE }}>Voices from our community.</h2>
+      </Reveal>
+      <div className="max-w-5xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {VOICES.map((v, i) => <VoiceCard key={i} v={v} i={i} />)}
+      </div>
+    </section>
+  );
+}
+
+// ============================================================
+// TRUST
 // ============================================================
 function Trust() {
   const facts = [
@@ -656,35 +617,35 @@ function Trust() {
     { region: "Zambia", detail: "International office" },
   ];
   return (
-    <section id="trust" className="py-24 md:py-32 scroll-mt-24" style={{ background: VOID }}>
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 px-6 md:px-16">
+    <section id="trust" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24" style={{ background: VOID }}>
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
         <Reveal>
-          <TelemetryFrame src={PHOTOS.hq} alt="YPA headquarters" className="aspect-[4/5] lg:aspect-auto lg:h-full" caption="HQ — Uganda" grayscale={0.4} />
+          <Frame src={PHOTOS.hq} alt="YPA headquarters" className="aspect-[16/10] lg:aspect-[4/5]" grayscale={0.1} />
         </Reveal>
         <div>
           <Reveal>
-            <Kicker tag="00.07">Due diligence</Kicker>
-            <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-4`} style={{ color: WHITE }}>The paperwork, on record.</h2>
+            <Kicker>Due diligence</Kicker>
+            <h2 className={`${display.className} text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: WHITE }}>The paperwork, on record.</h2>
           </Reveal>
-          <div className="mt-8" style={{ border: `1px solid ${LINE_SOFT}`, background: "rgba(255,255,255,0.02)" }}>
+          <div className="mt-6 md:mt-8">
             {facts.map((f, i) => (
               <Reveal key={i} delay={i * 0.05}>
-                <div className="flex items-baseline justify-between gap-4 px-4 py-4" style={{ borderTop: i === 0 ? "none" : `1px solid ${LINE_SOFT}` }}>
-                  <span className={`${mono.className} text-[11px] uppercase tracking-[0.06em]`} style={{ color: FOG }}>{f.k}</span>
-                  <span className={`${mono.className} text-sm md:text-base font-medium text-right`} style={{ color: SIGNAL }}>{f.v}</span>
+                <div className="flex items-baseline justify-between gap-4 py-3.5" style={{ borderTop: i === 0 ? `1px solid ${LINE_SOFT}` : "none", borderBottom: `1px solid ${LINE_SOFT}` }}>
+                  <span className={`${inter.className} text-sm`} style={{ color: FOG }}>{f.k}</span>
+                  <span className={`${inter.className} text-sm md:text-base font-medium text-right`} style={{ color: WHITE }}>{f.v}</span>
                 </div>
               </Reveal>
             ))}
           </div>
           <Reveal delay={0.15} className="mt-8">
-            <span className={`${mono.className} text-[10px] font-medium uppercase tracking-[0.18em]`} style={{ color: FOG }}>Find us</span>
+            <span className={`${inter.className} text-xs font-medium uppercase tracking-[0.18em]`} style={{ color: FOG }}>Find us</span>
             <div className="mt-4 space-y-4">
               {offices.map((o, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <MapPin className="h-4 w-4 mt-0.5 shrink-0" style={{ color: HARVEST }} strokeWidth={1.5} />
                   <div>
                     <div className={`${inter.className} text-sm font-medium`} style={{ color: WHITE }}>{o.region}</div>
-                    <div className={`${mono.className} text-[10px] mt-0.5 uppercase tracking-[0.08em]`} style={{ color: FOG }}>{o.detail}</div>
+                    <div className={`${inter.className} text-xs mt-0.5`} style={{ color: FOG }}>{o.detail}</div>
                   </div>
                 </div>
               ))}
@@ -697,34 +658,30 @@ function Trust() {
 }
 
 // ============================================================
-// FAQ — console log
+// FAQ
 // ============================================================
 function FAQ({ faqs }: { faqs: any[] }) {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section id="faq" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24 relative" style={{ background: PANEL }}>
-      <GridField opacity={0.3} />
-      <div className="relative max-w-3xl mx-auto">
-        <Reveal className="mb-12 md:mb-16 text-center flex flex-col items-center">
-          <Kicker tag="00.08">FAQ</Kicker>
-          <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-4`} style={{ color: WHITE }}>Common queries.</h2>
+    <section id="faq" className="py-16 md:py-28 px-5 sm:px-8 md:px-16 scroll-mt-24" style={{ background: PANEL }}>
+      <div className="max-w-3xl mx-auto">
+        <Reveal className="mb-8 md:mb-14 text-center flex flex-col items-center">
+          <Kicker>FAQ</Kicker>
+          <h2 className={`${display.className} text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: WHITE }}>Common questions.</h2>
         </Reveal>
         {faqs.length === 0 ? (
-          <p className={`${mono.className} text-center text-xs uppercase tracking-[0.1em]`} style={{ color: FOG }}>No FAQs published yet.</p>
+          <p className={`${inter.className} text-center text-sm`} style={{ color: FOG }}>No FAQs published yet.</p>
         ) : (
           <div>
             {faqs.map((faq, i) => (
               <Reveal key={faq.id} delay={i * 0.04}>
                 <div style={{ borderTop: i === 0 ? `1px solid ${LINE_SOFT}` : "none", borderBottom: `1px solid ${LINE_SOFT}` }}>
-                  <button onClick={() => setOpen(open === i ? null : i)} className="w-full py-5 md:py-6 flex items-center justify-between gap-4 text-left">
-                    <span className="flex items-center gap-3">
-                      <span className={`${mono.className} text-[10px]`} style={{ color: open === i ? SIGNAL : FOG }}>Q{String(i + 1).padStart(2, "0")}</span>
-                      <span className={`${inter.className} text-base md:text-lg font-medium`} style={{ color: WHITE }}>{faq.question}</span>
-                    </span>
+                  <button onClick={() => setOpen(open === i ? null : i)} className="w-full py-4 md:py-6 flex items-center justify-between gap-4 text-left">
+                    <span className={`${inter.className} text-[15px] md:text-lg font-medium`} style={{ color: WHITE }}>{faq.question}</span>
                     <motion.span animate={{ rotate: open === i ? 45 : 0 }} transition={{ duration: 0.3 }}><Plus className="h-5 w-5 shrink-0" style={{ color: open === i ? HARVEST : FOG }} /></motion.span>
                   </button>
                   {open === i && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} transition={{ duration: 0.25 }} className="pb-6 md:pb-7 pl-9">
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} transition={{ duration: 0.25 }} className="pb-5 md:pb-7">
                       <div className={`${inter.className} text-sm md:text-base font-light leading-relaxed`} style={{ color: FOG }} dangerouslySetInnerHTML={{ __html: faq.answer }} />
                     </motion.div>
                   )}
@@ -739,22 +696,20 @@ function FAQ({ faqs }: { faqs: any[] }) {
 }
 
 // ============================================================
-// CLOSE — signal sign-off
+// CLOSE
 // ============================================================
 function Close() {
   return (
-    <section className="relative h-[70vh] min-h-[440px] overflow-hidden" style={{ background: VOID }}>
-      <img src={PHOTOS.aerial} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.6) brightness(0.22) contrast(1.1)" }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 50%, rgba(0,174,239,0.14), transparent 65%)`, mixBlendMode: "screen" }} />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(5,6,8,0.55) 0%, rgba(5,6,8,0.92) 100%)" }} />
-      <GridField opacity={0.4} />
-      <ScanSweep />
-      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 md:px-16 text-center">
+    <section className="relative py-24 md:py-36 px-5 sm:px-8 md:px-16 overflow-hidden" style={{ background: VOID }}>
+      <img src={PHOTOS.aerial} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "brightness(0.28) contrast(1.05)" }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 40%, rgba(0,174,239,0.12), transparent 65%)` }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(7,8,11,0.55) 0%, rgba(7,8,11,0.9) 100%)" }} />
+      <div className="relative z-10 flex flex-col items-center justify-center text-center">
         <Reveal>
-          <div className={`${mono.className} text-[10px] tracking-[0.2em] uppercase mb-6`} style={{ color: SIGNAL }}>End of transmission</div>
-          <h2 className={`${display.className} text-white text-3xl md:text-5xl font-medium tracking-tight max-w-2xl mx-auto`}>Now you know who we are.</h2>
-          <p className={`${inter.className} mt-4 font-light max-w-md mx-auto`} style={{ color: FOG }}>Join Africa's leading youth agribusiness platform, or ask us anything else.</p>
-          <div className="mt-10 flex flex-wrap gap-3 justify-center">
+          <div className="h-px w-10 mx-auto mb-7" style={{ background: HARVEST }} />
+          <h2 className={`${display.className} text-white text-2xl sm:text-3xl md:text-5xl font-medium tracking-tight max-w-2xl mx-auto`}>Now you know who we are.</h2>
+          <p className={`${inter.className} mt-4 font-light max-w-md mx-auto text-sm md:text-base`} style={{ color: FOG }}>Join Africa's leading youth agribusiness platform, or ask us anything else.</p>
+          <div className="mt-9 flex flex-wrap gap-3 justify-center">
             <MorphButton href="/contact" idleText="Get in touch" revealText="Let's talk" />
             <MorphButton href="/sacco" idleText="See YPA SACCO" revealText="Explore →" variant="outline" icon={ChevronRight} />
           </div>
@@ -798,14 +753,14 @@ export default function AboutPage() {
       <Navigation />
       <SectionNav />
       <Hero />
-      <FoundingQuote />
       <Story content={content} />
-      <PhotoInterlude />
+      <Welcome />
       <Scale />
       <Leadership />
       <Purpose content={content} />
       <Values />
       <Timeline />
+      <Voices />
       <Trust />
       <FAQ faqs={faqs} />
       <Close />
