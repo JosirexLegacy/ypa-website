@@ -3,27 +3,32 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
 import { motion, useInView, useScroll, useTransform, useReducedMotion, AnimatePresence } from "framer-motion";
-import { useRef, useEffect, useState, useCallback } from "react";
-import { ArrowUpRight, ChevronDown, ChevronRight, Target, Globe, Users, Clock, Heart, Handshake, MapPin, FileText, ShieldCheck, Plus } from "lucide-react";
+import { useRef, useEffect, useState } from "react";
+import { ArrowUpRight, ChevronDown, ChevronRight, Target, Globe, Users, Clock, Heart, Handshake, MapPin, FileText, ShieldCheck, Plus, Award } from "lucide-react";
 
 // ============================================================
-// FONTS — display + body only, used with restraint
+// FONTS — display + body + mono for ledger numbers, matching the homepage
 // ============================================================
 const display = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display" });
+const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono" });
 const inter = Inter({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-inter" });
 
 // ============================================================
-// TOKENS
+// TOKENS — same brand system as the homepage
 // ============================================================
-const INK = "#0B0D0E";
+const YPA_BLUE = "#00AEEF";
+const YPA_BLUE_LIGHT = "#33C1F5";
+const GOLD = "#F0B429";
+const VOID = "#0A0A0B";
 const PAPER = "#FFFFFF";
 const CLOUD = "#F5F6F7";
 const STONE = "#68707A";
 const HAIRLINE = "#E7E9EC";
-const BLUE = "#00AEEF";
-const GOLD = "#F0B429";
+const INK = "#111111";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
 const getImageUrl = (image?: string) => (!image ? null : image.startsWith("http") ? image : `${API_URL}/assets/${image}`);
@@ -44,7 +49,7 @@ async function getFAQs() {
 }
 
 // ============================================================
-// Reveal — shared scroll-in primitive
+// Reveal
 // ============================================================
 function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null);
@@ -55,7 +60,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
       ref={ref}
       initial={reduce ? {} : { opacity: 0, y: 24 }}
       animate={inView ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }}
-      transition={{ duration: reduce ? 0 : 0.7, delay: reduce ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: reduce ? 0 : 0.7, delay: reduce ? 0 : delay, ease: EASE }}
       className={className}
     >
       {children}
@@ -63,13 +68,63 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
-function Kicker({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
-  return <span className={`${inter.className} text-[11px] md:text-xs font-medium uppercase tracking-[0.18em]`} style={{ color: light ? "rgba(255,255,255,0.5)" : STONE }}>{children}</span>;
+// Kicker with mono index — legitimate here since sections follow a real
+// order the SectionNav also tracks. Same visual language as the homepage.
+function Kicker({ index, children, light = false }: { index?: string; children: React.ReactNode; light?: boolean }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      {index && (
+        <>
+          <span className={`${mono.className} text-[10px]`} style={{ color: GOLD }}>{index}</span>
+          <span className="h-px w-5" style={{ background: "rgba(240,180,41,0.4)" }} />
+        </>
+      )}
+      <span className={`${inter.className} text-[11px] md:text-xs font-medium uppercase tracking-[0.2em]`} style={{ color: light ? "rgba(245,246,247,0.5)" : YPA_BLUE }}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
+function GrainOverlay() {
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none mix-blend-overlay opacity-[0.3]" aria-hidden="true">
+      <filter id="ypaGrainAbout2">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
+        <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#ypaGrainAbout2)" />
+    </svg>
+  );
+}
+
+function GlowSeal({ label = "Youth Platform Africa · Est. 2008" }: { label?: string }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      initial={reduce ? {} : { opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, ease: EASE }}
+      className="inline-flex items-center gap-2.5 rounded-full pl-2 pr-4 py-1.5 w-fit"
+      style={{ background: "rgba(240,180,41,0.08)", border: "1px solid rgba(240,180,41,0.32)" }}
+    >
+      <motion.span
+        className="flex h-6 w-6 items-center justify-center rounded-full shrink-0"
+        style={{ background: GOLD }}
+        animate={reduce ? {} : { boxShadow: [`0 0 0px ${GOLD}00`, `0 0 14px ${GOLD}90, 0 0 28px ${GOLD}40`, `0 0 0px ${GOLD}00`] }}
+        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <Award className="h-3.5 w-3.5" style={{ color: VOID }} />
+      </motion.span>
+      <span className={`${mono.className} text-[10px] sm:text-[11px] tracking-[0.16em] uppercase font-medium whitespace-nowrap`} style={{ color: GOLD }}>
+        {label}
+      </span>
+    </motion.div>
+  );
 }
 
 // ============================================================
-// MorphButton — the button-level signature. Pill that expands on
-// hover/tap to slide a second label into view. Used for every primary CTA.
+// MorphButton — colors now pull from the real brand, not neutral paper/ink
 // ============================================================
 function MorphButton({ href, idleText, revealText, variant = "solid", icon: Icon = ArrowUpRight }: { href: string; idleText: string; revealText: string; variant?: "solid" | "outline"; icon?: any }) {
   const [hover, setHover] = useState(false);
@@ -78,20 +133,16 @@ function MorphButton({ href, idleText, revealText, variant = "solid", icon: Icon
     <Link href={href} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onFocus={() => setHover(true)} onBlur={() => setHover(false)}>
       <motion.div
         className={`${inter.className} relative overflow-hidden inline-flex items-center h-12 rounded-full text-sm font-medium cursor-pointer select-none`}
-        style={solid ? { background: PAPER, color: INK } : { border: "1px solid rgba(255,255,255,0.28)", color: PAPER }}
-        animate={{ paddingLeft: 24, paddingRight: hover ? 20 : 24 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        style={solid ? { background: YPA_BLUE, color: VOID } : { border: "1px solid rgba(240,180,41,0.4)", color: "inherit" }}
+        animate={{ paddingLeft: 24, paddingRight: hover ? 20 : 24, boxShadow: solid && hover ? `0 0 24px ${YPA_BLUE}55` : "0 0 0px transparent" }}
+        transition={{ duration: 0.4, ease: EASE }}
       >
         <span className="relative h-5 overflow-hidden">
-          <motion.span className="block" animate={{ y: hover ? -20 : 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
-            {idleText}
-          </motion.span>
-          <motion.span className="block absolute top-0 left-0 whitespace-nowrap" animate={{ y: hover ? 0 : 20 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
-            {revealText}
-          </motion.span>
+          <motion.span className="block" animate={{ y: hover ? -20 : 0 }} transition={{ duration: 0.35, ease: EASE }}>{idleText}</motion.span>
+          <motion.span className="block absolute top-0 left-0 whitespace-nowrap" animate={{ y: hover ? 0 : 20 }} transition={{ duration: 0.35, ease: EASE }}>{revealText}</motion.span>
         </span>
-        <motion.span className="ml-2 flex items-center" animate={{ rotate: hover ? 45 : 0, width: hover ? 18 : 16 }} transition={{ duration: 0.35 }}>
-          <Icon className="h-4 w-4" />
+        <motion.span className="ml-2 flex items-center" animate={{ rotate: hover ? 45 : 0 }} transition={{ duration: 0.35 }}>
+          <Icon className="h-4 w-4" style={!solid ? { color: GOLD } : {}} />
         </motion.span>
       </motion.div>
     </Link>
@@ -99,8 +150,7 @@ function MorphButton({ href, idleText, revealText, variant = "solid", icon: Icon
 }
 
 // ============================================================
-// SectionNav — sticky scroll-spy pill bar. The "modern, navigable" element.
-// Appears once the hero clears, tracks the active section, smooth-scrolls.
+// SectionNav — sticky scroll-spy pill bar, restyled with the gold/blue glow
 // ============================================================
 const SECTIONS = [
   { id: "story", label: "Story" },
@@ -120,7 +170,6 @@ function SectionNav() {
     const hero = document.getElementById("hero");
     const io1 = new IntersectionObserver(([e]) => setVisible(!e.isIntersecting), { threshold: 0 });
     if (hero) io1.observe(hero);
-
     const observers = SECTIONS.map(({ id }) => {
       const el = document.getElementById(id);
       if (!el) return null;
@@ -142,18 +191,11 @@ function SectionNav() {
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.3 }}
           className="hidden md:flex fixed top-20 left-1/2 -translate-x-1/2 z-40 items-center gap-0.5 p-1 rounded-full"
-          style={{ background: "rgba(11,13,14,0.85)", backdropFilter: "blur(12px)" }}
+          style={{ background: "rgba(10,10,11,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(240,180,41,0.18)", boxShadow: `0 8px 32px rgba(0,0,0,0.3), 0 0 24px ${YPA_BLUE}12` }}
         >
           {SECTIONS.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => jump(s.id)}
-              className={`${inter.className} relative px-4 py-2 text-xs font-medium rounded-full transition-colors`}
-              style={{ color: active === s.id ? INK : "rgba(255,255,255,0.6)" }}
-            >
-              {active === s.id && (
-                <motion.span layoutId="navpill" className="absolute inset-0 rounded-full" style={{ background: PAPER }} transition={{ type: "spring", stiffness: 400, damping: 32 }} />
-              )}
+            <button key={s.id} onClick={() => jump(s.id)} className={`${mono.className} relative px-4 py-2 text-[10px] tracking-[0.1em] uppercase font-medium rounded-full transition-colors`} style={{ color: active === s.id ? VOID : "rgba(255,255,255,0.55)" }}>
+              {active === s.id && <motion.span layoutId="navpill" className="absolute inset-0 rounded-full" style={{ background: YPA_BLUE, boxShadow: `0 0 16px ${YPA_BLUE}70` }} transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
               <span className="relative z-10">{s.label}</span>
             </button>
           ))}
@@ -164,7 +206,7 @@ function SectionNav() {
 }
 
 // ============================================================
-// HERO
+// HERO — grain, dual glow orbs, mono locale tag: full homepage treatment
 // ============================================================
 function Hero() {
   const ref = useRef(null);
@@ -174,33 +216,81 @@ function Hero() {
   const reduce = useReducedMotion();
 
   return (
-    <section id="hero" ref={ref} className="relative h-[94vh] min-h-[580px] overflow-hidden" style={{ background: INK }}>
+    <section id="hero" ref={ref} className="relative h-[94vh] min-h-[580px] overflow-hidden" style={{ background: VOID }}>
       <motion.div style={reduce ? {} : { y }} className="absolute inset-0">
-        <img src="https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg" alt="" className="w-full h-full object-cover scale-110" style={{ filter: "grayscale(0.35) brightness(0.42)" }} />
+        <img src="https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg" alt="" className="w-full h-full object-cover scale-110" style={{ filter: "grayscale(0.5) brightness(0.45) contrast(1.05)" }} />
       </motion.div>
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(11,13,14,0.15) 0%, rgba(11,13,14,0.78) 100%)" }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 30% 40%, ${YPA_BLUE}15, transparent 70%)`, mixBlendMode: "color" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0.2) 0%, rgba(10,10,11,0.8) 100%)" }} />
+      <GrainOverlay />
+
+      <motion.div aria-hidden className="pointer-events-none absolute -left-24 top-1/3 w-[480px] h-[480px] rounded-full blur-[120px]" style={{ background: `radial-gradient(circle, ${YPA_BLUE}30 0%, ${GOLD}14 45%, transparent 70%)` }} animate={reduce ? {} : { opacity: [0.4, 0.8, 0.4], scale: [1, 1.1, 1] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
+      <motion.div aria-hidden className="pointer-events-none absolute -right-24 bottom-1/3 w-[360px] h-[360px] rounded-full blur-[100px]" style={{ background: `radial-gradient(circle, ${GOLD}20 0%, transparent 70%)` }} animate={reduce ? {} : { opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
 
       <motion.div style={reduce ? {} : { opacity }} className="relative z-10 h-full flex flex-col justify-end px-6 md:px-16 pb-16 md:pb-24">
-        <Reveal>
-          <h1 className={`${display.className} text-white font-medium leading-[0.95] tracking-tight text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl max-w-4xl`}>
+        <Reveal><GlowSeal /></Reveal>
+        <Reveal delay={0.08}>
+          <h1 className={`${display.className} text-white font-medium leading-[0.95] tracking-tight text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl max-w-4xl mt-6`}>
             Agribusiness,
             <br />
             built by young Africans.
           </h1>
         </Reveal>
-        <Reveal delay={0.12}>
+        <Reveal delay={0.18}>
           <p className={`${inter.className} mt-6 max-w-lg text-base md:text-lg font-light leading-relaxed text-white/70`}>
             From a 21-person village group in 2008 to a Pan-African platform with 12 branches — this is
             what we do, who leads it, and how you can check any of it.
           </p>
         </Reveal>
-        <Reveal delay={0.22}>
+        <Reveal delay={0.28}>
           <div className="mt-9 flex flex-wrap gap-3">
             <MorphButton href="#story" idleText="Our story" revealText="Scroll down" icon={ChevronDown} />
             <MorphButton href="#trust" idleText="Verify us" revealText="See the record" variant="outline" />
           </div>
         </Reveal>
       </motion.div>
+
+      <div className="hidden md:flex absolute bottom-8 right-8 z-10 items-center gap-2">
+        <span className="relative flex h-1 w-1"><span className="relative inline-flex h-1 w-1 rounded-full" style={{ background: GOLD }} /></span>
+        <span className={`${mono.className} text-[9px] tracking-[0.2em] uppercase text-white/30`}>Est. 2008 — Kampala, UG</span>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================
+// ABOUT INDEX — the marquee ticker, same mechanism as the homepage's
+// Field Index, carrying About-specific facts instead of live operations.
+// ============================================================
+const ABOUT_INDEX = [
+  { value: "2008", label: "Founded", delta: "village group of 21" },
+  { value: "12", label: "Branches", delta: "across Uganda" },
+  { value: "3", label: "Countries", delta: "UG · UAE · Zambia", featured: true },
+  { value: "URSB", label: "Registered", delta: "reg. no. on file" },
+  { value: "0", label: "Hidden fees", delta: "by policy" },
+];
+
+function AboutIndex() {
+  const reduce = useReducedMotion();
+  const track = [...ABOUT_INDEX, ...ABOUT_INDEX];
+  return (
+    <section className="relative overflow-hidden py-3" style={{ background: VOID, borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+      <div className="relative py-1">
+        <motion.div className="flex items-center gap-0 px-5 md:px-14" animate={reduce ? {} : { x: ["0%", "-50%"] }} transition={{ duration: 28, repeat: Infinity, ease: "linear" }}>
+          {track.map((m, idx) => (
+            <div key={idx} className="flex items-center shrink-0">
+              <div className="flex items-baseline gap-2 pr-6">
+                <span className={`${mono.className} text-lg sm:text-xl font-medium`} style={{ color: m.featured ? GOLD : "#F5F6F7" }}>{m.value}</span>
+                <span className={`${inter.className} text-[10px] sm:text-[11px]`} style={{ color: "rgba(245,246,247,0.4)" }}>{m.label}</span>
+                <span className={`${mono.className} text-[9px] uppercase tracking-wide`} style={{ color: "rgba(0,174,239,0.6)" }}>{m.delta}</span>
+              </div>
+              <span className="pr-6 select-none" style={{ color: "rgba(240,180,41,0.4)" }} aria-hidden="true">·</span>
+            </div>
+          ))}
+        </motion.div>
+        <div className="absolute inset-y-0 left-0 w-12 md:w-28 pointer-events-none" style={{ background: `linear-gradient(90deg, ${VOID}, transparent)` }} />
+        <div className="absolute inset-y-0 right-0 w-12 md:w-28 pointer-events-none" style={{ background: `linear-gradient(270deg, ${VOID}, transparent)` }} />
+      </div>
     </section>
   );
 }
@@ -214,7 +304,7 @@ function Story({ content }: { content: any }) {
       <div className="max-w-6xl mx-auto grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20 items-start">
         <Reveal>
           <div className={`${display.className} font-medium leading-none tracking-tight text-[20vw] sm:text-8xl lg:text-9xl`} style={{ color: INK }}>08</div>
-          <Kicker>Founded 2008</Kicker>
+          <Kicker index="01">Founded 2008</Kicker>
         </Reveal>
         <div>
           <Reveal>
@@ -238,7 +328,7 @@ function Story({ content }: { content: any }) {
             <div className="mt-10 grid grid-cols-3 gap-6 pt-8" style={{ borderTop: `1px solid ${HAIRLINE}` }}>
               {[["2008", "Founded"], ["12", "Branches"], ["3", "Countries"]].map(([v, l]) => (
                 <div key={l}>
-                  <div className={`${display.className} text-2xl md:text-3xl font-medium`} style={{ color: INK }}>{v}</div>
+                  <div className={`${mono.className} text-2xl md:text-3xl font-medium`} style={{ color: INK }}>{v}</div>
                   <div className={`${inter.className} text-xs mt-1 font-medium`} style={{ color: STONE }}>{l}</div>
                 </div>
               ))}
@@ -251,7 +341,7 @@ function Story({ content }: { content: any }) {
 }
 
 // ============================================================
-// SCALE — count-up numbers, full-bleed dark
+// SCALE — dark, count-up, now with the homepage's glow orbs
 // ============================================================
 function useCountUp(target: number, active: boolean, duration = 1600) {
   const [n, setN] = useState(0);
@@ -286,12 +376,14 @@ function ScaleNumber({ target, suffix, label }: { target: number; suffix: string
 
 function Scale() {
   return (
-    <section className="py-28 md:py-40 px-6 md:px-16" style={{ background: INK }}>
-      <div className="max-w-5xl mx-auto text-center mb-16 md:mb-24">
-        <Reveal><Kicker light>What we've built</Kicker></Reveal>
+    <section className="relative py-28 md:py-40 px-6 md:px-16 overflow-hidden" style={{ background: VOID }}>
+      <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] pointer-events-none" style={{ background: YPA_BLUE, opacity: 0.07 }} />
+      <div className="absolute bottom-[-15%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] pointer-events-none" style={{ background: GOLD, opacity: 0.06 }} />
+      <div className="relative max-w-5xl mx-auto text-center mb-16 md:mb-24">
+        <Reveal className="flex justify-center"><Kicker index="—" light>What we've built</Kicker></Reveal>
         <Reveal delay={0.08}><h2 className={`${display.className} text-white text-3xl md:text-5xl font-medium tracking-tight mt-3`}>The numbers, plainly.</h2></Reveal>
       </div>
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
+      <div className="relative max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
         <ScaleNumber target={130000} suffix="+" label="Goats under care" />
         <ScaleNumber target={12} suffix="" label="Branches, nationwide" />
         <ScaleNumber target={1000} suffix="+" label="Members empowered" />
@@ -301,14 +393,9 @@ function Scale() {
 }
 
 // ============================================================
-// LEADERSHIP — preview of 4, pulled (for now, hardcoded) from the team
-// roster. Each card slides its bio up from the bottom on hover/tap —
-// the "morph to reveal" interaction. "Meet the full team" leads to /team.
+// LEADERSHIP
 // ============================================================
 interface Leader { role: string; name: string; bio: string; image: string }
-
-// NOTE: hardcoded preview — keep this array in sync with the first 4
-// entries on /team manually until that page has a shared data source.
 const LEADERSHIP_PREVIEW: Leader[] = [
   { role: "Managing Director", name: "Obed Ben", bio: "Leads YPA's agribusiness strategy and community development work.", image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716326/acc94e42-c5d5-489c-b335-6ee5353253be.jpg" },
   { role: "Executive Director", name: "JB Magezi", bio: "Drives YPA's expansion across Africa and its financial-inclusion programmes.", image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716480/587e2393-e360-4ac2-bae3-22b7cec94705.jpg" },
@@ -320,40 +407,21 @@ function LeaderCard({ leader, index }: { leader: Leader; index: number }) {
   const [open, setOpen] = useState(false);
   return (
     <Reveal delay={index * 0.06}>
-      <div
-        className="relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer group"
-        style={{ background: CLOUD }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onClick={() => setOpen((o) => !o)}
-        tabIndex={0}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-      >
+      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer group" style={{ background: CLOUD }} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} onClick={() => setOpen((o) => !o)} tabIndex={0} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
         <img src={leader.image} alt={leader.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style={{ objectPosition: "50% 22%" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(11,13,14,0) 40%, rgba(11,13,14,0.88) 100%)" }} />
-
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0) 40%, rgba(10,10,11,0.9) 100%)" }} />
+        <div className="absolute top-3 left-3">
+          <span className={`${mono.className} text-[9px] px-1.5 py-0.5 rounded`} style={{ color: "#F5F6F7", background: "rgba(10,10,11,0.5)" }}>0{index + 1}</span>
+        </div>
         <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
           <div className={`${display.className} text-white text-base md:text-lg font-medium`}>{leader.name}</div>
           <div className={`${inter.className} text-xs md:text-sm text-white/60`}>{leader.role}</div>
-
-          <motion.div
-            initial={false}
-            animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden"
-          >
+          <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.35, ease: EASE }} className="overflow-hidden">
             <p className={`${inter.className} text-xs md:text-sm font-light text-white/75 leading-relaxed pt-2`}>{leader.bio}</p>
           </motion.div>
         </div>
-
-        <motion.div
-          className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(6px)" }}
-          animate={{ rotate: open ? 45 : 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Plus className="h-3.5 w-3.5 text-white" />
+        <motion.div className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(240,180,41,0.18)", backdropFilter: "blur(6px)" }} animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3 }}>
+          <Plus className="h-3.5 w-3.5" style={{ color: GOLD }} />
         </motion.div>
       </div>
     </Reveal>
@@ -366,7 +434,7 @@ function Leadership() {
       <div className="max-w-6xl mx-auto">
         <Reveal className="flex flex-wrap items-end justify-between gap-4 mb-12 md:mb-16">
           <div>
-            <Kicker>Governance</Kicker>
+            <Kicker index="02">Governance</Kicker>
             <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Led by real people.</h2>
           </div>
           <MorphButton href="/team" idleText="Meet the full team" revealText="View all →" variant="outline" />
@@ -380,28 +448,19 @@ function Leadership() {
 }
 
 // ============================================================
-// PURPOSE — flip cards. Front is the label, click/tap flips to the
-// full mission/vision statement. Cards live inside a shared border grid.
+// PURPOSE — flip cards
 // ============================================================
 function FlipCard({ icon: Icon, label, front, back }: { icon: any; label: string; front: string; back: string }) {
   const [flipped, setFlipped] = useState(false);
   return (
     <div className="p-10 md:p-14" style={{ background: PAPER }}>
       <div className="relative" style={{ perspective: 1200 }}>
-        <motion.div
-          className="relative cursor-pointer"
-          style={{ transformStyle: "preserve-3d" }}
-          animate={{ rotateY: flipped ? 180 : 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          onClick={() => setFlipped((f) => !f)}
-        >
+        <motion.div className="relative cursor-pointer" style={{ transformStyle: "preserve-3d" }} animate={{ rotateY: flipped ? 180 : 0 }} transition={{ duration: 0.6, ease: EASE }} onClick={() => setFlipped((f) => !f)}>
           <div style={{ backfaceVisibility: "hidden" }}>
-            <Icon className="h-6 w-6" style={{ color: BLUE }} strokeWidth={1.5} />
-            <Kicker><span className="mt-4 block">{label}</span></Kicker>
+            <Icon className="h-6 w-6" style={{ color: YPA_BLUE }} strokeWidth={1.5} />
+            <div className="mt-4"><Kicker>{label}</Kicker></div>
             <p className={`${display.className} mt-3 text-2xl md:text-3xl font-medium leading-[1.15] tracking-tight`} style={{ color: INK }}>{front}</p>
-            <span className={`${inter.className} inline-flex items-center gap-1.5 mt-5 text-xs font-medium`} style={{ color: STONE }}>
-              Tap to read the full statement <ChevronRight className="h-3.5 w-3.5" />
-            </span>
+            <span className={`${inter.className} inline-flex items-center gap-1.5 mt-5 text-xs font-medium`} style={{ color: STONE }}>Tap to read the full statement <ChevronRight className="h-3.5 w-3.5" /></span>
           </div>
           <div className="absolute inset-0" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
             <p className={`${inter.className} text-base md:text-lg font-light leading-relaxed`} style={{ color: "#3C4650" }} dangerouslySetInnerHTML={{ __html: back }} />
@@ -424,7 +483,7 @@ function Purpose({ content }: { content: any }) {
 }
 
 // ============================================================
-// VALUES — expandable rows. Click a value to slide open supporting detail.
+// VALUES — expandable rows
 // ============================================================
 const VALUES = [
   { text: "We walk in faith, guided by kindness, compassion and service.", detail: "Every branch decision starts from how it treats the people it touches, not just the numbers behind it.", icon: Heart },
@@ -441,13 +500,11 @@ function ValueRow({ v, i }: { v: (typeof VALUES)[number]; i: number }) {
     <Reveal delay={i * 0.05}>
       <div style={{ borderTop: i === 0 ? `1px solid ${HAIRLINE}` : "none", borderBottom: `1px solid ${HAIRLINE}` }}>
         <button onClick={() => setOpen((o) => !o)} className="w-full flex items-center gap-5 md:gap-8 py-6 md:py-7 text-left">
-          <Icon className="h-5 w-5 md:h-6 md:w-6 shrink-0" style={{ color: BLUE }} strokeWidth={1.5} />
+          <Icon className="h-5 w-5 md:h-6 md:w-6 shrink-0" style={{ color: YPA_BLUE }} strokeWidth={1.5} />
           <p className={`${inter.className} flex-1 text-base md:text-xl font-light leading-snug`} style={{ color: "#2A323B" }}>{v.text}</p>
-          <motion.span animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3 }} className="shrink-0">
-            <Plus className="h-4 w-4 md:h-5 md:w-5" style={{ color: STONE }} />
-          </motion.span>
+          <motion.span animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3 }} className="shrink-0"><Plus className="h-4 w-4 md:h-5 md:w-5" style={{ color: open ? GOLD : STONE }} /></motion.span>
         </button>
-        <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
+        <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.35, ease: EASE }} className="overflow-hidden">
           <p className={`${inter.className} text-sm md:text-base font-light pb-6 md:pb-7 pl-10 md:pl-14 pr-8`} style={{ color: STONE }}>{v.detail}</p>
         </motion.div>
       </div>
@@ -460,7 +517,7 @@ function Values() {
     <section id="values" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: CLOUD }}>
       <div className="max-w-4xl mx-auto">
         <Reveal className="mb-12 md:mb-16">
-          <Kicker>What we believe</Kicker>
+          <Kicker index="03">What we believe</Kicker>
           <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Five things we don't compromise on.</h2>
         </Reveal>
         <div>{VALUES.map((v, i) => <ValueRow key={i} v={v} i={i} />)}</div>
@@ -470,7 +527,7 @@ function Values() {
 }
 
 // ============================================================
-// TIMELINE — drag-scroll cards, click to expand the description
+// TIMELINE
 // ============================================================
 const MILESTONES = [
   { year: "2008", label: "Founded as a village group", desc: "21 members started the journey that would become YPA." },
@@ -485,8 +542,8 @@ function TimelineCard({ m, i }: { m: (typeof MILESTONES)[number]; i: number }) {
   const [open, setOpen] = useState(false);
   return (
     <Reveal delay={i * 0.05} className="shrink-0 snap-start w-[68vw] sm:w-[300px]">
-      <button onClick={() => setOpen((o) => !o)} className="text-left w-full pt-6" style={{ borderTop: `2px solid ${i % 2 ? GOLD : BLUE}` }}>
-        <div className={`${display.className} text-3xl md:text-4xl font-medium`} style={{ color: INK }}>{m.year}</div>
+      <button onClick={() => setOpen((o) => !o)} className="text-left w-full pt-6" style={{ borderTop: `2px solid ${i % 2 ? GOLD : YPA_BLUE}` }}>
+        <div className={`${mono.className} text-3xl md:text-4xl font-medium`} style={{ color: INK }}>{m.year}</div>
         <p className={`${inter.className} mt-2 text-sm md:text-base font-light leading-snug`} style={{ color: "#3C4650" }}>{m.label}</p>
         <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
           <p className={`${inter.className} text-xs md:text-sm font-light pt-2`} style={{ color: STONE }}>{m.desc}</p>
@@ -503,7 +560,7 @@ function Timeline() {
   return (
     <section id="timeline" className="py-24 md:py-32 pl-6 md:pl-16 scroll-mt-24" style={{ background: PAPER }}>
       <Reveal className="mb-12 md:mb-16 pr-6 md:pr-16">
-        <Kicker>Timeline</Kicker>
+        <Kicker index="04">Timeline</Kicker>
         <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Year by year.</h2>
       </Reveal>
       <div className="flex gap-6 md:gap-8 overflow-x-auto pb-4 pr-6 md:pr-16 snap-x snap-mandatory [-webkit-overflow-scrolling:touch]" style={{ scrollbarWidth: "none" }}>
@@ -514,7 +571,7 @@ function Timeline() {
 }
 
 // ============================================================
-// TRUST — plain rows, one row expands to show a linked doc if present
+// TRUST
 // ============================================================
 function Trust() {
   const facts = [
@@ -533,7 +590,7 @@ function Trust() {
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16">
         <div>
           <Reveal>
-            <Kicker>Due diligence</Kicker>
+            <Kicker index="05">Due diligence</Kicker>
             <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>The paperwork, on record.</h2>
           </Reveal>
           <div className="mt-10">
@@ -541,7 +598,7 @@ function Trust() {
               <Reveal key={i} delay={i * 0.05}>
                 <div className="flex items-baseline justify-between gap-4 py-4" style={{ borderTop: i === 0 ? `1px solid ${HAIRLINE}` : "none", borderBottom: `1px solid ${HAIRLINE}` }}>
                   <span className={`${inter.className} text-sm`} style={{ color: STONE }}>{f.k}</span>
-                  <span className={`${inter.className} text-sm md:text-base font-medium text-right`} style={{ color: INK }}>{f.v}</span>
+                  <span className={`${mono.className} text-sm md:text-base font-medium text-right`} style={{ color: INK }}>{f.v}</span>
                 </div>
               </Reveal>
             ))}
@@ -549,21 +606,19 @@ function Trust() {
           <Reveal delay={0.2}>
             <div className="mt-6 flex flex-wrap gap-2">
               {["Annual report", "Audited financials", "Strategic plan"].map((doc) => (
-                <span key={doc} className={`${inter.className} inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full`} style={{ color: STONE, border: `1px solid ${HAIRLINE}` }}>
-                  <FileText className="h-3 w-3" /> {doc}
-                </span>
+                <span key={doc} className={`${inter.className} inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full`} style={{ color: STONE, border: `1px solid ${HAIRLINE}` }}><FileText className="h-3 w-3" /> {doc}</span>
               ))}
             </div>
             <p className={`${inter.className} text-sm italic mt-2`} style={{ color: STONE }}>Documents to be linked once available.</p>
           </Reveal>
         </div>
         <div>
-          <Reveal delay={0.1}><Kicker>Find us</Kicker></Reveal>
+          <Reveal delay={0.1}><Kicker index="06">Find us</Kicker></Reveal>
           <div className="mt-10 space-y-8">
             {offices.map((o, i) => (
               <Reveal key={i} delay={0.1 + i * 0.06}>
                 <div className="flex items-start gap-4">
-                  <MapPin className="h-5 w-5 mt-0.5 shrink-0" style={{ color: BLUE }} strokeWidth={1.5} />
+                  <MapPin className="h-5 w-5 mt-0.5 shrink-0" style={{ color: YPA_BLUE }} strokeWidth={1.5} />
                   <div>
                     <div className={`${display.className} text-lg font-medium`} style={{ color: INK }}>{o.region}</div>
                     <div className={`${inter.className} text-sm mt-0.5`} style={{ color: STONE }}>{o.detail}</div>
@@ -586,8 +641,8 @@ function FAQ({ faqs }: { faqs: any[] }) {
   return (
     <section id="faq" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: PAPER }}>
       <div className="max-w-3xl mx-auto">
-        <Reveal className="mb-12 md:mb-16 text-center">
-          <Kicker>FAQ</Kicker>
+        <Reveal className="mb-12 md:mb-16 text-center flex flex-col items-center">
+          <Kicker index="07">FAQ</Kicker>
           <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Common questions.</h2>
         </Reveal>
         {faqs.length === 0 ? (
@@ -599,7 +654,7 @@ function FAQ({ faqs }: { faqs: any[] }) {
                 <div style={{ borderTop: i === 0 ? `1px solid ${HAIRLINE}` : "none", borderBottom: `1px solid ${HAIRLINE}` }}>
                   <button onClick={() => setOpen(open === i ? null : i)} className="w-full py-5 md:py-6 flex items-center justify-between gap-4 text-left">
                     <span className={`${inter.className} text-base md:text-lg font-medium`} style={{ color: INK }}>{faq.question}</span>
-                    <motion.span animate={{ rotate: open === i ? 45 : 0 }} transition={{ duration: 0.3 }}><Plus className="h-5 w-5" style={{ color: STONE }} /></motion.span>
+                    <motion.span animate={{ rotate: open === i ? 45 : 0 }} transition={{ duration: 0.3 }}><Plus className="h-5 w-5" style={{ color: open === i ? GOLD : STONE }} /></motion.span>
                   </button>
                   {open === i && (
                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} transition={{ duration: 0.25 }} className="pb-6 md:pb-7">
@@ -617,12 +672,14 @@ function FAQ({ faqs }: { faqs: any[] }) {
 }
 
 // ============================================================
-// CLOSE
+// CLOSE — dark, with the homepage's dual glow treatment
 // ============================================================
 function Close() {
   return (
-    <section className="py-24 md:py-36 px-6 md:px-16 text-center" style={{ background: INK }}>
-      <Reveal>
+    <section className="relative py-24 md:py-36 px-6 md:px-16 text-center overflow-hidden" style={{ background: VOID }}>
+      <div className="absolute top-[-40%] right-[-15%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none" style={{ background: YPA_BLUE, opacity: 0.1 }} />
+      <div className="absolute bottom-[-40%] left-[-15%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none" style={{ background: GOLD, opacity: 0.08 }} />
+      <Reveal className="relative">
         <div className="h-px w-10 mx-auto mb-8" style={{ background: GOLD }} />
         <h2 className={`${display.className} text-white text-3xl md:text-5xl font-medium tracking-tight max-w-2xl mx-auto`}>Now you know who we are.</h2>
         <p className={`${inter.className} mt-4 text-white/50 font-light max-w-md mx-auto`}>Join Africa's leading youth agribusiness platform, or ask us anything else.</p>
@@ -654,10 +711,10 @@ export default function AboutPage() {
 
   if (loading) {
     return (
-      <main className={`${display.variable} ${inter.variable} min-h-screen bg-white`}>
+      <main className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white`}>
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-8 h-8 border-2 rounded-full" style={{ borderColor: HAIRLINE, borderTopColor: BLUE }} />
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-8 h-8 border-2 rounded-full" style={{ borderColor: HAIRLINE, borderTopColor: YPA_BLUE }} />
         </div>
         <Footer />
       </main>
@@ -665,10 +722,11 @@ export default function AboutPage() {
   }
 
   return (
-    <main className={`${display.variable} ${inter.variable} min-h-screen bg-white overflow-x-hidden font-sans`}>
+    <main className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white overflow-x-hidden font-sans`}>
       <Navigation />
       <SectionNav />
       <Hero />
+      <AboutIndex />
       <Story content={content} />
       <Scale />
       <Leadership />
