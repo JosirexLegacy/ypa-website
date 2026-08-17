@@ -3,23 +3,23 @@
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Space_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono, Alegreya, Inter } from "next/font/google";
 import { motion, useInView, useScroll, useTransform, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { ArrowUpRight, ChevronDown, ChevronRight, Target, Globe, Users, Clock, Heart, Handshake, MapPin, FileText, ShieldCheck, Plus, Award } from "lucide-react";
 
 // ============================================================
-// FONTS — display + body + mono for ledger numbers, matching the homepage
+// FONTS — display, editorial serif for pull quotes, body, mono for data
 // ============================================================
 const display = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display" });
+const serif = Alegreya({ subsets: ["latin"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"], variable: "--font-serif" });
 const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono" });
 const inter = Inter({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-inter" });
 
 // ============================================================
-// TOKENS — same brand system as the homepage
+// TOKENS
 // ============================================================
 const YPA_BLUE = "#00AEEF";
-const YPA_BLUE_LIGHT = "#33C1F5";
 const GOLD = "#F0B429";
 const VOID = "#0A0A0B";
 const PAPER = "#FFFFFF";
@@ -27,11 +27,9 @@ const CLOUD = "#F5F6F7";
 const STONE = "#68707A";
 const HAIRLINE = "#E7E9EC";
 const INK = "#111111";
-
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8055";
-const getImageUrl = (image?: string) => (!image ? null : image.startsWith("http") ? image : `${API_URL}/assets/${image}`);
 
 async function getAboutContent() {
   try {
@@ -49,6 +47,25 @@ async function getFAQs() {
 }
 
 // ============================================================
+// REAL PHOTOGRAPHY — reused across the page, not decoration
+// ============================================================
+const PHOTOS = {
+  hero: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg",
+  community: "https://res.cloudinary.com/owwvyprb/image/upload/v1784714736/27b30d55-18ea-4197-b073-9a2c6dae3100.jpg",
+  goats: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716326/acc94e42-c5d5-489c-b335-6ee5353253be.jpg",
+  farm: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716480/587e2393-e360-4ac2-bae3-22b7cec94705.jpg",
+  aerial: "https://res.cloudinary.com/owwvyprb/image/upload/v1786356172/DJI_0017_g53jgu.jpg",
+  maize: "https://res.cloudinary.com/owwvyprb/image/upload/v1784803273/maizee_kkke6y.jpg",
+  sacco: "https://res.cloudinary.com/owwvyprb/image/upload/v1784727031/54b61dc1-469f-4363-8a52-4de7e285fa1b.jpg",
+  hq: "https://res.cloudinary.com/owwvyprb/image/upload/v1786356172/BZ6A9825_hkymyx.jpg",
+  members: "https://res.cloudinary.com/owwvyprb/image/upload/v1786357366/3P0D7976_fkxetu.jpg",
+  leader1: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716326/acc94e42-c5d5-489c-b335-6ee5353253be.jpg",
+  leader2: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716480/587e2393-e360-4ac2-bae3-22b7cec94705.jpg",
+  leader3: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716382/5fd55b99-ec2f-4990-b3c7-8a5b69837aad.jpg",
+  leader4: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726254/3P0D0022_gqfkkg.jpg",
+};
+
+// ============================================================
 // Reveal
 // ============================================================
 function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -56,32 +73,17 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const reduce = useReducedMotion();
   return (
-    <motion.div
-      ref={ref}
-      initial={reduce ? {} : { opacity: 0, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }}
-      transition={{ duration: reduce ? 0 : 0.7, delay: reduce ? 0 : delay, ease: EASE }}
-      className={className}
-    >
+    <motion.div ref={ref} initial={reduce ? {} : { opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : reduce ? {} : { opacity: 0, y: 24 }} transition={{ duration: reduce ? 0 : 0.7, delay: reduce ? 0 : delay, ease: EASE }} className={className}>
       {children}
     </motion.div>
   );
 }
 
-// Kicker with mono index — legitimate here since sections follow a real
-// order the SectionNav also tracks. Same visual language as the homepage.
 function Kicker({ index, children, light = false }: { index?: string; children: React.ReactNode; light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      {index && (
-        <>
-          <span className={`${mono.className} text-[10px]`} style={{ color: GOLD }}>{index}</span>
-          <span className="h-px w-5" style={{ background: "rgba(240,180,41,0.4)" }} />
-        </>
-      )}
-      <span className={`${inter.className} text-[11px] md:text-xs font-medium uppercase tracking-[0.2em]`} style={{ color: light ? "rgba(245,246,247,0.5)" : YPA_BLUE }}>
-        {children}
-      </span>
+      {index && <><span className={`${mono.className} text-[10px]`} style={{ color: GOLD }}>{index}</span><span className="h-px w-5" style={{ background: "rgba(240,180,41,0.4)" }} /></>}
+      <span className={`${inter.className} text-[11px] md:text-xs font-medium uppercase tracking-[0.2em]`} style={{ color: light ? "rgba(245,246,247,0.5)" : YPA_BLUE }}>{children}</span>
     </div>
   );
 }
@@ -89,11 +91,8 @@ function Kicker({ index, children, light = false }: { index?: string; children: 
 function GrainOverlay() {
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none mix-blend-overlay opacity-[0.3]" aria-hidden="true">
-      <filter id="ypaGrainAbout2">
-        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
-        <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0" />
-      </filter>
-      <rect width="100%" height="100%" filter="url(#ypaGrainAbout2)" />
+      <filter id="ypaGrain3"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" /><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0" /></filter>
+      <rect width="100%" height="100%" filter="url(#ypaGrain3)" />
     </svg>
   );
 }
@@ -101,58 +100,36 @@ function GrainOverlay() {
 function GlowSeal({ label = "Youth Platform Africa · Est. 2008" }: { label?: string }) {
   const reduce = useReducedMotion();
   return (
-    <motion.div
-      initial={reduce ? {} : { opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: EASE }}
-      className="inline-flex items-center gap-2.5 rounded-full pl-2 pr-4 py-1.5 w-fit"
-      style={{ background: "rgba(240,180,41,0.08)", border: "1px solid rgba(240,180,41,0.32)" }}
-    >
-      <motion.span
-        className="flex h-6 w-6 items-center justify-center rounded-full shrink-0"
-        style={{ background: GOLD }}
-        animate={reduce ? {} : { boxShadow: [`0 0 0px ${GOLD}00`, `0 0 14px ${GOLD}90, 0 0 28px ${GOLD}40`, `0 0 0px ${GOLD}00`] }}
-        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-      >
+    <motion.div initial={reduce ? {} : { opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE }} className="inline-flex items-center gap-2.5 rounded-full pl-2 pr-4 py-1.5 w-fit" style={{ background: "rgba(240,180,41,0.08)", border: "1px solid rgba(240,180,41,0.32)" }}>
+      <motion.span className="flex h-6 w-6 items-center justify-center rounded-full shrink-0" style={{ background: GOLD }} animate={reduce ? {} : { boxShadow: [`0 0 0px ${GOLD}00`, `0 0 14px ${GOLD}90, 0 0 28px ${GOLD}40`, `0 0 0px ${GOLD}00`] }} transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}>
         <Award className="h-3.5 w-3.5" style={{ color: VOID }} />
       </motion.span>
-      <span className={`${mono.className} text-[10px] sm:text-[11px] tracking-[0.16em] uppercase font-medium whitespace-nowrap`} style={{ color: GOLD }}>
-        {label}
-      </span>
+      <span className={`${mono.className} text-[10px] sm:text-[11px] tracking-[0.16em] uppercase font-medium whitespace-nowrap`} style={{ color: GOLD }}>{label}</span>
     </motion.div>
   );
 }
 
-// ============================================================
-// MorphButton — colors now pull from the real brand, not neutral paper/ink
-// ============================================================
 function MorphButton({ href, idleText, revealText, variant = "solid", icon: Icon = ArrowUpRight }: { href: string; idleText: string; revealText: string; variant?: "solid" | "outline"; icon?: any }) {
   const [hover, setHover] = useState(false);
   const solid = variant === "solid";
   return (
     <Link href={href} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onFocus={() => setHover(true)} onBlur={() => setHover(false)}>
-      <motion.div
-        className={`${inter.className} relative overflow-hidden inline-flex items-center h-12 rounded-full text-sm font-medium cursor-pointer select-none`}
-        style={solid ? { background: YPA_BLUE, color: VOID } : { border: "1px solid rgba(240,180,41,0.4)", color: "inherit" }}
-        animate={{ paddingLeft: 24, paddingRight: hover ? 20 : 24, boxShadow: solid && hover ? `0 0 24px ${YPA_BLUE}55` : "0 0 0px transparent" }}
-        transition={{ duration: 0.4, ease: EASE }}
-      >
+      <motion.div className={`${inter.className} relative overflow-hidden inline-flex items-center h-12 rounded-full text-sm font-medium cursor-pointer select-none`} style={solid ? { background: YPA_BLUE, color: VOID } : { border: "1px solid rgba(240,180,41,0.45)", color: "inherit" }} animate={{ paddingLeft: 24, paddingRight: hover ? 20 : 24, boxShadow: solid && hover ? `0 0 24px ${YPA_BLUE}55` : "0 0 0px transparent" }} transition={{ duration: 0.4, ease: EASE }}>
         <span className="relative h-5 overflow-hidden">
           <motion.span className="block" animate={{ y: hover ? -20 : 0 }} transition={{ duration: 0.35, ease: EASE }}>{idleText}</motion.span>
           <motion.span className="block absolute top-0 left-0 whitespace-nowrap" animate={{ y: hover ? 0 : 20 }} transition={{ duration: 0.35, ease: EASE }}>{revealText}</motion.span>
         </span>
-        <motion.span className="ml-2 flex items-center" animate={{ rotate: hover ? 45 : 0 }} transition={{ duration: 0.35 }}>
-          <Icon className="h-4 w-4" style={!solid ? { color: GOLD } : {}} />
-        </motion.span>
+        <motion.span className="ml-2 flex items-center" animate={{ rotate: hover ? 45 : 0 }} transition={{ duration: 0.35 }}><Icon className="h-4 w-4" style={!solid ? { color: GOLD } : {}} /></motion.span>
       </motion.div>
     </Link>
   );
 }
 
 // ============================================================
-// SectionNav — sticky scroll-spy pill bar, restyled with the gold/blue glow
+// SectionNav
 // ============================================================
 const SECTIONS = [
+  { id: "quote", label: "Founding" },
   { id: "story", label: "Story" },
   { id: "people", label: "People" },
   { id: "purpose", label: "Purpose" },
@@ -163,9 +140,8 @@ const SECTIONS = [
 ];
 
 function SectionNav() {
-  const [active, setActive] = useState("story");
+  const [active, setActive] = useState("quote");
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const hero = document.getElementById("hero");
     const io1 = new IntersectionObserver(([e]) => setVisible(!e.isIntersecting), { threshold: 0 });
@@ -179,23 +155,14 @@ function SectionNav() {
     });
     return () => { io1.disconnect(); observers.forEach((o) => o?.disconnect()); };
   }, []);
-
   const jump = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.3 }}
-          className="hidden md:flex fixed top-20 left-1/2 -translate-x-1/2 z-40 items-center gap-0.5 p-1 rounded-full"
-          style={{ background: "rgba(10,10,11,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(240,180,41,0.18)", boxShadow: `0 8px 32px rgba(0,0,0,0.3), 0 0 24px ${YPA_BLUE}12` }}
-        >
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3 }} className="hidden md:flex fixed top-20 left-1/2 -translate-x-1/2 z-40 items-center gap-0.5 p-1 rounded-full" style={{ background: "rgba(10,10,11,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(240,180,41,0.18)", boxShadow: `0 8px 32px rgba(0,0,0,0.3), 0 0 24px ${YPA_BLUE}12` }}>
           {SECTIONS.map((s) => (
-            <button key={s.id} onClick={() => jump(s.id)} className={`${mono.className} relative px-4 py-2 text-[10px] tracking-[0.1em] uppercase font-medium rounded-full transition-colors`} style={{ color: active === s.id ? VOID : "rgba(255,255,255,0.55)" }}>
-              {active === s.id && <motion.span layoutId="navpill" className="absolute inset-0 rounded-full" style={{ background: YPA_BLUE, boxShadow: `0 0 16px ${YPA_BLUE}70` }} transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
+            <button key={s.id} onClick={() => jump(s.id)} className={`${mono.className} relative px-3.5 py-2 text-[10px] tracking-[0.1em] uppercase font-medium rounded-full transition-colors`} style={{ color: active === s.id ? VOID : "rgba(255,255,255,0.55)" }}>
+              {active === s.id && <motion.span layoutId="navpill2" className="absolute inset-0 rounded-full" style={{ background: YPA_BLUE, boxShadow: `0 0 16px ${YPA_BLUE}70` }} transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
               <span className="relative z-10">{s.label}</span>
             </button>
           ))}
@@ -206,7 +173,7 @@ function SectionNav() {
 }
 
 // ============================================================
-// HERO — grain, dual glow orbs, mono locale tag: full homepage treatment
+// HERO — cinematic, magazine cover-line
 // ============================================================
 function Hero() {
   const ref = useRef(null);
@@ -214,112 +181,89 @@ function Hero() {
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.9], [1, 0]);
   const reduce = useReducedMotion();
-
   return (
-    <section id="hero" ref={ref} className="relative h-[94vh] min-h-[580px] overflow-hidden" style={{ background: VOID }}>
+    <section id="hero" ref={ref} className="relative h-[96vh] min-h-[600px] overflow-hidden" style={{ background: VOID }}>
       <motion.div style={reduce ? {} : { y }} className="absolute inset-0">
-        <img src="https://res.cloudinary.com/owwvyprb/image/upload/v1784726249/3P0D0002_tg15tl.jpg" alt="" className="w-full h-full object-cover scale-110" style={{ filter: "grayscale(0.5) brightness(0.45) contrast(1.05)" }} />
+        <img src={PHOTOS.hero} alt="" className="w-full h-full object-cover scale-110" style={{ filter: "grayscale(0.4) brightness(0.42) contrast(1.08)" }} />
       </motion.div>
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 30% 40%, ${YPA_BLUE}15, transparent 70%)`, mixBlendMode: "color" }} />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0.2) 0%, rgba(10,10,11,0.8) 100%)" }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 30% 40%, ${YPA_BLUE}18, transparent 70%)`, mixBlendMode: "color" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0.1) 0%, rgba(10,10,11,0.85) 100%)" }} />
       <GrainOverlay />
 
-      <motion.div aria-hidden className="pointer-events-none absolute -left-24 top-1/3 w-[480px] h-[480px] rounded-full blur-[120px]" style={{ background: `radial-gradient(circle, ${YPA_BLUE}30 0%, ${GOLD}14 45%, transparent 70%)` }} animate={reduce ? {} : { opacity: [0.4, 0.8, 0.4], scale: [1, 1.1, 1] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
-      <motion.div aria-hidden className="pointer-events-none absolute -right-24 bottom-1/3 w-[360px] h-[360px] rounded-full blur-[100px]" style={{ background: `radial-gradient(circle, ${GOLD}20 0%, transparent 70%)` }} animate={reduce ? {} : { opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
-
-      <motion.div style={reduce ? {} : { opacity }} className="relative z-10 h-full flex flex-col justify-end px-6 md:px-16 pb-16 md:pb-24">
-        <Reveal><GlowSeal /></Reveal>
-        <Reveal delay={0.08}>
-          <h1 className={`${display.className} text-white font-medium leading-[0.95] tracking-tight text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl max-w-4xl mt-6`}>
-            Agribusiness,
-            <br />
-            built by young Africans.
-          </h1>
-        </Reveal>
-        <Reveal delay={0.18}>
-          <p className={`${inter.className} mt-6 max-w-lg text-base md:text-lg font-light leading-relaxed text-white/70`}>
-            From a 21-person village group in 2008 to a Pan-African platform with 12 branches — this is
-            what we do, who leads it, and how you can check any of it.
-          </p>
-        </Reveal>
-        <Reveal delay={0.28}>
-          <div className="mt-9 flex flex-wrap gap-3">
-            <MorphButton href="#story" idleText="Our story" revealText="Scroll down" icon={ChevronDown} />
-            <MorphButton href="#trust" idleText="Verify us" revealText="See the record" variant="outline" />
-          </div>
-        </Reveal>
-      </motion.div>
-
-      <div className="hidden md:flex absolute bottom-8 right-8 z-10 items-center gap-2">
-        <span className="relative flex h-1 w-1"><span className="relative inline-flex h-1 w-1 rounded-full" style={{ background: GOLD }} /></span>
-        <span className={`${mono.className} text-[9px] tracking-[0.2em] uppercase text-white/30`}>Est. 2008 — Kampala, UG</span>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================
-// ABOUT INDEX — the marquee ticker, same mechanism as the homepage's
-// Field Index, carrying About-specific facts instead of live operations.
-// ============================================================
-const ABOUT_INDEX = [
-  { value: "2008", label: "Founded", delta: "village group of 21" },
-  { value: "12", label: "Branches", delta: "across Uganda" },
-  { value: "3", label: "Countries", delta: "UG · UAE · Zambia", featured: true },
-  { value: "URSB", label: "Registered", delta: "reg. no. on file" },
-  { value: "0", label: "Hidden fees", delta: "by policy" },
-];
-
-function AboutIndex() {
-  const reduce = useReducedMotion();
-  const track = [...ABOUT_INDEX, ...ABOUT_INDEX];
-  return (
-    <section className="relative overflow-hidden py-3" style={{ background: VOID, borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-      <div className="relative py-1">
-        <motion.div className="flex items-center gap-0 px-5 md:px-14" animate={reduce ? {} : { x: ["0%", "-50%"] }} transition={{ duration: 28, repeat: Infinity, ease: "linear" }}>
-          {track.map((m, idx) => (
-            <div key={idx} className="flex items-center shrink-0">
-              <div className="flex items-baseline gap-2 pr-6">
-                <span className={`${mono.className} text-lg sm:text-xl font-medium`} style={{ color: m.featured ? GOLD : "#F5F6F7" }}>{m.value}</span>
-                <span className={`${inter.className} text-[10px] sm:text-[11px]`} style={{ color: "rgba(245,246,247,0.4)" }}>{m.label}</span>
-                <span className={`${mono.className} text-[9px] uppercase tracking-wide`} style={{ color: "rgba(0,174,239,0.6)" }}>{m.delta}</span>
-              </div>
-              <span className="pr-6 select-none" style={{ color: "rgba(240,180,41,0.4)" }} aria-hidden="true">·</span>
+      <div className="relative z-10 h-full flex flex-col">
+        <div className="flex-1 flex items-start justify-between px-6 md:px-16 pt-28 md:pt-32">
+          <Reveal><GlowSeal /></Reveal>
+          <Reveal delay={0.1} className="hidden sm:block text-right">
+            <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase text-white/40`}>Vol. 01 — The Origin Story</span>
+          </Reveal>
+        </div>
+        <motion.div style={reduce ? {} : { opacity }} className="px-6 md:px-16 pb-16 md:pb-24">
+          <Reveal>
+            <h1 className={`${display.className} text-white font-medium leading-[0.92] tracking-tight text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl max-w-4xl`}>
+              21 people.
+              <br />
+              <span className={`${serif.className} italic`} style={{ color: "#F5F6F7" }}>One idea that grew.</span>
+            </h1>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <div className="mt-8 flex flex-wrap items-end gap-6">
+              <MorphButton href="#story" idleText="Read the story" revealText="Scroll down" icon={ChevronDown} />
+              <span className={`${inter.className} text-sm font-light text-white/50 max-w-xs`}>A Pan-African agribusiness platform, told the way it happened — not as a pitch deck.</span>
             </div>
-          ))}
+          </Reveal>
         </motion.div>
-        <div className="absolute inset-y-0 left-0 w-12 md:w-28 pointer-events-none" style={{ background: `linear-gradient(90deg, ${VOID}, transparent)` }} />
-        <div className="absolute inset-y-0 right-0 w-12 md:w-28 pointer-events-none" style={{ background: `linear-gradient(270deg, ${VOID}, transparent)` }} />
       </div>
     </section>
   );
 }
 
 // ============================================================
-// STORY
+// FOUNDING QUOTE — full-bleed pull quote, magazine chapter-opener
+// ============================================================
+function FoundingQuote() {
+  return (
+    <section id="quote" className="relative h-[70vh] min-h-[440px] overflow-hidden scroll-mt-24" style={{ background: VOID }}>
+      <img src={PHOTOS.community} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.55) brightness(0.4)" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0.5) 0%, rgba(10,10,11,0.75) 100%)" }} />
+      <div className="relative z-10 h-full flex items-center justify-center px-6 md:px-16 text-center">
+        <Reveal className="max-w-3xl">
+          <p className={`${serif.className} italic text-white text-2xl sm:text-3xl md:text-5xl leading-[1.25] tracking-tight`}>
+            &ldquo;We didn't set out to build a company. We set out to solve a problem for the people around us.&rdquo;
+          </p>
+          <span className={`${mono.className} block mt-6 text-[10px] tracking-[0.2em] uppercase text-white/40`}>YPA, founding group — 2008</span>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================
+// STORY — magazine two-column, drop cap, asymmetric photo grid
 // ============================================================
 function Story({ content }: { content: any }) {
   return (
     <section id="story" className="py-24 md:py-36 px-6 md:px-16 scroll-mt-24" style={{ background: PAPER }}>
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20 items-start">
-        <Reveal>
-          <div className={`${display.className} font-medium leading-none tracking-tight text-[20vw] sm:text-8xl lg:text-9xl`} style={{ color: INK }}>08</div>
-          <Kicker index="01">Founded 2008</Kicker>
-        </Reveal>
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_0.85fr] gap-12 lg:gap-16 items-start">
         <div>
-          <Reveal>
-            <h2 className={`${display.className} text-3xl md:text-5xl font-medium leading-[1.05] tracking-tight`} style={{ color: INK }}>
-              We started with 21 people and a shared problem to solve.
+          <Reveal><Kicker index="01">Founded 2008</Kicker></Reveal>
+          <Reveal delay={0.05}>
+            <h2 className={`${display.className} text-3xl md:text-5xl font-medium leading-[1.05] tracking-tight mt-4`} style={{ color: INK }}>
+              From a village group to a Pan-African platform.
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <div className={`${inter.className} mt-6 space-y-5 text-base md:text-lg font-light leading-relaxed`} style={{ color: "#3C4650" }}>
+            <div className={`${inter.className} mt-6 text-base md:text-lg font-light leading-relaxed`} style={{ color: "#3C4650" }}>
               {content?.story ? (
                 <div dangerouslySetInnerHTML={{ __html: content.story }} />
               ) : (
                 <>
-                  <p>Youth Platform Africa began in 2008 as a village group of 21 people. By 2010 it had grown into a Community Based Organisation with 60 members, who formed the Board of Governors and management that still guide the organisation today.</p>
-                  <p>As the work grew into international trade, we registered formally as BREC Youth Empowerment Africa Limited. Today YPA runs agribusiness and financial-inclusion programmes across 12 branches in Uganda, with international offices in Dubai and Zambia.</p>
+                  <p>
+                    <span className={`${serif.className} float-left text-6xl md:text-7xl leading-[0.8] pr-3 pt-1`} style={{ color: INK }}>Y</span>
+                    outh Platform Africa began in 2008 as a village group of 21 people. By 2010 it had grown into a Community Based Organisation with 60 members, who formed the Board of Governors and management that still guide the organisation today.
+                  </p>
+                  <p className="mt-4">
+                    As the work grew into international trade, we registered formally as BREC Youth Empowerment Africa Limited. Today YPA runs agribusiness and financial-inclusion programmes across 12 branches in Uganda, with international offices in Dubai and Zambia.
+                  </p>
                 </>
               )}
             </div>
@@ -335,13 +279,39 @@ function Story({ content }: { content: any }) {
             </div>
           </Reveal>
         </div>
+
+        {/* asymmetric photo grid — tall hero image + offset caption card */}
+        <Reveal delay={0.1} className="relative">
+          <div className="aspect-[3/4] rounded-2xl overflow-hidden">
+            <img src={PHOTOS.farm} alt="A YPA farm in Uganda" className="w-full h-full object-cover" />
+          </div>
+          <div className="absolute -bottom-6 -left-6 md:-left-10 w-32 md:w-40 aspect-square rounded-xl overflow-hidden border-4 border-white shadow-xl">
+            <img src={PHOTOS.goats} alt="Goats under YPA's care" className="w-full h-full object-cover" />
+          </div>
+          <span className={`${mono.className} absolute -top-6 right-0 text-[9px] tracking-[0.15em] uppercase`} style={{ color: STONE }}>Fig. 01 — Central Region</span>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 // ============================================================
-// SCALE — dark, count-up, now with the homepage's glow orbs
+// PHOTO INTERLUDE — full-width strip, breaks the rhythm before Scale
+// ============================================================
+function PhotoInterlude() {
+  return (
+    <section className="relative h-[42vh] min-h-[280px] overflow-hidden">
+      <img src={PHOTOS.aerial} alt="Aerial view of a YPA goat farm" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.15)" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(10,10,11,0.55) 0%, transparent 40%)" }} />
+      <div className="absolute bottom-4 left-6 md:left-16">
+        <span className={`${mono.className} text-[9px] tracking-[0.18em] uppercase text-white/70`}>Aerial — Mubende District, the Goats Programme</span>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================
+// SCALE — count-up set against a duotone photo, not flat void
 // ============================================================
 function useCountUp(target: number, active: boolean, duration = 1600) {
   const [n, setN] = useState(0);
@@ -369,18 +339,20 @@ function ScaleNumber({ target, suffix, label }: { target: number; suffix: string
   return (
     <div ref={ref} className="text-center">
       <div className={`${display.className} font-medium tracking-tight text-white text-[15vw] sm:text-7xl md:text-8xl`}>{n.toLocaleString()}{suffix}</div>
-      <div className={`${inter.className} mt-3 text-sm md:text-base font-light text-white/50`}>{label}</div>
+      <div className={`${inter.className} mt-3 text-sm md:text-base font-light text-white/60`}>{label}</div>
     </div>
   );
 }
 
 function Scale() {
   return (
-    <section className="relative py-28 md:py-40 px-6 md:px-16 overflow-hidden" style={{ background: VOID }}>
-      <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] pointer-events-none" style={{ background: YPA_BLUE, opacity: 0.07 }} />
-      <div className="absolute bottom-[-15%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] pointer-events-none" style={{ background: GOLD, opacity: 0.06 }} />
+    <section className="relative py-28 md:py-40 px-6 md:px-16 overflow-hidden">
+      <img src={PHOTOS.maize} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.6) brightness(0.28)" }} />
+      <div className="absolute inset-0" style={{ background: "rgba(10,10,11,0.55)" }} />
+      <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] pointer-events-none" style={{ background: YPA_BLUE, opacity: 0.12 }} />
+      <div className="absolute bottom-[-15%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] pointer-events-none" style={{ background: GOLD, opacity: 0.1 }} />
       <div className="relative max-w-5xl mx-auto text-center mb-16 md:mb-24">
-        <Reveal className="flex justify-center"><Kicker index="—" light>What we've built</Kicker></Reveal>
+        <Reveal className="flex justify-center"><Kicker index="02" light>What we've built</Kicker></Reveal>
         <Reveal delay={0.08}><h2 className={`${display.className} text-white text-3xl md:text-5xl font-medium tracking-tight mt-3`}>The numbers, plainly.</h2></Reveal>
       </div>
       <div className="relative max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
@@ -393,36 +365,30 @@ function Scale() {
 }
 
 // ============================================================
-// LEADERSHIP
+// LEADERSHIP — editorial portrait spread, alternating sides
 // ============================================================
 interface Leader { role: string; name: string; bio: string; image: string }
 const LEADERSHIP_PREVIEW: Leader[] = [
-  { role: "Managing Director", name: "Obed Ben", bio: "Leads YPA's agribusiness strategy and community development work.", image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716326/acc94e42-c5d5-489c-b335-6ee5353253be.jpg" },
-  { role: "Executive Director", name: "JB Magezi", bio: "Drives YPA's expansion across Africa and its financial-inclusion programmes.", image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716480/587e2393-e360-4ac2-bae3-22b7cec94705.jpg" },
-  { role: "General Manager", name: "Charles Kalemera", bio: "Oversees day-to-day operations across all 12 branches.", image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784716382/5fd55b99-ec2f-4990-b3c7-8a5b69837aad.jpg" },
-  { role: "Founding Member", name: "Name pending", bio: "Role summary and credentials to be added.", image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726254/3P0D0022_gqfkkg.jpg" },
+  { role: "Managing Director", name: "Obed Ben", bio: "Leads YPA's agribusiness strategy and community development work, shaping how the organisation grows branch by branch.", image: PHOTOS.leader1 },
+  { role: "Executive Director", name: "JB Magezi", bio: "Drives YPA's expansion across Africa and its financial-inclusion programmes, including the SACCO's growth to 12 branches.", image: PHOTOS.leader2 },
+  { role: "General Manager", name: "Charles Kalemera", bio: "Oversees day-to-day operations across all branches, keeping the goats, maize, and SACCO programmes running in sync.", image: PHOTOS.leader3 },
+  { role: "Founding Member", name: "Name pending", bio: "Role summary and credentials to be added.", image: PHOTOS.leader4 },
 ];
 
-function LeaderCard({ leader, index }: { leader: Leader; index: number }) {
-  const [open, setOpen] = useState(false);
+function LeaderRow({ leader, index }: { leader: Leader; index: number }) {
+  const flip = index % 2 === 1;
   return (
     <Reveal delay={index * 0.06}>
-      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer group" style={{ background: CLOUD }} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} onClick={() => setOpen((o) => !o)} tabIndex={0} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
-        <img src={leader.image} alt={leader.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style={{ objectPosition: "50% 22%" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0) 40%, rgba(10,10,11,0.9) 100%)" }} />
-        <div className="absolute top-3 left-3">
-          <span className={`${mono.className} text-[9px] px-1.5 py-0.5 rounded`} style={{ color: "#F5F6F7", background: "rgba(10,10,11,0.5)" }}>0{index + 1}</span>
+      <div className={`grid md:grid-cols-[0.7fr_1fr] gap-6 md:gap-10 items-center py-10 md:py-14 ${flip ? "md:[direction:rtl]" : ""}`} style={{ borderTop: index === 0 ? `1px solid ${HAIRLINE}` : "none", borderBottom: `1px solid ${HAIRLINE}` }}>
+        <div className="aspect-[4/5] rounded-2xl overflow-hidden" style={{ direction: "ltr" }}>
+          <img src={leader.image} alt={leader.name} className="w-full h-full object-cover" style={{ objectPosition: "50% 20%" }} />
         </div>
-        <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
-          <div className={`${display.className} text-white text-base md:text-lg font-medium`}>{leader.name}</div>
-          <div className={`${inter.className} text-xs md:text-sm text-white/60`}>{leader.role}</div>
-          <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.35, ease: EASE }} className="overflow-hidden">
-            <p className={`${inter.className} text-xs md:text-sm font-light text-white/75 leading-relaxed pt-2`}>{leader.bio}</p>
-          </motion.div>
+        <div style={{ direction: "ltr" }}>
+          <span className={`${mono.className} text-[10px]`} style={{ color: GOLD }}>0{index + 1}</span>
+          <h3 className={`${display.className} text-2xl md:text-3xl font-medium mt-2`} style={{ color: leader.name === "Name pending" ? STONE : INK }}>{leader.name}</h3>
+          <div className={`${inter.className} text-sm mt-1 font-medium`} style={{ color: YPA_BLUE }}>{leader.role}</div>
+          <p className={`${inter.className} mt-4 text-base font-light leading-relaxed max-w-md`} style={{ color: "#3C4650" }}>{leader.bio}</p>
         </div>
-        <motion.div className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(240,180,41,0.18)", backdropFilter: "blur(6px)" }} animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3 }}>
-          <Plus className="h-3.5 w-3.5" style={{ color: GOLD }} />
-        </motion.div>
       </div>
     </Reveal>
   );
@@ -431,41 +397,39 @@ function LeaderCard({ leader, index }: { leader: Leader; index: number }) {
 function Leadership() {
   return (
     <section id="people" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: PAPER }}>
-      <div className="max-w-6xl mx-auto">
-        <Reveal className="flex flex-wrap items-end justify-between gap-4 mb-12 md:mb-16">
+      <div className="max-w-5xl mx-auto">
+        <Reveal className="flex flex-wrap items-end justify-between gap-4 mb-4">
           <div>
-            <Kicker index="02">Governance</Kicker>
+            <Kicker index="03">Governance</Kicker>
             <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Led by real people.</h2>
           </div>
           <MorphButton href="/team" idleText="Meet the full team" revealText="View all →" variant="outline" />
         </Reveal>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {LEADERSHIP_PREVIEW.map((l, i) => <LeaderCard key={l.name} leader={l} index={i} />)}
-        </div>
+        <div>{LEADERSHIP_PREVIEW.map((l, i) => <LeaderRow key={l.name} leader={l} index={i} />)}</div>
       </div>
     </section>
   );
 }
 
 // ============================================================
-// PURPOSE — flip cards
+// PURPOSE — image-backed statements, click to expand the full text
 // ============================================================
-function FlipCard({ icon: Icon, label, front, back }: { icon: any; label: string; front: string; back: string }) {
-  const [flipped, setFlipped] = useState(false);
+function PurposeCard({ image, icon: Icon, label, front, back }: { image: string; icon: any; label: string; front: string; back: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="p-10 md:p-14" style={{ background: PAPER }}>
-      <div className="relative" style={{ perspective: 1200 }}>
-        <motion.div className="relative cursor-pointer" style={{ transformStyle: "preserve-3d" }} animate={{ rotateY: flipped ? 180 : 0 }} transition={{ duration: 0.6, ease: EASE }} onClick={() => setFlipped((f) => !f)}>
-          <div style={{ backfaceVisibility: "hidden" }}>
-            <Icon className="h-6 w-6" style={{ color: YPA_BLUE }} strokeWidth={1.5} />
-            <div className="mt-4"><Kicker>{label}</Kicker></div>
-            <p className={`${display.className} mt-3 text-2xl md:text-3xl font-medium leading-[1.15] tracking-tight`} style={{ color: INK }}>{front}</p>
-            <span className={`${inter.className} inline-flex items-center gap-1.5 mt-5 text-xs font-medium`} style={{ color: STONE }}>Tap to read the full statement <ChevronRight className="h-3.5 w-3.5" /></span>
-          </div>
-          <div className="absolute inset-0" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
-            <p className={`${inter.className} text-base md:text-lg font-light leading-relaxed`} style={{ color: "#3C4650" }} dangerouslySetInnerHTML={{ __html: back }} />
-          </div>
+    <div className="relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer group" onClick={() => setOpen((o) => !o)}>
+      <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style={{ filter: "grayscale(0.35) brightness(0.55)" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0.15) 0%, rgba(10,10,11,0.85) 100%)" }} />
+      <div className="relative h-full flex flex-col justify-end p-6 md:p-8">
+        <Icon className="h-6 w-6 mb-4" style={{ color: GOLD }} strokeWidth={1.5} />
+        <span className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/50`}>{label}</span>
+        <p className={`${display.className} text-white text-xl md:text-2xl font-medium leading-[1.2] mt-2`}>{front}</p>
+        <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.4, ease: EASE }} className="overflow-hidden">
+          <p className={`${inter.className} text-sm font-light text-white/75 leading-relaxed pt-4`} dangerouslySetInnerHTML={{ __html: back }} />
         </motion.div>
+        <span className={`${inter.className} inline-flex items-center gap-1.5 mt-4 text-xs font-medium text-white/50`}>
+          {open ? "Show less" : "Read the full statement"} <motion.span animate={{ rotate: open ? 180 : 0 }}><ChevronDown className="h-3.5 w-3.5" /></motion.span>
+        </span>
       </div>
     </div>
   );
@@ -473,40 +437,50 @@ function FlipCard({ icon: Icon, label, front, back }: { icon: any; label: string
 
 function Purpose({ content }: { content: any }) {
   return (
-    <section id="purpose" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: PAPER }}>
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-px" style={{ background: HAIRLINE }}>
-        <FlipCard icon={Target} label="Mission" front="Economic empowerment, through agribusiness." back={content?.mission || "To economically empower individuals through agribusiness that competes internationally."} />
-        <FlipCard icon={Globe} label="Vision" front="The greatest empowerment platform in Africa." back={content?.vision || "To be the greatest empowerment platform in Africa, and push back poverty with it."} />
+    <section id="purpose" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: CLOUD }}>
+      <Reveal className="max-w-5xl mx-auto mb-12 md:mb-16">
+        <Kicker index="04">Why we exist</Kicker>
+        <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Mission and vision, plainly stated.</h2>
+      </Reveal>
+      <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-4 md:gap-6">
+        <Reveal><PurposeCard image={PHOTOS.goats} icon={Target} label="Mission" front="Economic empowerment, through agribusiness." back={content?.mission || "To economically empower individuals through agribusiness that competes internationally."} /></Reveal>
+        <Reveal delay={0.08}><PurposeCard image={PHOTOS.hq} icon={Globe} label="Vision" front="The greatest empowerment platform in Africa." back={content?.vision || "To be the greatest empowerment platform in Africa, and push back poverty with it."} /></Reveal>
       </div>
     </section>
   );
 }
 
 // ============================================================
-// VALUES — expandable rows
+// VALUES — alternating photo/text editorial rows
 // ============================================================
 const VALUES = [
-  { text: "We walk in faith, guided by kindness, compassion and service.", detail: "Every branch decision starts from how it treats the people it touches, not just the numbers behind it.", icon: Heart },
-  { text: "We are honest and transparent in everything we do.", detail: "Our registration, tax status and financials are published, not just claimed — see the Trust section below.", icon: ShieldCheck },
-  { text: "We respect time — punctuality and efficiency matter.", detail: "Members and partners can expect commitments to be kept on the date they're made.", icon: Clock },
-  { text: "We believe collaboration is key. Together, we achieve more.", detail: "From the original 21-person group to today's 12 branches, growth has always come through shared effort.", icon: Handshake },
-  { text: "We build lasting connections between young Africans and their communities.", detail: "Our programmes are designed to stay rooted in the communities they start in, not extract from them.", icon: Users },
+  { text: "We walk in faith, guided by kindness, compassion and service.", detail: "Every branch decision starts from how it treats the people it touches, not just the numbers behind it.", icon: Heart, image: PHOTOS.community },
+  { text: "We are honest and transparent in everything we do.", detail: "Our registration, tax status and financials are published, not just claimed.", icon: ShieldCheck, image: PHOTOS.hq },
+  { text: "We respect time — punctuality and efficiency matter.", detail: "Members and partners can expect commitments to be kept on the date they're made.", icon: Clock, image: PHOTOS.maize },
+  { text: "We believe collaboration is key. Together, we achieve more.", detail: "From the original 21-person group to today's 12 branches, growth has always come through shared effort.", icon: Handshake, image: PHOTOS.members },
+  { text: "We build lasting connections between young Africans and their communities.", detail: "Our programmes are designed to stay rooted in the communities they start in, not extract from them.", icon: Users, image: PHOTOS.farm },
 ];
 
 function ValueRow({ v, i }: { v: (typeof VALUES)[number]; i: number }) {
   const [open, setOpen] = useState(false);
   const Icon = v.icon;
+  const flip = i % 2 === 1;
   return (
     <Reveal delay={i * 0.05}>
-      <div style={{ borderTop: i === 0 ? `1px solid ${HAIRLINE}` : "none", borderBottom: `1px solid ${HAIRLINE}` }}>
-        <button onClick={() => setOpen((o) => !o)} className="w-full flex items-center gap-5 md:gap-8 py-6 md:py-7 text-left">
-          <Icon className="h-5 w-5 md:h-6 md:w-6 shrink-0" style={{ color: YPA_BLUE }} strokeWidth={1.5} />
-          <p className={`${inter.className} flex-1 text-base md:text-xl font-light leading-snug`} style={{ color: "#2A323B" }}>{v.text}</p>
-          <motion.span animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3 }} className="shrink-0"><Plus className="h-4 w-4 md:h-5 md:w-5" style={{ color: open ? GOLD : STONE }} /></motion.span>
+      <div className={`grid md:grid-cols-[1fr_1.3fr] gap-6 md:gap-10 items-center py-10 md:py-14 ${flip ? "md:[direction:rtl]" : ""}`} style={{ borderTop: i === 0 ? `1px solid ${HAIRLINE}` : "none", borderBottom: `1px solid ${HAIRLINE}` }}>
+        <div className="aspect-[16/10] rounded-2xl overflow-hidden" style={{ direction: "ltr" }}>
+          <img src={v.image} alt="" className="w-full h-full object-cover" />
+        </div>
+        <button onClick={() => setOpen((o) => !o)} className="text-left" style={{ direction: "ltr" }}>
+          <Icon className="h-6 w-6 mb-3" style={{ color: YPA_BLUE }} strokeWidth={1.5} />
+          <p className={`${display.className} text-xl md:text-2xl font-medium leading-snug`} style={{ color: INK }}>{v.text}</p>
+          <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.35, ease: EASE }} className="overflow-hidden">
+            <p className={`${inter.className} text-sm md:text-base font-light pt-3`} style={{ color: STONE }}>{v.detail}</p>
+          </motion.div>
+          <span className={`${inter.className} inline-flex items-center gap-1.5 mt-3 text-xs font-medium`} style={{ color: STONE }}>
+            {open ? "Show less" : "Read more"} <motion.span animate={{ rotate: open ? 45 : 0 }}><Plus className="h-3.5 w-3.5" style={{ color: open ? GOLD : STONE }} /></motion.span>
+          </span>
         </button>
-        <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.35, ease: EASE }} className="overflow-hidden">
-          <p className={`${inter.className} text-sm md:text-base font-light pb-6 md:pb-7 pl-10 md:pl-14 pr-8`} style={{ color: STONE }}>{v.detail}</p>
-        </motion.div>
       </div>
     </Reveal>
   );
@@ -514,10 +488,10 @@ function ValueRow({ v, i }: { v: (typeof VALUES)[number]; i: number }) {
 
 function Values() {
   return (
-    <section id="values" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: CLOUD }}>
-      <div className="max-w-4xl mx-auto">
-        <Reveal className="mb-12 md:mb-16">
-          <Kicker index="03">What we believe</Kicker>
+    <section id="values" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: PAPER }}>
+      <div className="max-w-5xl mx-auto">
+        <Reveal className="mb-4">
+          <Kicker index="05">What we believe</Kicker>
           <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Five things we don't compromise on.</h2>
         </Reveal>
         <div>{VALUES.map((v, i) => <ValueRow key={i} v={v} i={i} />)}</div>
@@ -527,51 +501,52 @@ function Values() {
 }
 
 // ============================================================
-// TIMELINE
+// TIMELINE — vertical editorial, alternating photos
 // ============================================================
 const MILESTONES = [
-  { year: "2008", label: "Founded as a village group", desc: "21 members started the journey that would become YPA." },
-  { year: "2010", label: "Registered as a CBO", desc: "60 members formed the Board of Governors and management structure." },
-  { year: "2015", label: "Expanded to 5 branches", desc: "Growth from a single office into a regional presence across Uganda." },
-  { year: "2020", label: "Launched YPA SACCO", desc: "Formal savings and credit services became available to members." },
-  { year: "2023", label: "Reached 100,000 goats", desc: "A major milestone for the organisation's agribusiness projects." },
-  { year: "2025", label: "Opened Dubai & Zambia offices", desc: "The first step toward a genuinely Pan-African footprint." },
+  { year: "2008", label: "Founded as a village group", desc: "21 members started the journey that would become YPA.", image: PHOTOS.community },
+  { year: "2010", label: "Registered as a CBO", desc: "60 members formed the Board of Governors and management structure.", image: PHOTOS.members },
+  { year: "2015", label: "Expanded to 5 branches", desc: "Growth from a single office into a regional presence across Uganda.", image: PHOTOS.hq },
+  { year: "2020", label: "Launched YPA SACCO", desc: "Formal savings and credit services became available to members.", image: PHOTOS.sacco },
+  { year: "2023", label: "Reached 100,000 goats", desc: "A major milestone for the organisation's agribusiness projects.", image: PHOTOS.goats },
+  { year: "2025", label: "Opened Dubai & Zambia offices", desc: "The first step toward a genuinely Pan-African footprint.", image: PHOTOS.aerial },
 ];
 
-function TimelineCard({ m, i }: { m: (typeof MILESTONES)[number]; i: number }) {
+function TimelineRow({ m, i }: { m: (typeof MILESTONES)[number]; i: number }) {
   const [open, setOpen] = useState(false);
+  const flip = i % 2 === 1;
   return (
-    <Reveal delay={i * 0.05} className="shrink-0 snap-start w-[68vw] sm:w-[300px]">
-      <button onClick={() => setOpen((o) => !o)} className="text-left w-full pt-6" style={{ borderTop: `2px solid ${i % 2 ? GOLD : YPA_BLUE}` }}>
-        <div className={`${mono.className} text-3xl md:text-4xl font-medium`} style={{ color: INK }}>{m.year}</div>
-        <p className={`${inter.className} mt-2 text-sm md:text-base font-light leading-snug`} style={{ color: "#3C4650" }}>{m.label}</p>
-        <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
-          <p className={`${inter.className} text-xs md:text-sm font-light pt-2`} style={{ color: STONE }}>{m.desc}</p>
-        </motion.div>
-        <span className={`${inter.className} inline-flex items-center gap-1 mt-2 text-xs font-medium`} style={{ color: STONE }}>
-          {open ? "Show less" : "Read more"} <motion.span animate={{ rotate: open ? 180 : 0 }}><ChevronDown className="h-3 w-3" /></motion.span>
-        </span>
-      </button>
+    <Reveal delay={i * 0.05}>
+      <div className={`grid md:grid-cols-[0.8fr_1.2fr] gap-6 md:gap-10 items-center py-10 md:py-14 ${flip ? "md:[direction:rtl]" : ""}`} style={{ borderTop: i === 0 ? `1px solid ${HAIRLINE}` : "none", borderBottom: `1px solid ${HAIRLINE}` }}>
+        <div className="aspect-[4/3] rounded-2xl overflow-hidden" style={{ direction: "ltr" }}>
+          <img src={m.image} alt="" className="w-full h-full object-cover" />
+        </div>
+        <button onClick={() => setOpen((o) => !o)} className="text-left" style={{ direction: "ltr" }}>
+          <div className={`${mono.className} text-4xl md:text-5xl font-medium`} style={{ color: i % 2 ? GOLD : YPA_BLUE }}>{m.year}</div>
+          <p className={`${display.className} text-xl md:text-2xl font-medium leading-snug mt-2`} style={{ color: INK }}>{m.label}</p>
+          <motion.div initial={false} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
+            <p className={`${inter.className} text-sm md:text-base font-light pt-3`} style={{ color: STONE }}>{m.desc}</p>
+          </motion.div>
+        </button>
+      </div>
     </Reveal>
   );
 }
 
 function Timeline() {
   return (
-    <section id="timeline" className="py-24 md:py-32 pl-6 md:pl-16 scroll-mt-24" style={{ background: PAPER }}>
-      <Reveal className="mb-12 md:mb-16 pr-6 md:pr-16">
-        <Kicker index="04">Timeline</Kicker>
+    <section id="timeline" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: CLOUD }}>
+      <Reveal className="max-w-5xl mx-auto mb-4">
+        <Kicker index="06">Timeline</Kicker>
         <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Year by year.</h2>
       </Reveal>
-      <div className="flex gap-6 md:gap-8 overflow-x-auto pb-4 pr-6 md:pr-16 snap-x snap-mandatory [-webkit-overflow-scrolling:touch]" style={{ scrollbarWidth: "none" }}>
-        {MILESTONES.map((m, i) => <TimelineCard key={i} m={m} i={i} />)}
-      </div>
+      <div className="max-w-5xl mx-auto">{MILESTONES.map((m, i) => <TimelineRow key={i} m={m} i={i} />)}</div>
     </section>
   );
 }
 
 // ============================================================
-// TRUST
+// TRUST — split screen, real photo instead of naked text rows
 // ============================================================
 function Trust() {
   const facts = [
@@ -586,14 +561,17 @@ function Trust() {
     { region: "Zambia", detail: "International office" },
   ];
   return (
-    <section id="trust" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: CLOUD }}>
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16">
+    <section id="trust" className="py-24 md:py-32 scroll-mt-24" style={{ background: PAPER }}>
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-0 lg:gap-16 px-6 md:px-16">
+        <Reveal className="aspect-[4/5] lg:aspect-auto lg:h-full rounded-2xl overflow-hidden mb-8 lg:mb-0">
+          <img src={PHOTOS.hq} alt="YPA headquarters" className="w-full h-full object-cover" />
+        </Reveal>
         <div>
           <Reveal>
-            <Kicker index="05">Due diligence</Kicker>
+            <Kicker index="07">Due diligence</Kicker>
             <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>The paperwork, on record.</h2>
           </Reveal>
-          <div className="mt-10">
+          <div className="mt-8">
             {facts.map((f, i) => (
               <Reveal key={i} delay={i * 0.05}>
                 <div className="flex items-baseline justify-between gap-4 py-4" style={{ borderTop: i === 0 ? `1px solid ${HAIRLINE}` : "none", borderBottom: `1px solid ${HAIRLINE}` }}>
@@ -603,30 +581,20 @@ function Trust() {
               </Reveal>
             ))}
           </div>
-          <Reveal delay={0.2}>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {["Annual report", "Audited financials", "Strategic plan"].map((doc) => (
-                <span key={doc} className={`${inter.className} inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full`} style={{ color: STONE, border: `1px solid ${HAIRLINE}` }}><FileText className="h-3 w-3" /> {doc}</span>
-              ))}
-            </div>
-            <p className={`${inter.className} text-sm italic mt-2`} style={{ color: STONE }}>Documents to be linked once available.</p>
-          </Reveal>
-        </div>
-        <div>
-          <Reveal delay={0.1}><Kicker index="06">Find us</Kicker></Reveal>
-          <div className="mt-10 space-y-8">
-            {offices.map((o, i) => (
-              <Reveal key={i} delay={0.1 + i * 0.06}>
-                <div className="flex items-start gap-4">
-                  <MapPin className="h-5 w-5 mt-0.5 shrink-0" style={{ color: YPA_BLUE }} strokeWidth={1.5} />
+          <Reveal delay={0.15} className="mt-8">
+            <span className={`${inter.className} text-xs font-medium uppercase tracking-[0.18em]`} style={{ color: STONE }}>Find us</span>
+            <div className="mt-4 space-y-4">
+              {offices.map((o, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <MapPin className="h-4 w-4 mt-0.5 shrink-0" style={{ color: YPA_BLUE }} strokeWidth={1.5} />
                   <div>
-                    <div className={`${display.className} text-lg font-medium`} style={{ color: INK }}>{o.region}</div>
-                    <div className={`${inter.className} text-sm mt-0.5`} style={{ color: STONE }}>{o.detail}</div>
+                    <div className={`${inter.className} text-sm font-medium`} style={{ color: INK }}>{o.region}</div>
+                    <div className={`${inter.className} text-xs mt-0.5`} style={{ color: STONE }}>{o.detail}</div>
                   </div>
                 </div>
-              </Reveal>
-            ))}
-          </div>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
@@ -639,10 +607,10 @@ function Trust() {
 function FAQ({ faqs }: { faqs: any[] }) {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section id="faq" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: PAPER }}>
+    <section id="faq" className="py-24 md:py-32 px-6 md:px-16 scroll-mt-24" style={{ background: CLOUD }}>
       <div className="max-w-3xl mx-auto">
         <Reveal className="mb-12 md:mb-16 text-center flex flex-col items-center">
-          <Kicker index="07">FAQ</Kicker>
+          <Kicker index="08">FAQ</Kicker>
           <h2 className={`${display.className} text-3xl md:text-5xl font-medium tracking-tight mt-3`} style={{ color: INK }}>Common questions.</h2>
         </Reveal>
         {faqs.length === 0 ? (
@@ -672,22 +640,24 @@ function FAQ({ faqs }: { faqs: any[] }) {
 }
 
 // ============================================================
-// CLOSE — dark, with the homepage's dual glow treatment
+// CLOSE — full-bleed pull quote, bookends the hero
 // ============================================================
 function Close() {
   return (
-    <section className="relative py-24 md:py-36 px-6 md:px-16 text-center overflow-hidden" style={{ background: VOID }}>
-      <div className="absolute top-[-40%] right-[-15%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none" style={{ background: YPA_BLUE, opacity: 0.1 }} />
-      <div className="absolute bottom-[-40%] left-[-15%] w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none" style={{ background: GOLD, opacity: 0.08 }} />
-      <Reveal className="relative">
-        <div className="h-px w-10 mx-auto mb-8" style={{ background: GOLD }} />
-        <h2 className={`${display.className} text-white text-3xl md:text-5xl font-medium tracking-tight max-w-2xl mx-auto`}>Now you know who we are.</h2>
-        <p className={`${inter.className} mt-4 text-white/50 font-light max-w-md mx-auto`}>Join Africa's leading youth agribusiness platform, or ask us anything else.</p>
-        <div className="mt-10 flex flex-wrap gap-3 justify-center">
-          <MorphButton href="/contact" idleText="Get in touch" revealText="Let's talk" />
-          <MorphButton href="/sacco" idleText="See YPA SACCO" revealText="Explore →" variant="outline" icon={ChevronRight} />
-        </div>
-      </Reveal>
+    <section className="relative h-[70vh] min-h-[440px] overflow-hidden">
+      <img src={PHOTOS.aerial} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.3) brightness(0.35)" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0.4) 0%, rgba(10,10,11,0.85) 100%)" }} />
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 md:px-16 text-center">
+        <Reveal>
+          <div className="h-px w-10 mx-auto mb-8" style={{ background: GOLD }} />
+          <h2 className={`${display.className} text-white text-3xl md:text-5xl font-medium tracking-tight max-w-2xl mx-auto`}>Now you know who we are.</h2>
+          <p className={`${inter.className} mt-4 text-white/50 font-light max-w-md mx-auto`}>Join Africa's leading youth agribusiness platform, or ask us anything else.</p>
+          <div className="mt-10 flex flex-wrap gap-3 justify-center">
+            <MorphButton href="/contact" idleText="Get in touch" revealText="Let's talk" />
+            <MorphButton href="/sacco" idleText="See YPA SACCO" revealText="Explore →" variant="outline" icon={ChevronRight} />
+          </div>
+        </Reveal>
+      </div>
     </section>
   );
 }
@@ -711,7 +681,7 @@ export default function AboutPage() {
 
   if (loading) {
     return (
-      <main className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white`}>
+      <main className={`${display.variable} ${mono.variable} ${serif.variable} ${inter.variable} min-h-screen bg-white`}>
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-8 h-8 border-2 rounded-full" style={{ borderColor: HAIRLINE, borderTopColor: YPA_BLUE }} />
@@ -722,12 +692,13 @@ export default function AboutPage() {
   }
 
   return (
-    <main className={`${display.variable} ${mono.variable} ${inter.variable} min-h-screen bg-white overflow-x-hidden font-sans`}>
+    <main className={`${display.variable} ${mono.variable} ${serif.variable} ${inter.variable} min-h-screen bg-white overflow-x-hidden font-sans`}>
       <Navigation />
       <SectionNav />
       <Hero />
-      <AboutIndex />
+      <FoundingQuote />
       <Story content={content} />
+      <PhotoInterlude />
       <Scale />
       <Leadership />
       <Purpose content={content} />
