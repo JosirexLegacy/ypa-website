@@ -16,7 +16,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Play,
-  Pause,
   Sparkles,
   Shield,
   Users,
@@ -24,16 +23,13 @@ import {
   Sprout,
   Leaf,
   Award,
-  Handshake,
   Calendar,
   Clock,
   MapPin,
-  Newspaper,
   Tv,
   Radio,
   Printer,
   Globe,
-  ExternalLink,
   Lightbulb,
   Target,
   Heart,
@@ -41,11 +37,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  X,
-  Volume2,
-  VolumeX,
-  Camera,
-  Film,
   GraduationCap,
   Tractor,
   Utensils,
@@ -949,7 +940,7 @@ const FieldIndex = () => {
   const track = [...FIELD_INDEX, ...FIELD_INDEX];
 
   return (
-    <section id="index" className="relative overflow-hidden py-3" style={{ background: VOID, borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+    <section id="index" className="relative overflow-hidden py-3 scroll-mt-20" style={{ background: VOID, borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
       <div className="flex items-center gap-2 px-5 md:px-14 pb-2.5">
         <span className="relative flex h-1.5 w-1.5">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: YPA_BLUE }} />
@@ -1159,7 +1150,7 @@ const AerialShowcase = () => {
         <button
           onClick={prev}
           aria-label="Previous footage"
-          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border shrink-0 transition-colors duration-200 active:scale-95 hover:bg-white/5"
+          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border shrink-0 transition-colors duration-200 active:scale-95 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF]/60"
           style={{ borderColor: "rgba(240,180,41,0.3)", color: "#F5F6F7" }}
         >
           <ChevronLeft className="w-4 h-4" />
@@ -1202,7 +1193,7 @@ const AerialShowcase = () => {
         <button
           onClick={next}
           aria-label="Next footage"
-          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border shrink-0 transition-colors duration-200 active:scale-95 hover:bg-white/5"
+          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border shrink-0 transition-colors duration-200 active:scale-95 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF]/60"
           style={{ borderColor: "rgba(240,180,41,0.3)", color: "#F5F6F7" }}
         >
           <ChevronRight className="w-4 h-4" />
@@ -1302,7 +1293,7 @@ const ECOSYSTEM = [
 
 const ExploreRail = () => {
   return (
-    <section id="explore" className="px-5 md:px-14 py-16 md:py-24 max-w-7xl mx-auto">
+    <section id="explore" className="px-5 md:px-14 py-16 md:py-24 max-w-7xl mx-auto scroll-mt-20">
       <ScrollReveal>
         <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
           <div>
@@ -1334,7 +1325,7 @@ const ExploreRail = () => {
             <ScrollReveal key={i} delay={i * 0.04} className={item.tall ? "sm:row-span-2" : ""}>
               <Link href={item.href} className="group block h-full">
                 <div
-                  className={`relative h-full rounded-2xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl ${
+                  className={`relative h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.015] hover:shadow-2xl ${
                     item.tall ? "min-h-[280px] sm:min-h-[320px]" : "min-h-[200px] sm:min-h-[220px]"
                   }`}
                   style={{ boxShadow: `0 4px 20px ${item.color}15` }}
@@ -1446,7 +1437,7 @@ const TheLineup = () => {
   const [hover, setHover] = useState<number | null>(null);
 
   return (
-    <section id="lineup" className="px-5 md:px-14 py-16 md:py-24 bg-[#111111]">
+    <section id="lineup" className="px-5 md:px-14 py-16 md:py-24 bg-[#111111] scroll-mt-20">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
           <div className={`${display.className} text-[11px] md:text-[13px] text-white/40 mb-2`}>
@@ -1546,7 +1537,7 @@ const WHY_POINTS = [
 
 const TrustBar = () => {
   return (
-    <section id="trust" className="px-5 md:px-14 py-16 md:py-24 bg-white border-t" style={{ borderColor: "#EEF1F3" }}>
+    <section id="trust" className="px-5 md:px-14 py-16 md:py-24 bg-white border-t scroll-mt-20" style={{ borderColor: "#EEF1F3" }}>
       <div className="max-w-7xl mx-auto">
         <ScrollReveal className="mb-8 md:mb-12">
           <div className="flex items-center gap-2.5">
@@ -1618,7 +1609,7 @@ const Signal = ({ signalArticles }: { signalArticles: any[] }) => {
   const rest = signalArticles.filter((a) => a.slug !== featured?.slug) || [];
 
   return (
-    <section id="signal" className="px-5 md:px-14 py-16 md:py-24 max-w-7xl mx-auto">
+    <section id="signal" className="px-5 md:px-14 py-16 md:py-24 max-w-7xl mx-auto scroll-mt-20">
       <ScrollReveal>
         <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
           <div>
@@ -1733,7 +1724,7 @@ const MemberVoices = () => {
   const track = [...VOICES, ...VOICES];
 
   return (
-    <section id="voices" className="py-12 md:py-20 overflow-hidden border-y border-[#1F3B57] bg-[#0E2540]">
+    <section id="voices" className="py-16 md:py-24 overflow-hidden border-y border-[#1F3B57] bg-[#0E2540] scroll-mt-20">
       <ScrollReveal className="px-5 md:px-14 max-w-7xl mx-auto mb-6 md:mb-10">
         <div className={`${display.className} text-[11px] md:text-[13px] text-white/40 mb-2`}>
           In their own words
@@ -1772,7 +1763,7 @@ const RecentBlogs = ({ blogs }: { blogs: any[] }) => {
   const rest = blogs.slice(1, 4);
 
   return (
-    <section id="blog" className="px-5 md:px-14 py-16 md:py-24 max-w-7xl mx-auto">
+    <section id="blog" className="px-5 md:px-14 py-16 md:py-24 max-w-7xl mx-auto scroll-mt-20">
       <ScrollReveal>
         <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
           <div>
@@ -1889,7 +1880,7 @@ const EventsBanner = ({ events }: { events: any[] }) => {
   const upcomingEvents = events.slice(0, 3);
 
   return (
-    <section className="px-4 sm:px-5 md:px-14 py-12 md:py-20 bg-[#0E2540] overflow-hidden border-y border-[#1F3B57]">
+    <section className="px-4 sm:px-5 md:px-14 py-16 md:py-24 bg-[#0E2540] overflow-hidden border-y border-[#1F3B57] scroll-mt-20">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 md:mb-8 gap-3">
@@ -2081,7 +2072,7 @@ const SocialMedia = () => {
 // ============================================================
 const FinalCTA = () => {
   return (
-    <section id="cta" className="relative px-5 py-20 md:py-32 overflow-hidden bg-[#111111]">
+    <section id="cta" className="relative px-5 py-20 md:py-32 overflow-hidden bg-[#111111] scroll-mt-20">
       <div className="absolute inset-0">
         <div className="absolute top-[-50%] right-[-15%] w-[300px] md:w-[700px] h-[300px] md:h-[700px] rounded-full blur-3xl bg-[#00AEEF]/10" />
         <div className="absolute bottom-[-50%] left-[-15%] w-[300px] md:w-[700px] h-[300px] md:h-[700px] rounded-full blur-3xl bg-[#33C1F5]/10" />
@@ -2123,8 +2114,6 @@ const FinalCTA = () => {
 // LIVE PANEL
 // ============================================================
 const LivePanel = ({ events, blogs }: { events: any[]; blogs: any[] }) => {
-  const GOLD = "#F0B429";
-  
   const facts = [
     { icon: Target, title: "Our Mission", description: "Empowering Africa's youth through sustainable agribusiness and financial inclusion." },
     { icon: Heart, title: "Our Impact", description: "130,000+ goats under care. 18,000+ active members. 12 branches across Uganda." },
