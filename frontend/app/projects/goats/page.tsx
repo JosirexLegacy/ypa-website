@@ -162,11 +162,11 @@ const AnimatedCounter = ({ target, suffix = "", label = "" }: { target: number; 
 
   return (
     <div ref={ref} className="text-center">
-      <span className={`${display.className} text-3xl md:text-4xl font-medium`} style={{ color: YPA_BLUE }}>
-        {count}{suffix}
+      <span className={`${display.className} text-2xl sm:text-3xl md:text-4xl font-medium`} style={{ color: YPA_BLUE }}>
+        {count.toLocaleString()}{suffix}
       </span>
       {label && (
-        <p className={`${mono.className} text-[10px] md:text-[11px] tracking-[0.1em] uppercase text-[#5B6B7A] mt-1 font-medium`}>
+        <p className={`${mono.className} text-[9px] sm:text-[10px] md:text-[11px] tracking-[0.1em] uppercase text-[#5B6B7A] mt-1 font-medium`}>
           {label}
         </p>
       )}
@@ -352,11 +352,11 @@ export default function GoatsPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="flex flex-wrap items-center gap-3 md:gap-4 mt-6 md:mt-8"
+              className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 mt-6 md:mt-8"
             >
               <button
                 onClick={() => scrollToSection('models')}
-                className="group inline-flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-full text-sm font-medium text-white transition-all hover:-translate-y-0.5"
+                className="group inline-flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-full text-sm font-medium text-white transition-all hover:-translate-y-0.5 w-full sm:w-auto"
                 style={{
                   background: YPA_BLUE,
                   boxShadow: `0 20px 40px -12px ${YPA_BLUE}66`
@@ -367,7 +367,7 @@ export default function GoatsPage() {
               </button>
               <button
                 onClick={() => scrollToSection('pricing')}
-                className={`${mono.className} inline-flex items-center gap-2 text-[10px] md:text-[11px] tracking-[0.15em] uppercase text-white/40 hover:text-white/70 transition-colors border border-white/10 px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-white/5 backdrop-blur-sm`}
+                className={`${mono.className} inline-flex items-center justify-center gap-2 text-[10px] md:text-[11px] tracking-[0.15em] uppercase text-white/40 hover:text-white/70 transition-colors border border-white/10 px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-white/5 backdrop-blur-sm w-full sm:w-auto`}
               >
                 View Pricing
                 <ChevronDown className="w-4 h-4" />
@@ -430,35 +430,35 @@ export default function GoatsPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0E2540]/80 via-[#0E2540]/20 to-transparent" />
 
                 {/* Floating stat cards on image */}
-                <div className="absolute bottom-4 md:bottom-6 left-4 md:left-6 right-4 md:right-6">
-                  <div className="grid grid-cols-2 gap-3 md:gap-4">
-                    <div className="p-3 md:p-4 rounded-2xl" style={{
+                <div className="absolute bottom-3 md:bottom-6 left-3 md:left-6 right-3 md:right-6">
+                  <div className="grid grid-cols-2 max-[380px]:grid-cols-1 gap-2.5 md:gap-4">
+                    <div className="p-2.5 md:p-4 rounded-xl md:rounded-2xl" style={{
                       background: "rgba(14,37,64,0.85)",
                       backdropFilter: "blur(16px)",
                       border: "1px solid rgba(255,255,255,0.08)"
                     }}>
                       <div className="flex items-center gap-2 md:gap-3">
-                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center" style={{ background: `${YPA_GOLD}30` }}>
-                          <Trophy className="w-4 h-4 md:w-5 md:h-5" style={{ color: YPA_GOLD }} />
+                        <div className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center shrink-0" style={{ background: `${YPA_GOLD}30` }}>
+                          <Trophy className="w-3.5 h-3.5 md:w-5 md:h-5" style={{ color: YPA_GOLD }} />
                         </div>
-                        <div>
-                          <div className={`${display.className} text-white font-medium text-xs md:text-sm`}>#1 Goat Farmers</div>
-                          <div className={`${mono.className} text-white/40 text-[8px] md:text-[10px] tracking-[0.1em] uppercase`}>130,000+ goats</div>
+                        <div className="min-w-0">
+                          <div className={`${display.className} text-white font-medium text-xs md:text-sm truncate`}>#1 Goat Farmers</div>
+                          <div className={`${mono.className} text-white/40 text-[8px] md:text-[10px] tracking-[0.1em] uppercase truncate`}>130,000+ goats</div>
                         </div>
                       </div>
                     </div>
-                    <div className="p-3 md:p-4 rounded-2xl" style={{
+                    <div className="p-2.5 md:p-4 rounded-xl md:rounded-2xl" style={{
                       background: "rgba(14,37,64,0.85)",
                       backdropFilter: "blur(16px)",
                       border: "1px solid rgba(255,255,255,0.08)"
                     }}>
                       <div className="flex items-center gap-2 md:gap-3">
-                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center" style={{ background: `${YPA_BLUE}30` }}>
-                          <Users className="w-4 h-4 md:w-5 md:h-5" style={{ color: YPA_BLUE }} />
+                        <div className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center shrink-0" style={{ background: `${YPA_BLUE}30` }}>
+                          <Users className="w-3.5 h-3.5 md:w-5 md:h-5" style={{ color: YPA_BLUE }} />
                         </div>
-                        <div>
-                          <div className={`${display.className} text-white font-medium text-xs md:text-sm`}>1,000+ Members</div>
-                          <div className={`${mono.className} text-white/40 text-[8px] md:text-[10px] tracking-[0.1em] uppercase`}>Growing community</div>
+                        <div className="min-w-0">
+                          <div className={`${display.className} text-white font-medium text-xs md:text-sm truncate`}>1,000+ Members</div>
+                          <div className={`${mono.className} text-white/40 text-[8px] md:text-[10px] tracking-[0.1em] uppercase truncate`}>Growing community</div>
                         </div>
                       </div>
                     </div>
@@ -508,7 +508,7 @@ export default function GoatsPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex-1 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 ${
+                    className={`flex-1 px-2 sm:px-3 md:px-4 py-2 rounded-lg text-[11px] sm:text-xs md:text-sm font-medium whitespace-nowrap transition-all duration-300 ${
                       activeTab === tab.id
                         ? 'bg-white text-[#111111] shadow-sm'
                         : 'text-[#5B6B7A] hover:text-[#111111]'
@@ -649,7 +649,7 @@ export default function GoatsPage() {
       {/* ============================================================
         THE BREED
         ============================================================ */}
-      <section id="breed" className="py-16 md:py-24 px-5 md:px-14" style={{ background: MIST }}>
+      <section id="breed" className="py-16 md:py-24 px-5 md:px-14 scroll-mt-20" style={{ background: MIST }}>
         <div className="container mx-auto max-w-6xl">
           <ScrollReveal className="text-center mb-10 md:mb-16">
             <div className={`${mono.className} text-[10px] md:text-[11px] tracking-[0.22em] uppercase mb-2 md:mb-3`} style={{ color: MUTE_ON_LIGHT }}>
@@ -781,7 +781,7 @@ export default function GoatsPage() {
       {/* ============================================================
         MODELS
         ============================================================ */}
-      <section id="models" className="py-16 md:py-24 px-5 md:px-14" style={{ background: MIST }}>
+      <section id="models" className="py-16 md:py-24 px-5 md:px-14 scroll-mt-20" style={{ background: MIST }}>
         <div className="container mx-auto max-w-6xl">
           <ScrollReveal className="text-center mb-10 md:mb-16">
             <div className={`${mono.className} text-[10px] md:text-[11px] tracking-[0.22em] uppercase mb-2 md:mb-3`} style={{ color: MUTE_ON_LIGHT }}>
@@ -863,7 +863,7 @@ export default function GoatsPage() {
       {/* ============================================================
         PRICING
         ============================================================ */}
-      <section id="pricing" className="py-16 md:py-24 px-5 md:px-14 bg-white">
+      <section id="pricing" className="py-16 md:py-24 px-5 md:px-14 bg-white scroll-mt-20">
         <div className="container mx-auto max-w-6xl">
           <ScrollReveal className="text-center mb-10 md:mb-16">
             <div className={`${mono.className} text-[10px] md:text-[11px] tracking-[0.22em] uppercase mb-2 md:mb-3`} style={{ color: MUTE_ON_LIGHT }}>
@@ -906,7 +906,7 @@ export default function GoatsPage() {
       {/* ============================================================
         RETURNS + WHY YPA
         ============================================================ */}
-      <section id="returns" className="py-16 md:py-24 px-5 md:px-14" style={{ background: MIST }}>
+      <section id="returns" className="py-16 md:py-24 px-5 md:px-14 scroll-mt-20" style={{ background: MIST }}>
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-10 md:gap-12 items-start">
             <ScrollReveal>
@@ -1063,10 +1063,10 @@ export default function GoatsPage() {
                 <p className="text-xs md:text-sm max-w-2xl mx-auto text-white/60">
                   Join the Goats Project and start your agribusiness journey
                 </p>
-                <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-6 md:mt-8">
+                <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 md:gap-4 mt-6 md:mt-8">
                   <Link
                     href="/contact"
-                    className="group inline-flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-full text-sm font-medium text-white transition-all hover:-translate-y-0.5"
+                    className="group inline-flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-full text-sm font-medium text-white transition-all hover:-translate-y-0.5 w-full sm:w-auto"
                     style={{ background: YPA_BLUE, boxShadow: `0 20px 40px -12px ${YPA_BLUE}66` }}
                   >
                     Contact Us Now
@@ -1074,7 +1074,7 @@ export default function GoatsPage() {
                   </Link>
                   <button
                     onClick={() => scrollToSection('pricing')}
-                    className={`${mono.className} inline-flex items-center gap-2 text-[10px] md:text-[11px] tracking-[0.15em] uppercase text-white/40 hover:text-white/70 transition-colors border border-white/10 px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-white/5 backdrop-blur-sm`}
+                    className={`${mono.className} inline-flex items-center justify-center gap-2 text-[10px] md:text-[11px] tracking-[0.15em] uppercase text-white/40 hover:text-white/70 transition-colors border border-white/10 px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-white/5 backdrop-blur-sm w-full sm:w-auto`}
                   >
                     View Pricing
                     <ChevronRight className="w-4 h-4" />
