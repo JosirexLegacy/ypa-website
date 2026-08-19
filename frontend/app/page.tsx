@@ -289,36 +289,154 @@ const LINEUP = [
 // ============================================================
 // DRONE FOOTAGE — Easy to add more videos
 // ============================================================
-const DRONE_FOOTAGE = [
+interface VideoItem {
+  id: string;
+  videoId: string;
+  title: string;
+  subtitle: string;
+  tag: string;
+  color: string;
+  location: string;
+  stat: string;
+  publishedAt?: string;
+}
+
+const YPA_CHANNEL_HANDLE = "youthplatformafrica";
+const YPA_CHANNEL_URL = `https://www.youtube.com/@${YPA_CHANNEL_HANDLE}`;
+
+const CURATED_VIDEOS: VideoItem[] = [
   {
-    id: 1,
+    id: "v1",
     videoId: "ULOKzJezKc8",
     title: "The Herd in Motion",
     subtitle: "Aerial view — the Goats Programme",
-    tag: "LIVESTOCK",
+    tag: "Livestock",
     color: YPA_BLUE,
     location: "Mubende District, Uganda",
     stat: "130,000+ under care",
   },
   {
-    id: 2,
+    id: "v2",
     videoId: "lKkeDNTbtho",
     title: "Fields Under Contract",
     subtitle: "Aerial view — Maize & Contract Farming",
-    tag: "CROPPING",
+    tag: "Cropping",
     color: GOLD,
     location: "Central Region, Uganda",
     stat: "5,000+ acres cultivated",
   },
   {
-    id: 3,
+    id: "v3",
     videoId: "_iT3kN3sEgk",
     title: "Twelve Branches, One Ledger",
     subtitle: "Aerial view — YPA SACCO",
-    tag: "FINANCE",
+    tag: "Finance",
     color: YPA_BLUE_LIGHT,
     location: "Kampala, Uganda",
     stat: "12 branches nationwide",
+  },
+];
+
+// ============================================================
+// LIVE CHANNEL FETCHER — pulls the latest uploads straight from
+// @youthplatformafrica.
+//
+// Setup: console.cloud.google.com → enable "YouTube Data API v3"
+// → create an API key → put it in .env as
+// NEXT_PUBLIC_YOUTUBE_API_KEY=your_key_here
+//
+// No key set (or the request fails)? This returns [] and
+// VideoTheater silently falls back to CURATED_VIDEOS — the
+// section always renders, live or not.
+// ============================================================
+async function getChannelVideos(maxResults = 8): Promise<VideoItem[]> {
+  const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+  if (!apiKey) return [];
+  try {
+    const chRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${YPA_CHANNEL_HANDLE}&key=${apiKey}`,
+      { next: { revalidate: 3600 } }
+    );
+    const chData = await chRes.json();
+    const channelId = chData?.items?.[0]?.id;
+    if (!channelId) return [];
+
+    const searchRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=date&maxResults=${maxResults}&type=video&key=${apiKey}`,
+      { next: { revalidate: 3600 } }
+    );
+    const searchData = await searchRes.json();
+    const items = searchData?.items || [];
+    const palette = [YPA_BLUE, GOLD, YPA_BLUE_LIGHT, "#34D399"];
+
+    return items
+      .filter((it: any) => it?.id?.videoId)
+      .map((item: any, idx: number) => ({
+        id: `yt-${item.id.videoId}`,
+        videoId: item.id.videoId,
+        title: item.snippet.title,
+        subtitle: item.snippet.channelTitle || "Youth Platform Africa",
+        tag: "Latest",
+        color: palette[idx % palette.length],
+        location: "Uganda",
+        stat: new Date(item.snippet.publishedAt).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        publishedAt: item.snippet.publishedAt,
+      }));
+  } catch (err) {
+    console.error("Error fetching YPA channel videos:", err);
+    return [];
+  }
+}
+
+// ============================================================
+// YPA DEALS — a creative "ad slot" for offers/promos. Add an
+// object to DEALS and it appears automatically.
+// ============================================================
+interface DealItem {
+  id: string;
+  badge: string;
+  title: string;
+  description: string;
+  cta: string;
+  href: string;
+  image: string;
+  color: string;
+}
+
+const DEALS: DealItem[] = [
+  {
+    id: "d1",
+    badge: "Limited Slots",
+    title: "Join the Goats Programme this quarter",
+    description: "Zero enrollment fee for new members who sign up before the season closes.",
+    cta: "Claim this offer",
+    href: "/projects/goats",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1786356172/DJI_0017_g53jgu.jpg",
+    color: YPA_BLUE,
+  },
+  {
+    id: "d2",
+    badge: "SACCO Boost",
+    title: "Open a SACCO account, get bonus savings interest",
+    description: "New members earn an extra 1% on their first year of savings.",
+    cta: "Open an account",
+    href: "/sacco",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784727031/54b61dc1-469f-4363-8a52-4de7e285fa1b.jpg",
+    color: GOLD,
+  },
+  {
+    id: "d3",
+    badge: "Farm-to-Table",
+    title: "20% off your first visit to Mbuzi Choma",
+    description: "Taste the goats you're helping raise — show your YPA membership card at the door.",
+    cta: "Reserve a table",
+    href: "/mbuzi-choma",
+    image: "https://res.cloudinary.com/owwvyprb/image/upload/v1784726488/2d86272b-4d19-41b6-b35e-7431ca4d7b7f.jpg",
+    color: "#EF4444",
   },
 ];
 
@@ -412,6 +530,7 @@ const SECTIONS = [
   { id: "explore", label: "Ecosystem" },
   { id: "lineup", label: "The Agribusiness Projects" },
   { id: "trust", label: "Why Trust Us" },
+  { id: "theater", label: "From Above" },
   { id: "signal", label: "Inside YPA" },
   { id: "voices", label: "Member Voices" },
   { id: "blog", label: "Blog" },
@@ -988,239 +1107,424 @@ const FieldIndex = () => {
 };
 
 // ============================================================
-// AERIAL SHOWCASE — manual, lightweight, one video mounted at a time
+// EQUALIZER — small "now playing" indicator
 // ============================================================
-const AerialShowcase = () => {
+const EqualizerBars = ({ color }: { color: string }) => (
+  <div className="flex items-end gap-[2px] h-3">
+    {[0, 1, 2].map((i) => (
+      <motion.span
+        key={i}
+        className="w-[2px] rounded-full"
+        style={{ background: color }}
+        animate={{ height: ["30%", "100%", "50%", "80%", "30%"] }}
+        transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut", delay: i * 0.15 }}
+      />
+    ))}
+  </div>
+);
+
+// ============================================================
+// VIDEO THEATER — YouTube-style hub, live from @youthplatformafrica
+// ============================================================
+const VideoTheater = ({ videos }: { videos: VideoItem[] }) => {
+  const library = videos.length > 0 ? videos : CURATED_VIDEOS;
   const [activeIndex, setActiveIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const thumbRailRef = useRef<HTMLDivElement>(null);
+  const [activeTag, setActiveTag] = useState("All");
+  const railRef = useRef<HTMLDivElement>(null);
+  const mobileRailRef = useRef<HTMLDivElement>(null);
 
-  const goTo = useCallback((index: number) => {
-    const total = DRONE_FOOTAGE.length;
-    setActiveIndex(((index % total) + total) % total);
-    setPlaying(false);
-  }, []);
+  const tags = ["All", ...Array.from(new Set(library.map((v) => v.tag)))];
+  const filtered = activeTag === "All" ? library : library.filter((v) => v.tag === activeTag);
+  const footage = filtered[Math.min(activeIndex, Math.max(filtered.length - 1, 0))] || library[0];
 
-  const next = useCallback(() => goTo(activeIndex + 1), [activeIndex, goTo]);
-  const prev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo]);
+  const goTo = useCallback(
+    (index: number) => {
+      const total = filtered.length;
+      if (total === 0) return;
+      setActiveIndex(((index % total) + total) % total);
+      setPlaying(false);
+    },
+    [filtered.length]
+  );
 
   useEffect(() => {
-    const rail = thumbRailRef.current;
-    const activeThumb = rail?.children[activeIndex] as HTMLElement | undefined;
-    if (rail && activeThumb) {
-      const railRect = rail.getBoundingClientRect();
-      const thumbRect = activeThumb.getBoundingClientRect();
-      if (thumbRect.left < railRect.left || thumbRect.right > railRect.right) {
+    setActiveIndex(0);
+    setPlaying(false);
+  }, [activeTag]);
+
+  useEffect(() => {
+    [railRef, mobileRailRef].forEach((ref) => {
+      const rail = ref.current;
+      const activeThumb = rail?.children[activeIndex] as HTMLElement | undefined;
+      if (rail && activeThumb) {
         activeThumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       }
-    }
+    });
   }, [activeIndex]);
 
-  const totalVideos = DRONE_FOOTAGE.length;
-  const footage = DRONE_FOOTAGE[activeIndex];
+  if (!footage) return null;
 
   return (
-    <section className="relative overflow-hidden py-16 md:py-24" style={{ background: VOID }}>
-      {/* Ambient glow — same language as the hero, static (no animated blur = no jank) */}
-      <div
-        className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full blur-[110px] pointer-events-none"
-        style={{ background: footage.color, opacity: 0.08 }}
-      />
-      <div
-        className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[110px] pointer-events-none"
-        style={{ background: GOLD, opacity: 0.05 }}
-      />
+    <section id="theater" className="relative overflow-hidden py-16 md:py-24 scroll-mt-20" style={{ background: VOID }}>
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full blur-[110px] pointer-events-none" style={{ background: footage.color, opacity: 0.08 }} />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[110px] pointer-events-none" style={{ background: GOLD, opacity: 0.05 }} />
 
       {/* Header */}
-      <div className="relative z-10 px-5 md:px-14 mb-8 md:mb-12">
-        <GlowSeal label="Field-Verified Aerial Footage" />
+      <div className="relative z-10 px-5 md:px-14 mb-8 md:mb-10">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <GlowSeal label="Live from the YPA YouTube Channel" />
+          <a
+            href={YPA_CHANNEL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-medium tracking-wide border transition-all hover:-translate-y-0.5"
+            style={{ borderColor: "rgba(255,255,255,0.15)", color: "#F5F6F7" }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#FF0000">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+            Subscribe on YouTube
+          </a>
+        </div>
 
         <div className="flex items-end justify-between gap-4 mt-5 flex-wrap">
           <h2 className={`${display.className} text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-tight`}>
             The operation,{" "}
-            <span
-              className={`${serif.className} italic`}
-              style={{ color: YPA_BLUE_LIGHT, textShadow: `0 0 24px ${YPA_BLUE}60` }}
-            >
+            <span className={`${serif.className} italic`} style={{ color: YPA_BLUE_LIGHT, textShadow: `0 0 24px ${YPA_BLUE}60` }}>
               from above
             </span>
           </h2>
-          <span className={`${mono.className} text-[11px] text-white/35 tracking-[0.15em]`}>
-            {String(activeIndex + 1).padStart(2, "0")} / {String(totalVideos).padStart(2, "0")}
-          </span>
         </div>
         <p className="text-white/40 text-sm mt-3 max-w-2xl font-light">
-          {totalVideos} field-verified locations across YPA's programmes. Tap a thumbnail or use the arrows — nothing moves until you tell it to.
+          Every clip pulled straight from @{YPA_CHANNEL_HANDLE}. New uploads show up here automatically.
         </p>
-      </div>
 
-      {/* Stage — one video mounted at a time, click-to-play (no forced autoplay on scroll) */}
-      <div className="relative z-10 px-4 sm:px-5 md:px-14">
-        <div className="max-w-4xl mx-auto">
-          <div
-            className="relative aspect-[16/9] rounded-2xl md:rounded-3xl overflow-hidden bg-[#0A0A0B]"
-            style={{
-              border: `1px solid ${footage.color}40`,
-              boxShadow: `0 24px 64px -20px ${footage.color}30, 0 0 0 1px ${footage.color}10 inset`,
-            }}
-          >
-            <AnimatePresence mode="wait">
-              {playing ? (
-                <motion.iframe
-                  key={`playing-${footage.id}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 w-full h-full"
-                  src={`https://www.youtube-nocookie.com/embed/${footage.videoId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3`}
-                  title={footage.title}
-                  allow="autoplay; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                  frameBorder={0}
-                />
-              ) : (
-                <motion.button
-                  key={`poster-${footage.id}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  onClick={() => setPlaying(true)}
-                  className="absolute inset-0 w-full h-full group"
-                  aria-label={`Play ${footage.title}`}
-                >
-                  <img
-                    src={`https://img.youtube.com/vi/${footage.videoId}/hqdefault.jpg`}
-                    alt={footage.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                    style={{ filter: "brightness(0.5) saturate(0.65)" }}
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span
-                      className="flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-full backdrop-blur-sm border transition-transform duration-300 group-hover:scale-110"
-                      style={{ background: `${footage.color}22`, borderColor: `${footage.color}55` }}
-                    >
-                      <Play className="h-5 w-5 md:h-6 md:w-6 text-white ml-1" />
-                    </span>
-                  </div>
-                  <div className="absolute top-3 left-3 md:top-4 md:left-4">
-                    <span
-                      className={`${mono.className} text-[9px] tracking-[0.18em] uppercase px-2.5 py-1 rounded-full border backdrop-blur-sm`}
-                      style={{ background: `${footage.color}22`, borderColor: `${footage.color}45`, color: footage.color }}
-                    >
-                      {footage.tag}
-                    </span>
-                  </div>
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Caption — crossfades with the active clip */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={footage.id}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.25 }}
-              className="pt-4 md:pt-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
-            >
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`${mono.className} text-[9px] tracking-[0.18em] uppercase`} style={{ color: footage.color }}>
-                    {footage.subtitle}
-                  </span>
-                  <span className="w-px h-3 hidden sm:inline-block" style={{ background: `${footage.color}30` }} />
-                  <span className={`${mono.className} text-[9px] text-white/35 hidden sm:inline`}>{footage.location}</span>
-                </div>
-                <h3 className={`${display.className} text-base sm:text-lg md:text-xl font-medium text-white mt-1`}>
-                  {footage.title}
-                </h3>
-              </div>
-              <span className={`${mono.className} text-[10px] text-white/40 shrink-0`}>{footage.stat}</span>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* Manual controls */}
-      <div className="relative z-10 flex items-center justify-center gap-3 md:gap-4 mt-8 md:mt-10 px-4">
-        <button
-          onClick={prev}
-          aria-label="Previous footage"
-          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border shrink-0 transition-colors duration-200 active:scale-95 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF]/60"
-          style={{ borderColor: "rgba(240,180,41,0.3)", color: "#F5F6F7" }}
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-
-        {/* Thumbnail rail — native scroll, no JS drag physics, fully manual */}
-        <div
-          ref={thumbRailRef}
-          className="flex gap-2.5 md:gap-3 overflow-x-auto max-w-[68vw] sm:max-w-[420px] md:max-w-[560px] px-1 py-1 [&::-webkit-scrollbar]:hidden"
-          style={{ scrollSnapType: "x mandatory", scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          {DRONE_FOOTAGE.map((f, index) => {
-            const isActive = index === activeIndex;
+        {/* Filter chips */}
+        <div className="flex gap-2 mt-5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
+          {tags.map((tag) => {
+            const isActive = tag === activeTag;
             return (
               <button
-                key={f.id}
-                onClick={() => goTo(index)}
-                aria-label={`Show ${f.title}`}
-                className="relative shrink-0 rounded-lg overflow-hidden transition-all duration-200"
+                key={tag}
+                onClick={() => setActiveTag(tag)}
+                className={`${mono.className} shrink-0 rounded-full px-3.5 py-1.5 text-[10px] tracking-[0.1em] uppercase border transition-all duration-300`}
                 style={{
-                  width: isActive ? "76px" : "60px",
-                  height: isActive ? "48px" : "40px",
-                  border: `2px solid ${isActive ? f.color : "rgba(255,255,255,0.12)"}`,
-                  opacity: isActive ? 1 : 0.55,
-                  scrollSnapAlign: "center",
+                  borderColor: isActive ? footage.color : "rgba(255,255,255,0.14)",
+                  background: isActive ? `${footage.color}18` : "transparent",
+                  color: isActive ? footage.color : "rgba(245,246,247,0.5)",
                 }}
               >
-                <img
-                  src={`https://img.youtube.com/vi/${f.videoId}/default.jpg`}
-                  alt={f.title}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  style={{ filter: isActive ? "none" : "grayscale(0.4) brightness(0.7)" }}
-                />
+                {tag}
               </button>
             );
           })}
         </div>
-
-        <button
-          onClick={next}
-          aria-label="Next footage"
-          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border shrink-0 transition-colors duration-200 active:scale-95 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF]/60"
-          style={{ borderColor: "rgba(240,180,41,0.3)", color: "#F5F6F7" }}
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
       </div>
 
-      {/* CTAs */}
-      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 mt-9 md:mt-14 px-5">
-        <Link
-          href="/projects"
-          className="group inline-flex items-center gap-2 rounded-full px-6 md:px-8 py-3 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_28px_rgba(0,174,239,0.5)]"
-          style={{ background: YPA_BLUE, color: VOID }}
-        >
-          Explore Our Projects
-          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </Link>
-        <Link
-          href="/contact"
-          className="group inline-flex items-center gap-2 rounded-full px-6 md:px-8 py-3 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5 border hover:bg-white/5"
-          style={{ borderColor: "rgba(240,180,41,0.25)", color: "#F5F6F7" }}
-        >
-          Become a Member
-          <Users className="h-4 w-4" style={{ color: GOLD }} />
-        </Link>
-      </div>
+      {/* Theater: player + up-next */}
+      <div className="relative z-10 px-4 sm:px-5 md:px-14">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+          {/* Player column */}
+          <div>
+            <div
+              className="relative aspect-[16/9] rounded-2xl md:rounded-3xl overflow-hidden bg-[#0A0A0B]"
+              style={{ border: `1px solid ${footage.color}40`, boxShadow: `0 24px 64px -20px ${footage.color}30, 0 0 0 1px ${footage.color}10 inset` }}
+            >
+              <AnimatePresence mode="wait">
+                {playing ? (
+                  <motion.iframe
+                    key={`playing-${footage.videoId}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 w-full h-full"
+                    src={`https://www.youtube-nocookie.com/embed/${footage.videoId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3`}
+                    title={footage.title}
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                    frameBorder={0}
+                  />
+                ) : (
+                  <motion.button
+                    key={`poster-${footage.videoId}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    onClick={() => setPlaying(true)}
+                    className="absolute inset-0 w-full h-full group"
+                    aria-label={`Play ${footage.title}`}
+                  >
+                    <img
+                      src={`https://img.youtube.com/vi/${footage.videoId}/hqdefault.jpg`}
+                      alt={footage.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      style={{ filter: "brightness(0.5) saturate(0.65)" }}
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span
+                        className="flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-full backdrop-blur-sm border transition-transform duration-300 group-hover:scale-110"
+                        style={{ background: `${footage.color}22`, borderColor: `${footage.color}55` }}
+                      >
+                        <Play className="h-5 w-5 md:h-6 md:w-6 text-white ml-1" />
+                      </span>
+                    </div>
+                    <div className="absolute top-3 left-3 md:top-4 md:left-4">
+                      <span
+                        className={`${mono.className} text-[9px] tracking-[0.18em] uppercase px-2.5 py-1 rounded-full border backdrop-blur-sm`}
+                        style={{ background: `${footage.color}22`, borderColor: `${footage.color}45`, color: footage.color }}
+                      >
+                        {footage.tag}
+                      </span>
+                    </div>
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={{ background: `linear-gradient(to top, ${VOID}, transparent)` }} />
+            {/* Meta row */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={footage.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.25 }}
+                className="pt-4 md:pt-5"
+              >
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <span
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-medium text-[11px]"
+                      style={{ background: YPA_BLUE, color: VOID }}
+                    >
+                      YPA
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className={`${display.className} text-base sm:text-lg md:text-xl font-medium text-white`}>{footage.title}</h3>
+                      <div className="flex items-center gap-2 flex-wrap mt-1">
+                        <span className={`${mono.className} text-[9px] text-white/40`}>{footage.subtitle}</span>
+                        <span className="w-1 h-1 rounded-full bg-white/20" />
+                        <span className={`${mono.className} text-[9px] text-white/40`}>{footage.stat}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {playing && (
+                    <span className="inline-flex items-center gap-1.5 shrink-0" style={{ color: footage.color }}>
+                      <EqualizerBars color={footage.color} />
+                      <span className={`${mono.className} text-[9px] uppercase tracking-wide`}>Playing</span>
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Up-next sidebar — desktop, vertical scroll */}
+          <div className="hidden lg:block">
+            <div className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/40 mb-3`}>
+              Up next · {filtered.length} videos
+            </div>
+            <div ref={railRef} className="flex flex-col gap-2.5 max-h-[460px] overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
+              {filtered.map((v, index) => {
+                const isActive = index === activeIndex;
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => goTo(index)}
+                    className="flex gap-3 text-left rounded-xl p-2 transition-all duration-300"
+                    style={{
+                      background: isActive ? `${v.color}14` : "transparent",
+                      border: `1px solid ${isActive ? `${v.color}40` : "transparent"}`,
+                    }}
+                  >
+                    <div className="relative w-28 aspect-video shrink-0 rounded-lg overflow-hidden">
+                      <img
+                        src={`https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg`}
+                        alt={v.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        style={{ filter: isActive ? "none" : "grayscale(0.3) brightness(0.8)" }}
+                      />
+                      {isActive && playing && (
+                        <span className="absolute bottom-1 right-1 bg-black/70 rounded px-1 py-0.5">
+                          <EqualizerBars color={v.color} />
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className={`${display.className} text-[13px] font-medium leading-snug line-clamp-2`} style={{ color: isActive ? "#F5F6F7" : "rgba(245,246,247,0.75)" }}>
+                        {v.title}
+                      </p>
+                      <p className={`${mono.className} text-[9px] text-white/35 mt-1`}>{v.subtitle}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Up-next rail — mobile, horizontal scroll-snap */}
+          <div className="lg:hidden -mx-4 sm:mx-0">
+            <div className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/40 mb-3 px-4 sm:px-0`}>
+              Up next
+            </div>
+            <div
+              ref={mobileRailRef}
+              className="flex gap-3 overflow-x-auto px-4 sm:px-0 pb-2 [&::-webkit-scrollbar]:hidden"
+              style={{ scrollSnapType: "x mandatory" }}
+            >
+              {filtered.map((v, index) => {
+                const isActive = index === activeIndex;
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => goTo(index)}
+                    className="shrink-0 w-[200px] text-left rounded-xl overflow-hidden"
+                    style={{ scrollSnapAlign: "start", border: `1px solid ${isActive ? v.color : "rgba(255,255,255,0.1)"}` }}
+                  >
+                    <div className="relative aspect-video">
+                      <img
+                        src={`https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg`}
+                        alt={v.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        style={{ filter: isActive ? "none" : "grayscale(0.3) brightness(0.75)" }}
+                      />
+                      {isActive && (
+                        <span
+                          className={`${mono.className} absolute top-1.5 left-1.5 text-[8px] uppercase tracking-wide px-1.5 py-0.5 rounded-full`}
+                          style={{ background: `${v.color}cc`, color: VOID }}
+                        >
+                          Now
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-2 bg-white/[0.03]">
+                      <p className="text-[11px] font-medium text-white/85 leading-snug line-clamp-2">{v.title}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================================
+// YPA DEALS — rotating "ad" banner for offers
+// ============================================================
+const YPADeals = () => {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const total = DEALS.length;
+  const DURATION = 6000;
+
+  useEffect(() => {
+    if (paused || reduceMotion) return;
+    const t = setInterval(() => setActive((p) => (p + 1) % total), DURATION);
+    return () => clearInterval(t);
+  }, [paused, reduceMotion, total]);
+
+  const deal = DEALS[active];
+
+  return (
+    <section
+      className="px-5 md:px-14 py-10 md:py-14 max-w-7xl mx-auto scroll-mt-20"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <ScrollReveal>
+        <div className="flex items-center gap-2.5 mb-4">
+          <span className={`${mono.className} text-[10px] tracking-[0.25em] uppercase`} style={{ color: GOLD }}>
+            YPA Deals
+          </span>
+          <span className="h-px flex-1" style={{ background: "rgba(240,180,41,0.3)" }} />
+          <span className={`${mono.className} text-[10px] text-[#5B6B7A]`}>Offers across our programmes</span>
+        </div>
+      </ScrollReveal>
+
+      <ScrollReveal delay={0.05}>
+        <div
+          className="relative rounded-2xl md:rounded-3xl overflow-hidden min-h-[280px] md:min-h-[340px]"
+          style={{ boxShadow: `0 20px 50px -20px ${deal.color}40` }}
+        >
+          {/* Story-style progress bars */}
+          <div className="absolute top-3 left-3 right-3 z-20 flex gap-1.5">
+            {DEALS.map((_, i) => (
+              <div key={i} className="h-[3px] flex-1 rounded-full overflow-hidden bg-white/25">
+                {i === active && !reduceMotion && (
+                  <motion.div
+                    key={active}
+                    className="h-full bg-white"
+                    initial={{ width: "0%" }}
+                    animate={{ width: paused ? undefined : "100%" }}
+                    transition={{ duration: DURATION / 1000, ease: "linear" }}
+                  />
+                )}
+                {i < active && <div className="h-full bg-white" />}
+              </div>
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={deal.id}
+              initial={{ opacity: 0, scale: 1.04 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0"
+            >
+              <img src={deal.image} alt={deal.title} className="absolute inset-0 w-full h-full object-cover" style={{ filter: "brightness(0.5) saturate(0.85)" }} />
+              <div className="absolute inset-0" style={{ background: `linear-gradient(100deg, ${deal.color}40, #060B14cc 65%)` }} />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Diagonal ribbon */}
+          <div className="absolute -left-10 top-8 z-10 rotate-[-40deg]">
+            <span className={`${mono.className} block px-12 py-1.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-white`} style={{ background: deal.color }}>
+              {deal.badge}
+            </span>
+          </div>
+
+          <div className="relative z-10 flex flex-col justify-end h-full min-h-[280px] md:min-h-[340px] p-6 md:p-10 max-w-xl">
+            <AnimatePresence mode="wait">
+              <motion.div key={`text-${deal.id}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.35, delay: 0.1 }}>
+                <h3 className={`${display.className} text-xl md:text-3xl font-medium text-white leading-snug`}>{deal.title}</h3>
+                <p className="text-white/60 text-sm md:text-[15px] font-light mt-2 max-w-md">{deal.description}</p>
+                <Link
+                  href={deal.href}
+                  className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all hover:-translate-y-0.5"
+                  style={{ background: deal.color, color: VOID }}
+                >
+                  {deal.cta}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Dot nav */}
+          <div className="absolute bottom-4 right-4 md:bottom-6 md:right-8 z-10 flex gap-1.5">
+            {DEALS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                aria-label={`Show deal ${i + 1}`}
+                className="h-1.5 rounded-full transition-all duration-300"
+                style={{ width: i === active ? "18px" : "6px", background: i === active ? "#fff" : "rgba(255,255,255,0.35)" }}
+              />
+            ))}
+          </div>
+        </div>
+      </ScrollReveal>
     </section>
   );
 };
@@ -2315,21 +2619,24 @@ export default function Home() {
   const [events, setEvents] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [signalArticles, setSignalArticles] = useState([]);
+  const [channelVideos, setChannelVideos] = useState<VideoItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const run = async () => {
       try {
-        const [p, e, b, s] = await Promise.all([
+        const [p, e, b, s, cv] = await Promise.all([
           getPressCoverage(),
           getEvents(),
           getBlogPosts(),
           getSignalArticles(),
+          getChannelVideos(),
         ]);
         setPress(p);
         setEvents(e);
         setBlogs(b);
         setSignalArticles(s);
+        setChannelVideos(cv);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -2367,7 +2674,8 @@ export default function Home() {
       <ExploreRail />
       <TheLineup />
       <TrustBar />
-      <AerialShowcase />
+      <YPADeals />
+      <VideoTheater videos={channelVideos} />
       <Signal signalArticles={signalArticles} />
       <MemberVoices />
       <RecentBlogs blogs={blogs} />
