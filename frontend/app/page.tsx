@@ -470,8 +470,14 @@ const GrainOverlay = () => (
 // ============================================================
 // GLOW SEAL — shared signature element
 // ============================================================
-const GlowSeal = ({ label = "Youth Platform Africa · Est. 2008" }: { label?: string }) => {
-  const reduceMotion = useReducedMotion();
+const GlowSeal = ({
+  label = "Youth Platform Africa · Est. 2008",
+  animated = true,
+}: {
+  label?: string;
+  animated?: boolean;
+}) => {
+  const reduceMotion = useReducedMotion() || !animated;
   return (
     <motion.div
       initial={reduceMotion ? {} : { opacity: 0, y: -8 }}
@@ -482,7 +488,7 @@ const GlowSeal = ({ label = "Youth Platform Africa · Est. 2008" }: { label?: st
     >
       <motion.span
         className="flex h-6 w-6 items-center justify-center rounded-full shrink-0"
-        style={{ background: GOLD }}
+        style={{ background: GOLD, boxShadow: reduceMotion ? `0 0 14px ${GOLD}60` : undefined }}
         animate={
           reduceMotion
             ? {}
@@ -1057,6 +1063,8 @@ const FIELD_INDEX = [
 const FieldIndex = () => {
   const reduceMotion = useReducedMotion();
   const track = [...FIELD_INDEX, ...FIELD_INDEX];
+  const tickerRef = useRef(null);
+  const tickerInView = useInView(tickerRef, { margin: "200px" });
 
   return (
     <section id="index" className="relative overflow-hidden py-3 scroll-mt-20" style={{ background: VOID, borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -1074,10 +1082,10 @@ const FieldIndex = () => {
         </span>
       </div>
 
-      <div className="relative py-1">
+      <div ref={tickerRef} className="relative py-1">
         <motion.div
           className="flex items-center gap-0 px-5 md:px-14"
-          animate={reduceMotion ? {} : { x: ["0%", "-50%"] }}
+          animate={reduceMotion || !tickerInView ? {} : { x: ["0%", "-50%"] }}
           transition={{ duration: 32, repeat: Infinity, ease: "linear" }}
         >
           {track.map((m, idx) => (
@@ -1111,13 +1119,19 @@ const FieldIndex = () => {
 // ============================================================
 const EqualizerBars = ({ color }: { color: string }) => (
   <div className="flex items-end gap-[2px] h-3">
+    <style>{`
+      @keyframes eqBounce { 0%,100% { height: 30%; } 25% { height: 90%; } 50% { height: 50%; } 75% { height: 75%; } }
+    `}</style>
     {[0, 1, 2].map((i) => (
-      <motion.span
+      <span
         key={i}
         className="w-[2px] rounded-full"
-        style={{ background: color }}
-        animate={{ height: ["30%", "100%", "50%", "80%", "30%"] }}
-        transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut", delay: i * 0.15 }}
+        style={{
+          background: color,
+          height: "50%",
+          animation: "eqBounce 0.9s ease-in-out infinite",
+          animationDelay: `${i * 0.15}s`,
+        }}
       />
     ))}
   </div>
@@ -1167,13 +1181,12 @@ const VideoTheater = ({ videos }: { videos: VideoItem[] }) => {
 
   return (
     <section id="theater" className="relative overflow-hidden py-16 md:py-24 scroll-mt-20" style={{ background: VOID }}>
-      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full blur-[110px] pointer-events-none" style={{ background: footage.color, opacity: 0.08 }} />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[110px] pointer-events-none" style={{ background: GOLD, opacity: 0.05 }} />
+      <div className="absolute -top-24 left-[-8%] w-[380px] h-[380px] rounded-full blur-[90px] pointer-events-none" style={{ background: footage.color, opacity: 0.07 }} />
 
       {/* Header */}
-      <div className="relative z-10 px-5 md:px-14 mb-8 md:mb-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-14 mb-8 md:mb-10">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <GlowSeal label="Live from the YPA YouTube Channel" />
+          <GlowSeal label="Live from the YPA YouTube Channel" animated={false} />
           <a
             href={YPA_CHANNEL_URL}
             target="_blank"
@@ -1201,7 +1214,8 @@ const VideoTheater = ({ videos }: { videos: VideoItem[] }) => {
         </p>
 
         {/* Filter chips */}
-        <div className="flex gap-2 mt-5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
+        <div className="relative -mx-5 md:-mx-14 mt-5">
+        <div className="flex gap-2 overflow-x-auto pb-1 px-5 md:px-14 [&::-webkit-scrollbar]:hidden">
           {tags.map((tag) => {
             const isActive = tag === activeTag;
             return (
@@ -1220,13 +1234,16 @@ const VideoTheater = ({ videos }: { videos: VideoItem[] }) => {
             );
           })}
         </div>
+        <div className="absolute inset-y-0 left-0 w-6 md:w-14 pointer-events-none" style={{ background: `linear-gradient(90deg, ${VOID}, transparent)` }} />
+        <div className="absolute inset-y-0 right-0 w-6 md:w-14 pointer-events-none" style={{ background: `linear-gradient(270deg, ${VOID}, transparent)` }} />
+        </div>
       </div>
 
       {/* Theater: player + up-next */}
-      <div className="relative z-10 px-4 sm:px-5 md:px-14">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-14">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 lg:gap-8 items-stretch">
           {/* Player column */}
-          <div>
+          <div className="flex flex-col">
             <div
               className="relative aspect-[16/9] rounded-2xl md:rounded-3xl overflow-hidden bg-[#0A0A0B]"
               style={{ border: `1px solid ${footage.color}40`, boxShadow: `0 24px 64px -20px ${footage.color}30, 0 0 0 1px ${footage.color}10 inset` }}
@@ -1322,13 +1339,17 @@ const VideoTheater = ({ videos }: { videos: VideoItem[] }) => {
             </AnimatePresence>
           </div>
 
-          {/* Up-next sidebar — desktop, vertical scroll */}
-          <div className="hidden lg:block">
-            <div className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/40 mb-3`}>
-              Up next · {filtered.length} videos
-            </div>
-            <div ref={railRef} className="flex flex-col gap-2.5 max-h-[460px] overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
-              {filtered.map((v, index) => {
+          {/* Up-next sidebar — desktop, vertical scroll, stretches to match player height */}
+          <div className="hidden lg:flex lg:flex-col">
+            <div
+              className="flex flex-col h-full rounded-2xl border p-3"
+              style={{ borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}
+            >
+              <div className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/40 mb-3 px-1 shrink-0`}>
+                Up next · {filtered.length} videos
+              </div>
+              <div ref={railRef} className="flex flex-col gap-2 overflow-y-auto pr-1 flex-1 min-h-0" style={{ scrollbarWidth: "thin" }}>
+                {filtered.map((v, index) => {
                 const isActive = index === activeIndex;
                 return (
                   <button
@@ -1363,17 +1384,18 @@ const VideoTheater = ({ videos }: { videos: VideoItem[] }) => {
                   </button>
                 );
               })}
+              </div>
             </div>
           </div>
 
           {/* Up-next rail — mobile, horizontal scroll-snap */}
-          <div className="lg:hidden -mx-4 sm:mx-0">
-            <div className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/40 mb-3 px-4 sm:px-0`}>
+          <div className="lg:hidden relative -mx-5 md:-mx-14">
+            <div className={`${mono.className} text-[10px] tracking-[0.2em] uppercase text-white/40 mb-3 px-5 md:px-14`}>
               Up next
             </div>
             <div
               ref={mobileRailRef}
-              className="flex gap-3 overflow-x-auto px-4 sm:px-0 pb-2 [&::-webkit-scrollbar]:hidden"
+              className="flex gap-3 overflow-x-auto pb-2 px-5 md:px-14 [&::-webkit-scrollbar]:hidden"
               style={{ scrollSnapType: "x mandatory" }}
             >
               {filtered.map((v, index) => {
@@ -1409,6 +1431,8 @@ const VideoTheater = ({ videos }: { videos: VideoItem[] }) => {
                 );
               })}
             </div>
+            <div className="absolute inset-y-0 left-0 w-6 pointer-events-none" style={{ background: `linear-gradient(90deg, ${VOID}, transparent)` }} />
+            <div className="absolute inset-y-0 right-0 w-6 pointer-events-none" style={{ background: `linear-gradient(270deg, ${VOID}, transparent)` }} />
           </div>
         </div>
       </div>
@@ -1462,9 +1486,9 @@ const YPADeals = () => {
                 {i === active && !reduceMotion && (
                   <motion.div
                     key={active}
-                    className="h-full bg-white"
-                    initial={{ width: "0%" }}
-                    animate={{ width: paused ? undefined : "100%" }}
+                    className="h-full w-full bg-white origin-left"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: paused ? undefined : 1 }}
                     transition={{ duration: DURATION / 1000, ease: "linear" }}
                   />
                 )}
@@ -2026,9 +2050,11 @@ const VOICES = [
 const MemberVoices = () => {
   const reduceMotion = useReducedMotion();
   const track = [...VOICES, ...VOICES];
+  const voicesRef = useRef(null);
+  const voicesInView = useInView(voicesRef, { margin: "200px" });
 
   return (
-    <section id="voices" className="py-16 md:py-24 overflow-hidden border-y border-[#1F3B57] bg-[#0E2540] scroll-mt-20">
+    <section id="voices" ref={voicesRef} className="py-16 md:py-24 overflow-hidden border-y border-[#1F3B57] bg-[#0E2540] scroll-mt-20">
       <ScrollReveal className="px-5 md:px-14 max-w-7xl mx-auto mb-6 md:mb-10">
         <div className={`${display.className} text-[11px] md:text-[13px] text-white/40 mb-2`}>
           In their own words
@@ -2040,7 +2066,7 @@ const MemberVoices = () => {
 
       <motion.div
         className="flex gap-4 md:gap-6 px-5"
-        animate={reduceMotion ? {} : { x: ["0%", "-50%"] }}
+        animate={reduceMotion || !voicesInView ? {} : { x: ["0%", "-50%"] }}
         transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
       >
         {track.map((v, i) => (
