@@ -72,27 +72,25 @@ const Navigation = () => {
       items: [
         { name: "Goats", href: "/projects/goats" },
         { name: "Maize", href: "/projects/maize" },
-        { name: "Beekeeping", href: "/projects/beekeeping" },
-        { name: "Planned Kids", href: "/projects/planned-kids" },
+        { name: "SACCO", href: "/sacco" },
+        { name: "Full Ecosystem", href: "/ecosystem" },
       ]
     },
     ecosystem: {
       items: [
+        { name: "Overview", href: "/ecosystem" },
         { name: "Mbuzi Choma", href: "/sister-companies/mbuzi-choma" },
-        { name: "YPA SACCO", href: "https://ypa-wealth-depot.vercel.app/" }, // ✅ UPDATED LINK
+        { name: "SACCO", href: "/sacco" },
         { name: "Machinery Hub", href: "/sister-companies/machinery-hub" },
         { name: "Agribusiness School", href: "/sister-companies/agribusiness-school" },
       ]
     },
     branches: {
       items: [
-        { name: "Rubaga (HQ)", href: "/branches/rubaga" },
-        { name: "Nansana", href: "/branches/nansana" },
-        { name: "Mbarara", href: "/branches/mbarara" },
-        { name: "Masaka", href: "/branches/masaka" },
-        { name: "Gomba", href: "/branches/gomba" },
-        { name: "Dubai", href: "/branches/dubai" },
-        { name: "Zambia", href: "/branches/zambia" },
+        { name: "All Branches", href: "/branches" },
+        { name: "Head Office", href: "/branches" },
+        { name: "Regional Network", href: "/branches" },
+        { name: "Contact Desk", href: "/contact" },
       ]
     },
     media: {

@@ -16,7 +16,7 @@ export default function SisterCompanies() {
       icon: Landmark,
       title: "YPA SACCO",
       description: "Member-owned savings and credit cooperative offering low-interest loans and financial literacy.",
-      href: "/sister-companies/ypa-sacco"
+      href: "/sacco"
     },
     {
       icon: Wrench,
