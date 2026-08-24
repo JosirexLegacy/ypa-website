@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Navigation from "@/components/Navigation";
@@ -78,6 +79,20 @@ const getImageUrl = (image: string | undefined): string | null => {
   return `${API_URL}/assets/${image}`;
 };
 
+const getOptimizedImageUrl = (image: string | undefined, width: number = 500, quality: number = 80): string | null => {
+  const url = getImageUrl(image);
+  if (!url) return null;
+
+  if (url.includes('images.unsplash.com') || url.includes('res.cloudinary.com')) {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}w=${width}&q=${quality}&auto=format,compress`;
+  }
+
+  return url;
+};
+
+const FALLBACK_AVATAR = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&q=80';
+
 // ============================================================
 // DATA FETCHING
 // ============================================================
@@ -153,10 +168,13 @@ const MemberImage = ({ image, name, className }: { image?: string; name: string;
   }
 
   return (
-    <img
-      src={imageUrl}
+    <Image
+      src={getOptimizedImageUrl(image, 500, 80) || FALLBACK_AVATAR}
       alt={name}
       className={className}
+      width={500}
+      height={500}
+      sizes="(max-width: 768px) 100vw, 240px"
       style={{ objectPosition: '50% 20%' }}
       onError={() => setError(true)}
     />

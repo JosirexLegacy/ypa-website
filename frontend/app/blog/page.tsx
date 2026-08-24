@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -107,6 +108,20 @@ function getImageUrl(image: string | undefined): string | null {
   }
   return null;
 }
+
+function getOptimizedImageUrl(image: string | undefined, width: number = 900, quality: number = 75): string | null {
+  const url = getImageUrl(image);
+  if (!url) return null;
+
+  if (url.includes('images.unsplash.com') || url.includes('res.cloudinary.com')) {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}w=${width}&q=${quality}&auto=format,compress`;
+  }
+
+  return url;
+}
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=900&q=80';
 
 // ============================================================
 // CATEGORIES
@@ -451,14 +466,13 @@ export default function BlogPage() {
                 <div className="grid md:grid-cols-5 gap-0">
                   <div className="relative h-[250px] md:h-[380px] md:col-span-2 overflow-hidden bg-[#0A0A0B]">
                     {featuredPost.featured_image ? (
-                      <img
-                        src={getImageUrl(featuredPost.featured_image) || ''}
+                      <Image
+                        src={getOptimizedImageUrl(featuredPost.featured_image, 1200, 80) || FALLBACK_IMAGE}
                         alt={featuredPost.title}
-                        crossOrigin="anonymous"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : null}
                     <div className={`absolute inset-0 flex items-center justify-center ${featuredPost.featured_image ? 'hidden' : ''}`}>
@@ -565,14 +579,13 @@ export default function BlogPage() {
                       <div className="relative rounded-xl md:rounded-2xl border border-white/10 bg-[#0A0A0B] overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-[#00AEEF]/5 hover:-translate-y-1 h-full flex flex-col">
                         <div className="relative w-full h-44 md:h-52 min-h-[176px] md:min-h-[208px] overflow-hidden bg-[#0A0A0B] flex-shrink-0">
                           {post.featured_image ? (
-                            <img
-                              src={getImageUrl(post.featured_image) || ''}
+                            <Image
+                              src={getOptimizedImageUrl(post.featured_image, 900, 80) || FALLBACK_IMAGE}
                               alt={post.title}
-                              crossOrigin="anonymous"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              className="object-cover transition-transform duration-700 group-hover:scale-105"
+                              priority={index < 2}
                             />
                           ) : null}
                           <div className={`absolute inset-0 flex items-center justify-center ${post.featured_image ? 'hidden' : ''}`}>
@@ -633,14 +646,12 @@ export default function BlogPage() {
                       <div className="flex flex-col sm:flex-row gap-4 p-4 md:p-5 rounded-xl md:rounded-2xl border border-white/10 bg-[#0A0A0B] hover:shadow-lg hover:shadow-[#00AEEF]/5 transition-all duration-300 hover:-translate-y-1">
                         <div className="relative w-full sm:w-48 h-32 sm:h-40 rounded-lg overflow-hidden bg-[#0A0A0B] flex-shrink-0">
                           {post.featured_image ? (
-                            <img
-                              src={getImageUrl(post.featured_image) || ''}
+                            <Image
+                              src={getOptimizedImageUrl(post.featured_image, 700, 75) || FALLBACK_IMAGE}
                               alt={post.title}
-                              crossOrigin="anonymous"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              fill
+                              sizes="(max-width: 640px) 100vw, 220px"
+                              className="object-cover transition-transform duration-700 group-hover:scale-105"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">

@@ -1,5 +1,6 @@
 // frontend/app/blog/[slug]/page.tsx
 
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navigation from "@/components/Navigation";
@@ -144,8 +145,25 @@ function getVideoEmbedUrl(url: string) {
 // ============================================================
 function getImageUrl(image: string | undefined): string | null {
   if (!image) return null;
+  if (image.startsWith('http://') || image.startsWith('https://')) {
+    return image;
+  }
   return `${API_URL}/assets/${image}`;
 }
+
+function getOptimizedImageUrl(image: string | undefined, width: number = 1200, quality: number = 80): string | null {
+  const url = getImageUrl(image);
+  if (!url) return null;
+
+  if (url.includes('images.unsplash.com') || url.includes('res.cloudinary.com')) {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}w=${width}&q=${quality}&auto=format,compress`;
+  }
+
+  return url;
+}
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=1200&q=80';
 
 // ============================================================
 // DATA FETCHING - FIXED ✅
@@ -306,10 +324,13 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       <div className="relative w-full px-5 md:px-14">
         <div className="relative w-full aspect-[21/9] max-h-[70vh] min-h-[300px] md:min-h-[400px] overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl">
           {featuredImageUrl ? (
-            <img
-              src={featuredImageUrl}
+            <Image
+              src={getOptimizedImageUrl(post.featured_image, 1400, 85) || FALLBACK_IMAGE}
               alt={post.title}
-              className="w-full h-full object-cover"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 70vw"
+              className="object-cover"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#0E2540] to-[#153455] flex items-center justify-center text-white/20">
@@ -417,10 +438,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                       className="relative aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-[#F5F9FF] hover:shadow-lg transition-shadow group"
                     >
                       {imageUrl && (
-                        <img
-                          src={imageUrl}
+                        <Image
+                          src={getOptimizedImageUrl(image, 1000, 80) || FALLBACK_IMAGE}
                           alt={`${post.title} - Image ${index + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       )}
                     </div>
@@ -548,10 +571,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                   >
                     <div className="relative aspect-[16/9] overflow-hidden bg-[#F6F8FA]">
                       {related.featured_image ? (
-                        <img
-                          src={getImageUrl(related.featured_image) || ''}
+                        <Image
+                          src={getOptimizedImageUrl(related.featured_image, 700, 75) || FALLBACK_IMAGE}
                           alt={related.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 320px"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[#5B6B7A]/30">
