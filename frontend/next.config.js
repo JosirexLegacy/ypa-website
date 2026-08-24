@@ -42,6 +42,26 @@ const nextConfig = {
         hostname: 'farm6.staticflickr.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+        pathname: '/vi/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.youtube-nocookie.com',
+        pathname: '/embed/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.youtube.com',
+        pathname: '/embed/**',
+      },
     ],
   },
   turbopack: {},
